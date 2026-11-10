@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.js";
-import { useCountUp, useReveal, useRevealGroup } from "../hooks.js";
+import { useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.js";
 import CertSwitcher from "./CertSwitcher.jsx";
 
 const STATS = [
@@ -23,7 +23,9 @@ function About({ onOpenImage, onPrefetchLightbox }) {
   const photoRef = useReveal();
   const textRef = useRevealGroup(85);
   const toolsRef = useRevealGroup(65);
-  const journeyRef = useRevealGroup(95);
+  const journeyHeadRef = useRevealGroup(80);
+  const eduCardRef = useJourneyReveal(1750);
+  const expCardRef = useJourneyReveal(1850);
 
   return (
     <section className="about" id="about">
@@ -86,22 +88,22 @@ function About({ onOpenImage, onPrefetchLightbox }) {
       </div>
 
       {/* Pendidikan & Pengalaman Kerja */}
-      <div className="container journey" ref={journeyRef}>
-        <div className="section-center-head" data-reveal-item>
+      <div className="container journey">
+        <div className="section-center-head" ref={journeyHeadRef} data-reveal-item>
           <p className="eyebrow">Education & Experience</p>
           <h3 className="section-heading">
             Pendidikan & <span className="text-grad">Pengalaman Kerja</span>
           </h3>
         </div>
         <div className="journey__grid">
-          <div className="journey-card" data-reveal-item>
+          <div className="journey-card journey-card--left" ref={eduCardRef}>
             <div className="journey-card__head">
               <span className="journey-card__icon" aria-hidden="true">🎓</span>
               <h4>Education</h4>
             </div>
             <ul className="journey-card__list">
-              {EDUCATION_LIST.map(item => (
-                <li key={item.title}>
+              {EDUCATION_LIST.map((item, idx) => (
+                <li key={item.title} style={{ "--item-i": idx }}>
                   <span className="journey-card__period">{item.period}</span>
                   <h5>{item.title}</h5>
                   <p>{item.detail}</p>
@@ -111,21 +113,21 @@ function About({ onOpenImage, onPrefetchLightbox }) {
             <div className="journey-skills">
               <span className="journey-skills__label">Key Skills</span>
               <div className="journey-skills__tags">
-                {KEY_SKILLS.map(skill => (
-                  <span key={skill} className="skill-chip">{skill}</span>
+                {KEY_SKILLS.map((skill, idx) => (
+                  <span key={skill} className="skill-chip" style={{ "--chip-i": idx }}>{skill}</span>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="journey-card" data-reveal-item>
+          <div className="journey-card journey-card--right" ref={expCardRef}>
             <div className="journey-card__head">
               <span className="journey-card__icon" aria-hidden="true">💼</span>
               <h4>Work Experience</h4>
             </div>
             <ul className="journey-card__list">
-              {EXPERIENCE_LIST.map(item => (
-                <li key={item.title}>
+              {EXPERIENCE_LIST.map((item, idx) => (
+                <li key={item.title} style={{ "--item-i": idx }}>
                   <span className="journey-card__period">{item.period}</span>
                   <h5>{item.title}</h5>
                   <p>{item.detail}</p>

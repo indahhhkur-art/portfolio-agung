@@ -77,6 +77,63 @@ export function useReveal() {
   return ref;
 }
 
+/**
+ * Mengamati kartu Pendidikan & Pengalaman Kerja agar animasi bertingkat
+ * baru terpicu saat kartu benar-benar masuk ke area pandang (~82% viewport),
+ * sehingga rangkaian timeline terasa hidup saat dilihat.
+ */
+export function useJourneyReveal(settleMs = 1750) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const card = ref.current;
+    if (!card) return;
+    let settled = 0;
+
+    const activate = () => {
+      if (card.classList.contains("is-animated")) return;
+      card.classList.add("is-animated");
+      settled = window.setTimeout(() => card.classList.add("is-settled"), settleMs);
+    };
+
+    const io = new IntersectionObserver(
+      entries => {
+        entries.forEach(en => {
+          if (en.isIntersecting) {
+            activate();
+            io.disconnect();
+          }
+        });
+      },
+      { rootMargin: "0px 0px -16% 0px", threshold: 0.1 }
+    );
+    io.observe(card);
+
+    // Fallback jika user melompat langsung melewati posisi elemen ke bagian lebih bawah
+    let raf = 0;
+    const onScrollPast = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        if (card.getBoundingClientRect().top <= window.innerHeight * 0.84) {
+          activate();
+          io.disconnect();
+          window.removeEventListener("scroll", onScrollPast);
+        }
+      });
+    };
+    window.addEventListener("scroll", onScrollPast, { passive: true });
+    onScrollPast();
+
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      if (settled) window.clearTimeout(settled);
+      window.removeEventListener("scroll", onScrollPast);
+      io.disconnect();
+    };
+  }, [settleMs]);
+  return ref;
+}
+
 /** Mengamati elemen kartu individu dengan stagger per-baris dan cleanup settle otomatis. */
 export function useRevealCard(delayMs = 0, resetKey = "") {
   const ref = useRef(null);
