@@ -256,8 +256,71 @@ export const CERTS = [
   }
 ];
 
+export const SERVICES = [
+  {
+    category: "ecommerce",
+    icon: "🛒",
+    title: "E-Commerce Design",
+    desc: "Feeds katalog produk marketplace, banner etalase toko, infografis keunggulan, dan visual penunjang konversi."
+  },
+  {
+    category: "social",
+    icon: "📱",
+    title: "Social Media & Campaign",
+    desc: "Konten carousel edukasi, visual promo kampanye, feeds Instagram konsisten, dan aset pemasaran digital."
+  },
+  {
+    category: "print",
+    icon: "📦",
+    title: "Packaging & Print",
+    desc: "Desain kemasan produk siap cetak, label nutrisi, brosur, spanduk, dan materi komunikasi korporat."
+  },
+  {
+    category: "illustration",
+    icon: "✨",
+    title: "Icon & Ilustrasi Vektor",
+    desc: "Paket ikon kustom, ilustrasi karakter flat design, dan aset grafis vektor untuk kebutuhan produk digital."
+  }
+];
+
+export const TOOLS = [
+  { code: "Ps", name: "Photoshop", role: "Retouch & Compositing" },
+  { code: "Ai", name: "Illustrator", role: "Vector & Branding" },
+  { code: "Cd", name: "CorelDRAW", role: "Print & Packaging" },
+  { code: "Fg", name: "Figma", role: "UI & Digital Layout" },
+  { code: "Cv", name: "Canva", role: "Social Media Fast-Kit" },
+  { code: "Of", name: "MS Office", role: "Administrasi & Data" }
+];
+
+export const EDUCATION = [
+  {
+    period: "Sarjana (S1)",
+    title: "STMIK IKMI Cirebon",
+    detail: "Teknik Informatika — dasar kuat di teknologi informasi, pengolahan data, dan sistem digital."
+  },
+  {
+    period: "Sertifikasi 70 Jam",
+    title: "California Institute of the Arts",
+    detail: "Kursus online Graphic Design (20 minggu) bersama Coursera mencakup tipografi, branding & tata letak."
+  }
+];
+
+export const EXPERIENCE = [
+  {
+    period: "Program Magang",
+    title: "Bank Syariah Indonesia (BSI)",
+    detail: "Bidang operasional, administrasi, layanan nasabah, dukungan event perusahaan, serta pengelolaan konten digital pemasaran."
+  },
+  {
+    period: "5+ Tahun",
+    title: "Graphic Designer & Digital Creator",
+    detail: "Menangani desain e-commerce (Beso Shop, Nestiora, Klyroa), kampanye sosial media korporat/instansi, hingga aset microstock."
+  }
+];
+
 export const NAV_ITEMS = [
   { id: "home", label: "Home" },
+  { id: "services", label: "Services" },
   { id: "about", label: "About" },
   { id: "portfolio", label: "Portfolio" },
   { id: "contact", label: "Contact" }

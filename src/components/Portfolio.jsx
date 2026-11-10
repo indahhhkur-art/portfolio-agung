@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { FILTERS, IMG, PROJECTS } from "../data.js";
+import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.js";
 import { useReveal } from "../hooks.js";
 
-export default function Portfolio({ onOpenProject }) {
-  const [filter, setFilter] = useState("all");
+export default function Portfolio({ filter, onFilterChange, onOpenProject }) {
   const headRef = useReveal();
   const filterRef = useReveal();
 
@@ -12,10 +10,15 @@ export default function Portfolio({ onOpenProject }) {
   return (
     <section className="work" id="portfolio">
       <div className="container">
-        <div className="section-head reveal" ref={headRef}>
-          <p className="eyebrow">Portfolio</p>
-          <h2>Karya Pilihan</h2>
-          <p>Klik proyek untuk melihat seluruh karya dan detail pekerjaannya.</p>
+        <div className="section-split reveal" ref={headRef}>
+          <div>
+            <p className="eyebrow">Portfolio</p>
+            <h2 className="section-heading">
+              Karya <span className="text-grad">Pilihan</span>
+            </h2>
+            <p className="section-sub">Klik proyek untuk melihat seluruh karya dan detail pekerjaannya.</p>
+          </div>
+          <span className="work__total">{visible.length} Proyek Ditampilkan</span>
         </div>
 
         <div className="filters reveal" ref={filterRef} role="tablist" aria-label="Filter kategori">
@@ -25,7 +28,7 @@ export default function Portfolio({ onOpenProject }) {
               role="tab"
               aria-selected={filter === f.key}
               className={`chip${filter === f.key ? " is-active" : ""}`}
-              onClick={() => setFilter(f.key)}
+              onClick={() => onFilterChange(f.key)}
             >
               {f.label}
             </button>
@@ -48,13 +51,19 @@ export default function Portfolio({ onOpenProject }) {
                   loading="lazy"
                   decoding="async"
                 />
+                <span className="card__cat">{CATEGORY_LABEL[p.category]}</span>
                 <span className="card__count">{p.images.length} karya</span>
               </div>
               <div className="card__body">
-                <h3>{p.title}</h3>
-                <p>{p.summary}</p>
                 <div className="tags">
                   {p.tags.map(t => <span key={t} className="tag">{t}</span>)}
+                </div>
+                <div className="card__row">
+                  <div className="card__copy">
+                    <h3>{p.title}</h3>
+                    <p>{p.summary}</p>
+                  </div>
+                  <span className="card__arrow" aria-hidden="true">↗</span>
                 </div>
               </div>
             </button>
