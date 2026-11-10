@@ -12,7 +12,7 @@ export const CONTACT = {
 export const IMG = `${import.meta.env.BASE_URL}img/`;
 
 const seq = (prefix, from, to) =>
-  Array.from({ length: to - from + 1 }, (_, i) => `${prefix}${String(from + i).padStart(2, "0")}.jpg`);
+  Array.from({ length: to - from + 1 }, (_, i) => `${prefix}${String(from + i).padStart(2, "0")}.webp`);
 
 export const CATEGORY_LABEL = {
   ecommerce: "E-Commerce",
@@ -41,7 +41,7 @@ export const PROJECTS = [
       "Menyematkan trust badges (Pengiriman 24 Jam, 7 Hari Bebas Pengembalian, 100% Original) untuk memaksimalkan rasio konversi."
     ],
     tags: ["E-Commerce", "Marketplace", "Product Catalog", "Feed"],
-    cover: "beso-01.jpg",
+    cover: "beso-01.webp",
     images: seq("beso-", 1, 18),
     driveUrl: "https://drive.google.com/drive/folders/1cBGb6LCzinVt7YpQimy271-3GaI8I1OV?usp=sharing"
   },
@@ -56,8 +56,8 @@ export const PROJECTS = [
       "Menciptakan konsistensi visual etalase marketplace untuk memperkuat kredibilitas dan citra brand."
     ],
     tags: ["E-Commerce", "Marketplace", "Banner Toko", "Kitchenware"],
-    cover: "nestiora-01.jpg",
-    images: ["nestiora-banner.jpg", ...seq("nestiora-", 1, 18)],
+    cover: "nestiora-01.webp",
+    images: ["nestiora-banner.webp", ...seq("nestiora-", 1, 18)],
     driveUrl: "https://drive.google.com/drive/folders/19bWaCSk_bTSZoj3Jzw3pGaPt2pIw4pwa?usp=sharing"
   },
   {
@@ -71,7 +71,7 @@ export const PROJECTS = [
       "Menghasilkan materi visual konsisten yang meningkatkan daya tarik produk di platform e-commerce."
     ],
     tags: ["E-Commerce", "Marketplace", "Branding", "Premium Kitchen"],
-    cover: "klyroa-01.jpg",
+    cover: "klyroa-01.webp",
     images: seq("klyroa-", 1, 18),
     driveUrl: "https://drive.google.com/drive/folders/1DxQjlqY1MIlzjRy97jjRFSUSTQiK3XI_?usp=drive_link"
   },
@@ -86,11 +86,11 @@ export const PROJECTS = [
       "Menyiapkan materi promosi toko offline berupa standing roll-up banner dan desain kemasan produk (packaging box) siap cetak."
     ],
     tags: ["Social media", "Marketing", "Instagram", "Packaging", "Branding"],
-    cover: "alumina-05.jpg",
+    cover: "alumina-05.webp",
     images: [
-      "alumina-05.jpg", "alumina-06.jpg", "alumina-07.jpg", "alumina-08.jpg",
-      "alumina-09.jpg", "alumina-10.jpg", "alumina-01.jpg", "alumina-02.jpg",
-      "alumina-03.jpg", "alumina-04.jpg"
+      "alumina-05.webp", "alumina-06.webp", "alumina-07.webp", "alumina-08.webp",
+      "alumina-09.webp", "alumina-10.webp", "alumina-01.webp", "alumina-02.webp",
+      "alumina-03.webp", "alumina-04.webp"
     ]
   },
   {
@@ -104,7 +104,7 @@ export const PROJECTS = [
       "Menghadirkan materi promosi paket keberangkatan resmi berizin PPIU Kemenag yang terpercaya."
     ],
     tags: ["Social media", "Marketing", "Instagram", "Travel Umroh"],
-    cover: "elumroh-01.jpg",
+    cover: "elumroh-01.webp",
     images: seq("elumroh-", 1, 13)
   },
   {
@@ -118,7 +118,7 @@ export const PROJECTS = [
       "Memproduksi materi visual promosi sewa & fabrikasi tenda untuk kebutuhan acara, kafe, dan industri."
     ],
     tags: ["Social media", "Marketing", "Instagram", "Branding"],
-    cover: "gudangtenda-01.jpg",
+    cover: "gudangtenda-01.webp",
     images: seq("gudangtenda-", 1, 16)
   },
   {
@@ -132,7 +132,7 @@ export const PROJECTS = [
       "Membuat konten video untuk media sosial."
     ],
     tags: ["Social media", "Marketing", "Instagram"],
-    cover: "schoters-01.jpg",
+    cover: "schoters-01.webp",
     images: seq("schoters-", 1, 27)
   },
   {
@@ -146,7 +146,7 @@ export const PROJECTS = [
       "Menyusun dan mengelola kalender konten tiap platform agar tayang tepat waktu dan relevan."
     ],
     tags: ["Social media", "Marketing", "Instagram"],
-    cover: "disbudpar-01.jpg",
+    cover: "disbudpar-01.webp",
     images: seq("disbudpar-", 1, 7)
   },
   {
@@ -160,8 +160,8 @@ export const PROJECTS = [
       "Layanan Zakat, Infaq, dan Sedekah: materi donasi & konsultasi."
     ],
     tags: ["Social media", "Banner", "Flyer"],
-    cover: "yabinu-flyer.jpg",
-    images: ["yabinu-flyer.jpg", "yabinu-29.jpg", "yabinu-30.jpg", ...seq("yabinu-", 1, 28)]
+    cover: "yabinu-flyer.webp",
+    images: ["yabinu-flyer.webp", "yabinu-29.webp", "yabinu-30.webp", ...seq("yabinu-", 1, 28)]
   },
   {
     id: "ecozest-social",
@@ -174,7 +174,7 @@ export const PROJECTS = [
       "Menerapkan masukan desain untuk meningkatkan hasil proyek."
     ],
     tags: ["Social media", "Marketing", "Instagram"],
-    cover: "ecozest-10.jpg",
+    cover: "ecozest-10.webp",
     images: seq("ecozest-", 1, 27)
   },
   {
@@ -188,8 +188,8 @@ export const PROJECTS = [
       "Menyiapkan file siap cetak lengkap dengan garis potong dan dimensi."
     ],
     tags: ["Packaging", "Label", "Print"],
-    cover: "ecozest-packaging.jpg",
-    images: ["ecozest-packaging.jpg", "ecozest-label.jpg"]
+    cover: "ecozest-packaging.webp",
+    images: ["ecozest-packaging.webp", "ecozest-label.webp"]
   },
   {
     id: "aba",
@@ -201,8 +201,8 @@ export const PROJECTS = [
       "Mendesain tampilan digital kreatif untuk iklan online bagi bisnis lokal."
     ],
     tags: ["Social media", "Marketing", "Instagram"],
-    cover: "aba-poster.jpg",
-    images: ["aba-poster.jpg", "aba-03.jpg", "aba-01.jpg", "aba-02.jpg"]
+    cover: "aba-poster.webp",
+    images: ["aba-poster.webp", "aba-03.webp", "aba-01.webp", "aba-02.webp"]
   },
   {
     id: "microstock",
@@ -215,15 +215,15 @@ export const PROJECTS = [
       "Mendesain tampilan digital kreatif untuk iklan online bagi bisnis lokal."
     ],
     tags: ["Icon", "Flat Design", "Illustration"],
-    cover: "micro-mockup.jpg",
-    images: ["micro-icons-color.jpg", "micro-icons-glyph.jpg", "micro-icons-line.jpg", "micro-mockup.jpg",
-             "micro-illustration.jpg", "micro-ui.jpg", "micro-abstract.jpg"]
+    cover: "micro-mockup.webp",
+    images: ["micro-icons-color.webp", "micro-icons-glyph.webp", "micro-icons-line.webp", "micro-mockup.webp",
+             "micro-illustration.webp", "micro-ui.webp", "micro-abstract.webp"]
   }
 ];
 
 export const CERTS = [
   {
-    src: "cert-01.jpg",
+    src: "cert-01.webp",
     w: 702,
     h: 1006,
     label: "Sertifikat Kompetensi — Desainer Grafis Muda (BNSP)",
@@ -233,7 +233,7 @@ export const CERTS = [
     badge: "BNSP"
   },
   {
-    src: "cert-02.jpg",
+    src: "cert-02.webp",
     w: 711,
     h: 1005,
     label: "Sertifikat Kompetensi — Data Management Staff (BNSP)",
@@ -243,7 +243,7 @@ export const CERTS = [
     badge: "BNSP"
   },
   {
-    src: "cert-03.jpg",
+    src: "cert-03.webp",
     w: 636,
     h: 491,
     label: "Google Digital Marketing & E-commerce (Coursera)",
@@ -253,7 +253,7 @@ export const CERTS = [
     badge: "Google"
   },
   {
-    src: "cert-04.jpg",
+    src: "cert-04.webp",
     w: 636,
     h: 491,
     label: "Graphic Design Specialization — CalArts (Coursera)",

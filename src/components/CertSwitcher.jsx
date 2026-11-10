@@ -1,9 +1,8 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { IMG } from "../data.js";
 import { useRevealGroup } from "../hooks.js";
-import Picture, { toWebpSrc } from "./Picture.jsx";
 
-function CertSwitcher({ items, onOpenImage }) {
+function CertSwitcher({ items, onOpenImage, onPrefetch }) {
   const sectionRef = useRevealGroup(95);
   const trackRef = useRef(null);
   const cardRefs = useRef([]);
@@ -232,6 +231,8 @@ function CertSwitcher({ items, onOpenImage }) {
               type="button"
               className={`cert-app${active === i ? " is-focused" : ""}`}
               aria-label={`Lihat ${c.label}`}
+              onPointerEnter={onPrefetch}
+              onFocus={onPrefetch}
               onClick={e => onCardClick(i, e)}
             >
               <div className="cert-app__bar">
@@ -243,9 +244,8 @@ function CertSwitcher({ items, onOpenImage }) {
                 <span className="cert-app__zoom" aria-hidden="true">↗</span>
               </div>
               <div className="cert-app__screen">
-                <Picture
+                <img
                   src={`${IMG}${c.src}`}
-                  webpSrc={toWebpSrc(c.src)}
                   alt={c.label}
                   width={c.w}
                   height={c.h}

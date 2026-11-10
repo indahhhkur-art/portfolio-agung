@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import Navbar from "./components/Navbar.jsx";
 import Hero from "./components/Hero.jsx";
 import About from "./components/About.jsx";
 import Portfolio from "./components/Portfolio.jsx";
 import Contact from "./components/Contact.jsx";
-import ProjectModal from "./components/ProjectModal.jsx";
-import Lightbox from "./components/Lightbox.jsx";
+import ScrollUI from "./components/ScrollUI.jsx";
 import { useAnimatedPresence, useBodyLock, useSmoothScroll } from "./hooks.js";
+
+const loadModal = () => import("./components/ProjectModal.jsx");
+const loadLightbox = () => import("./components/Lightbox.jsx");
+
+const ProjectModal = lazy(loadModal);
+const Lightbox = lazy(loadLightbox);
 
 export default function App() {
   const [filter, setFilter] = useState("all");
@@ -38,11 +43,18 @@ export default function App() {
 
   return (
     <>
+      <a href="#main" className="skip-link">Lewati ke konten utama</a>
+      <ScrollUI hidden={overlayOpen} />
       <Navbar />
-      <main>
+      <main id="main">
         <Hero />
-        <About onOpenImage={openImage} />
-        <Portfolio filter={filter} onFilterChange={setFilter} onOpenProject={setProject} />
+        <About onOpenImage={openImage} onPrefetchLightbox={loadLightbox} />
+        <Portfolio
+          filter={filter}
+          onFilterChange={setFilter}
+          onOpenProject={setProject}
+          onPrefetchModal={loadModal}
+        />
         <Contact />
       </main>
 
@@ -65,23 +77,25 @@ export default function App() {
         </div>
       </footer>
 
-      {modalPres.rendered && (
-        <ProjectModal
-          project={modalPres.rendered}
-          closing={modalPres.closing}
-          onClose={closeProject}
-          onOpenImage={openImage}
-        />
-      )}
-      {lbPres.rendered && (
-        <Lightbox
-          items={lbPres.rendered.items}
-          index={lbPres.rendered.index}
-          closing={lbPres.closing}
-          onClose={closeImage}
-          onStep={stepImage}
-        />
-      )}
+      <Suspense fallback={null}>
+        {modalPres.rendered && (
+          <ProjectModal
+            project={modalPres.rendered}
+            closing={modalPres.closing}
+            onClose={closeProject}
+            onOpenImage={openImage}
+          />
+        )}
+        {lbPres.rendered && (
+          <Lightbox
+            items={lbPres.rendered.items}
+            index={lbPres.rendered.index}
+            closing={lbPres.closing}
+            onClose={closeImage}
+            onStep={stepImage}
+          />
+        )}
+      </Suspense>
     </>
   );
 }

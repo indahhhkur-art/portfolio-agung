@@ -1,9 +1,13 @@
 import { memo, useEffect, useRef } from "react";
 import { CATEGORY_LABEL, IMG } from "../data.js";
+import { useFocusTrap } from "../hooks.js";
 
 function ProjectModal({ project, closing, onClose, onOpenImage }) {
+  const modalRef = useRef(null);
   const panelRef = useRef(null);
   const closeRef = useRef(null);
+
+  useFocusTrap(modalRef, !closing);
 
   useEffect(() => {
     const prev = document.activeElement;
@@ -16,6 +20,7 @@ function ProjectModal({ project, closing, onClose, onOpenImage }) {
 
   return (
     <div
+      ref={modalRef}
       className={`modal ${closing ? "is-closing" : "is-open"}`}
       role="dialog"
       aria-modal="true"
@@ -25,7 +30,10 @@ function ProjectModal({ project, closing, onClose, onOpenImage }) {
       <div className="modal__panel" ref={panelRef}>
         <button className="icon-btn modal__close" ref={closeRef} onClick={onClose} aria-label="Tutup">✕</button>
         <div className="modal__head">
-          <p className="eyebrow">{CATEGORY_LABEL[project.category]}</p>
+          <div className="modal__meta-top">
+            <p className="eyebrow">{CATEGORY_LABEL[project.category]}</p>
+            <span className="modal__badge">{items.length} Karya Desain</span>
+          </div>
           <h3 id="modalTitle">{project.title}</h3>
           <ul className="modal__bullets">
             {project.bullets.map(b => <li key={b}>{b}</li>)}
@@ -54,7 +62,14 @@ function ProjectModal({ project, closing, onClose, onOpenImage }) {
               aria-label={`Perbesar ${it.label}`}
               onClick={() => onOpenImage(items, i)}
             >
-              <img src={`${IMG}${it.src}`} alt={it.label} loading="lazy" decoding="async" />
+              <img
+                ref={el => { if (el?.complete) el.classList.add("is-loaded"); }}
+                src={`${IMG}${it.src}`}
+                alt={it.label}
+                loading="lazy"
+                decoding="async"
+                onLoad={e => e.currentTarget.classList.add("is-loaded")}
+              />
             </button>
           ))}
         </div>

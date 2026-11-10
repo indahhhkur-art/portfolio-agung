@@ -8,7 +8,7 @@ let sweepRaf = 0;
 
 function runRevealSweep() {
   sweepRaf = 0;
-  const triggerLine = window.innerHeight * 0.94;
+  const triggerLine = window.innerHeight * 0.95;
   pendingRevealNodes.forEach(node => {
     const rect = node.getBoundingClientRect();
     if (rect.top <= triggerLine) {
@@ -53,7 +53,7 @@ function getRevealObserver() {
         sharedRevealIO.unobserve(en.target);
       });
     },
-    { rootMargin: "0px 0px -5% 0px", threshold: 0.01 }
+    { rootMargin: "0px 0px -4% 0px", threshold: 0.01 }
   );
   return sharedRevealIO;
 }
@@ -77,9 +77,52 @@ export function useReveal() {
   return ref;
 }
 
+/** Mengamati elemen kartu individu dengan stagger per-baris dan cleanup settle otomatis. */
+export function useRevealCard(delayMs = 0, resetKey = "") {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.classList.remove("is-shown", "is-settled");
+    let settleTimer = 0;
+
+    const show = () => {
+      el.style.setProperty("--reveal-delay", `${delayMs}ms`);
+      el.classList.add("is-shown");
+      settleTimer = window.setTimeout(() => {
+        el.classList.add("is-settled");
+        el.style.removeProperty("--reveal-delay");
+      }, 760 + delayMs);
+    };
+
+    const io = getRevealObserver();
+    revealCallbacks.set(el, show);
+    pendingRevealNodes.add(el);
+    io.observe(el);
+
+    const raf = window.requestAnimationFrame(() => {
+      if (el.getBoundingClientRect().top <= window.innerHeight * 0.95 && revealCallbacks.has(el)) {
+        show();
+        revealCallbacks.delete(el);
+        pendingRevealNodes.delete(el);
+        io.unobserve(el);
+      }
+    });
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      if (settleTimer) window.clearTimeout(settleTimer);
+      revealCallbacks.delete(el);
+      pendingRevealNodes.delete(el);
+      io.unobserve(el);
+    };
+  }, [delayMs, resetKey]);
+  return ref;
+}
+
 /**
  * Mengamati kontainer dan memunculkan seluruh child [data-reveal-item] secara bertahap
- * (staggered power3.out ala ScrollTrigger), lalu membersihkan delay setelah selesai.
+ * (staggered power3.out), lalu membersihkan delay setelah selesai.
  */
 export function useRevealGroup(staggerMs = 85, triggerKey = "") {
   const ref = useRef(null);
@@ -89,7 +132,6 @@ export function useRevealGroup(staggerMs = 85, triggerKey = "") {
     const items = Array.from(root.querySelectorAll("[data-reveal-item]"));
     const targets = items.length ? items : [root];
 
-    // Reset state saat filter kategori berganti agar animasi masuk terputar rapi
     targets.forEach(el => el.classList.remove("is-shown", "is-settled"));
 
     let settleTimer = 0;
@@ -112,9 +154,8 @@ export function useRevealGroup(staggerMs = 85, triggerKey = "") {
     pendingRevealNodes.add(root);
     io.observe(root);
 
-    // Jika node sudah terlihat langsung (misal setelah klik filter portfolio)
     const immediateCheck = window.requestAnimationFrame(() => {
-      if (root.getBoundingClientRect().top <= window.innerHeight * 0.94 && revealCallbacks.has(root)) {
+      if (root.getBoundingClientRect().top <= window.innerHeight * 0.95 && revealCallbacks.has(root)) {
         triggerShow();
         revealCallbacks.delete(root);
         pendingRevealNodes.delete(root);
@@ -306,6 +347,31 @@ export function useScrollSpy(ids) {
     };
   }, [ids]);
   return state;
+}
+
+/** Mengunci focus Tab tetap berputar di dalam dialog aktif demi aksesibilitas penuh. */
+export function useFocusTrap(containerRef, active = true) {
+  useEffect(() => {
+    if (!active) return;
+    const onKeyDown = e => {
+      if (e.key !== "Tab" || !containerRef.current) return;
+      const focusable = containerRef.current.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [containerRef, active]);
 }
 
 /** Mengunci scroll body tanpa menyebabkan layout shift akibat hilangnya scrollbar desktop. */

@@ -1,11 +1,60 @@
 import { memo, useMemo } from "react";
 import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.js";
-import { useRevealGroup } from "../hooks.js";
+import { useRevealCard, useRevealGroup } from "../hooks.js";
 import Picture, { toWebpSrc } from "./Picture.jsx";
 
-function Portfolio({ filter, onFilterChange, onOpenProject }) {
+const ProjectCard = memo(function ProjectCard({ project, index, filter, onOpen, onPrefetch }) {
+  const cardRef = useRevealCard((index % 4) * 70, filter);
+
+  return (
+    <button
+      ref={cardRef}
+      type="button"
+      className="card"
+      data-reveal-item
+      onPointerEnter={onPrefetch}
+      onFocus={onPrefetch}
+      onClick={() => onOpen(project)}
+    >
+      <div className="card__media">
+        <Picture
+          src={`${IMG}${project.cover}`}
+          webpSrc={toWebpSrc(project.cover, "thumbs/")}
+          alt={`Cover proyek ${project.title}`}
+          width={400}
+          height={300}
+          loading="lazy"
+          decoding="async"
+        />
+        <span className="card__cat">{CATEGORY_LABEL[project.category]}</span>
+        <span className="card__count">{project.images.length} karya</span>
+      </div>
+      <div className="card__body">
+        <div className="tags">
+          {project.tags.map(t => <span key={t} className="tag">{t}</span>)}
+        </div>
+        <div className="card__row">
+          <div className="card__copy">
+            <h3>{project.title}</h3>
+            <p>{project.summary}</p>
+          </div>
+          <span className="card__arrow" aria-hidden="true">↗</span>
+        </div>
+      </div>
+    </button>
+  );
+});
+
+function Portfolio({ filter, onFilterChange, onOpenProject, onPrefetchModal }) {
   const headRef = useRevealGroup(80);
-  const cardsRef = useRevealGroup(65, filter);
+
+  const counts = useMemo(() => {
+    const map = { all: PROJECTS.length };
+    PROJECTS.forEach(p => {
+      map[p.category] = (map[p.category] || 0) + 1;
+    });
+    return map;
+  }, []);
 
   const visible = useMemo(
     () => PROJECTS.filter(p => filter === "all" || p.category === filter),
@@ -36,47 +85,22 @@ function Portfolio({ filter, onFilterChange, onOpenProject }) {
                 className={`chip${filter === f.key ? " is-active" : ""}`}
                 onClick={() => onFilterChange(f.key)}
               >
-                {f.label}
+                {f.label} <span className="chip__num">{counts[f.key] || 0}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="cards" key={filter} ref={cardsRef}>
-          {visible.map(p => (
-            <button
+        <div className="cards">
+          {visible.map((p, idx) => (
+            <ProjectCard
               key={p.id}
-              type="button"
-              className="card"
-              data-reveal-item
-              onClick={() => onOpenProject(p)}
-            >
-              <div className="card__media">
-                <Picture
-                  src={`${IMG}${p.cover}`}
-                  webpSrc={toWebpSrc(p.cover, "thumbs/")}
-                  alt={`Cover proyek ${p.title}`}
-                  width={400}
-                  height={300}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span className="card__cat">{CATEGORY_LABEL[p.category]}</span>
-                <span className="card__count">{p.images.length} karya</span>
-              </div>
-              <div className="card__body">
-                <div className="tags">
-                  {p.tags.map(t => <span key={t} className="tag">{t}</span>)}
-                </div>
-                <div className="card__row">
-                  <div className="card__copy">
-                    <h3>{p.title}</h3>
-                    <p>{p.summary}</p>
-                  </div>
-                  <span className="card__arrow" aria-hidden="true">↗</span>
-                </div>
-              </div>
-            </button>
+              project={p}
+              index={idx}
+              filter={filter}
+              onOpen={onOpenProject}
+              onPrefetch={onPrefetchModal}
+            />
           ))}
         </div>
       </div>

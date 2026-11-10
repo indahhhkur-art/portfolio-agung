@@ -2,7 +2,6 @@ import { memo } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.js";
 import { useCountUp, useReveal, useRevealGroup } from "../hooks.js";
 import CertSwitcher from "./CertSwitcher.jsx";
-import Picture, { toWebpSrc } from "./Picture.jsx";
 
 const STATS = [
   { value: "5+", label: "Tahun pengalaman" },
@@ -20,7 +19,7 @@ function StatCounter({ value, label }) {
   );
 }
 
-function About({ onOpenImage }) {
+function About({ onOpenImage, onPrefetchLightbox }) {
   const photoRef = useReveal();
   const textRef = useRevealGroup(85);
   const toolsRef = useRevealGroup(65);
@@ -30,9 +29,8 @@ function About({ onOpenImage }) {
     <section className="about" id="about">
       <div className="container about__inner">
         <div className="about__photo reveal" ref={photoRef}>
-          <Picture
-            src={`${IMG}agung-photo.jpg`}
-            webpSrc={toWebpSrc("agung-photo.jpg")}
+          <img
+            src={`${IMG}agung-photo.webp`}
             alt="Foto Agung Saeful"
             width={1140}
             height={1311}
@@ -138,7 +136,7 @@ function About({ onOpenImage }) {
         </div>
       </div>
 
-      <CertSwitcher items={CERTS} onOpenImage={onOpenImage} />
+      <CertSwitcher items={CERTS} onOpenImage={onOpenImage} onPrefetch={onPrefetchLightbox} />
     </section>
   );
 }
