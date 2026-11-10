@@ -1,12 +1,12 @@
-import { CERTS, IMG } from "../data.js";
+import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.js";
 import { useReveal } from "../hooks.js";
 import CertSwitcher from "./CertSwitcher.jsx";
 
-const EDUCATION = [
-  { school: "STMIK IKMI Cirebon", detail: "Sarjana (S1), Teknik Informatika" },
+const SUMMARY_EDU = [
+  { school: "STMIK IKMI Cirebon", detail: "S1 Teknik Informatika (Lulus 2025 · IPK 3.82/4.00)" },
   {
     school: "California Institute of the Arts",
-    detail: "Kursus online Graphic Design, program sertifikat 20 minggu / 70 jam bersama Coursera."
+    detail: "Online Certificate Graphic Design, Branding & Digital Marketing (Complete/Pass)."
   }
 ];
 
@@ -19,6 +19,8 @@ const STATS = [
 export default function About({ onOpenImage }) {
   const photoRef = useReveal();
   const textRef = useReveal();
+  const toolsRef = useReveal();
+  const journeyRef = useReveal();
 
   return (
     <section className="about" id="about">
@@ -47,7 +49,7 @@ export default function About({ onOpenImage }) {
           </p>
 
           <ul className="edu">
-            {EDUCATION.map(e => (
+            {SUMMARY_EDU.map(e => (
               <li key={e.school}>
                 <span className="edu__icon" aria-hidden="true">🎓</span>
                 <div>
@@ -62,6 +64,76 @@ export default function About({ onOpenImage }) {
             {STATS.map(s => (
               <div key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Perangkat Kerja & Desain */}
+      <div className="container tools-block reveal" ref={toolsRef}>
+        <div className="section-center-head">
+          <p className="eyebrow">My Tools</p>
+          <h3 className="section-heading">
+            Perangkat <span className="text-grad">Kerja & Desain</span>
+          </h3>
+        </div>
+        <div className="tools__grid">
+          {TOOLS.map(t => (
+            <div className="tool-pill" key={t.code}>
+              <div className="tool-pill__icon" aria-hidden="true">{t.code}</div>
+              <strong>{t.name}</strong>
+              <span>{t.role}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Pendidikan & Pengalaman Kerja */}
+      <div className="container journey reveal" ref={journeyRef}>
+        <div className="section-center-head">
+          <p className="eyebrow">Education & Experience</p>
+          <h3 className="section-heading">
+            Pendidikan & <span className="text-grad">Pengalaman Kerja</span>
+          </h3>
+        </div>
+        <div className="journey__grid">
+          <div className="journey-card">
+            <div className="journey-card__head">
+              <span className="journey-card__icon" aria-hidden="true">🎓</span>
+              <h4>Education</h4>
+            </div>
+            <ul className="journey-card__list">
+              {EDUCATION_LIST.map(item => (
+                <li key={item.title}>
+                  <span className="journey-card__period">{item.period}</span>
+                  <h5>{item.title}</h5>
+                  <p>{item.detail}</p>
+                </li>
+              ))}
+            </ul>
+            <div className="journey-skills">
+              <span className="journey-skills__label">Key Skills</span>
+              <div className="journey-skills__tags">
+                {KEY_SKILLS.map(skill => (
+                  <span key={skill} className="skill-chip">{skill}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="journey-card">
+            <div className="journey-card__head">
+              <span className="journey-card__icon" aria-hidden="true">💼</span>
+              <h4>Work Experience</h4>
+            </div>
+            <ul className="journey-card__list">
+              {EXPERIENCE_LIST.map(item => (
+                <li key={item.title}>
+                  <span className="journey-card__period">{item.period}</span>
+                  <h5>{item.title}</h5>
+                  <p>{item.detail}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

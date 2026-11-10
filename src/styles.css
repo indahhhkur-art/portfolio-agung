@@ -140,6 +140,61 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .stats strong { display: block; font-size: 2.1rem; font-weight: 800; line-height: 1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .stats span { font-size: .8rem; color: var(--muted); }
 
+/* Tools Strip (Sesuai Referensi Screenshot: Kapsul Oval 3 Kolom x 2 Baris) */
+.section-center-head { text-align: center; margin-bottom: 2rem; }
+.tools-block { padding: 72px 0 18px; }
+.tools__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
+.tool-pill {
+  background: var(--bg); border: 1.5px solid #e9ecf7; border-radius: 999px;
+  padding: 1.35rem 1.2rem; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: .42rem;
+  contain: layout style paint;
+  transition: transform .25s var(--ease-smooth), box-shadow .25s var(--ease-smooth), background-color .2s ease;
+}
+.tool-pill:hover {
+  transform: translate3d(0, -5px, 0); background: #fff;
+  box-shadow: 0 12px 26px rgba(70, 80, 140, .12);
+}
+.tool-pill__icon {
+  width: 48px; height: 48px; border-radius: 50%; background: var(--grad); color: #fff;
+  font-weight: 800; font-size: .95rem; display: grid; place-items: center;
+  box-shadow: 0 6px 14px rgba(110, 110, 200, .25);
+}
+.tool-pill strong { font-size: .94rem; font-weight: 700; color: var(--ink); }
+.tool-pill span { font-size: .76rem; color: var(--muted); font-family: "Montserrat", sans-serif; line-height: 1.35; }
+
+/* Education & Work Experience Cards */
+.journey { padding: 60px 0 12px; }
+.journey__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem; align-items: stretch; }
+.journey-card {
+  background: var(--bg); border: 1.5px solid #e9ecf7; border-radius: 22px; padding: 1.8rem;
+  display: flex; flex-direction: column; contain: layout style paint;
+  transition: transform .26s var(--ease-smooth), box-shadow .26s var(--ease-smooth), background-color .2s ease;
+}
+.journey-card:hover { transform: translate3d(0, -4px, 0); box-shadow: 0 14px 32px rgba(70, 80, 140, .09); background: #fff; }
+.journey-card__head { display: flex; align-items: center; gap: .85rem; margin-bottom: 1.35rem; padding-bottom: 1rem; border-bottom: 1px solid #e3e7f5; }
+.journey-card__icon {
+  width: 46px; height: 46px; border-radius: 50%; background: var(--grad); color: #fff;
+  display: grid; place-items: center; font-size: 1.25rem; box-shadow: 0 6px 14px rgba(120, 110, 200, .26);
+}
+.journey-card__head h4 { margin: 0; font-size: 1.18rem; font-weight: 700; color: #46464b; }
+.journey-card__list { display: grid; gap: 1.15rem; margin-bottom: 1.35rem; }
+.journey-card__list li { padding-left: .95rem; border-left: 3px solid var(--blue); }
+.journey-card__period { font-size: .74rem; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: .06em; }
+.journey-card__list h5 { font-size: .96rem; font-weight: 700; color: var(--ink); margin: .15rem 0 .25rem; }
+.journey-card__list p { font-size: .84rem; color: var(--muted); font-family: "Montserrat", sans-serif; line-height: 1.5; }
+
+.journey-skills { margin-top: auto; padding-top: 1.35rem; border-top: 1px dashed #dde2f2; }
+.journey-skills__label {
+  display: inline-block; font-size: .74rem; font-weight: 700; color: var(--blue);
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: .65rem;
+}
+.journey-skills__tags { display: flex; flex-wrap: wrap; gap: .45rem; }
+.skill-chip {
+  font-size: .76rem; font-weight: 600; color: var(--ink);
+  background: #fff; border: 1px solid #dfe4f4; padding: .3rem .75rem; border-radius: 999px;
+}
+
 /* Certification — Model Recent Apps (Kiri ke Kanan) */
 .certs { padding: 70px 0 18px; }
 .certs__head {
@@ -478,7 +533,8 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 
 /* Responsive */
 @media (max-width: 900px) {
-  .hero__inner, .about__inner { grid-template-columns: 1fr; }
+  .hero__inner, .about__inner, .journey__grid { grid-template-columns: 1fr; }
+  .tools__grid { grid-template-columns: repeat(2, 1fr); }
   .hero { padding-top: 110px; }
   .hero__art { order: -1; max-width: 420px; margin-inline: auto; }
   .about__photo { max-width: 340px; margin-inline: auto; }

@@ -256,6 +256,61 @@ export const CERTS = [
   }
 ];
 
+export const TOOLS = [
+  { code: "Ai", name: "Adobe Illustrator", role: "Vector & Brand Design" },
+  { code: "Cd", name: "CorelDRAW", role: "Print & Layout Assets" },
+  { code: "Cv", name: "Canva", role: "Social Media & Promo" },
+  { code: "Of", name: "Microsoft Office", role: "Administrasi & Data" },
+  { code: "Cc", name: "CapCut Desktop", role: "Short-Form Video" },
+  { code: "Fm", name: "Filmora", role: "Video Editing" }
+];
+
+export const EDUCATION_LIST = [
+  {
+    period: "Lulus 2025 · IPK 3.82 / 4.00",
+    title: "S1 Teknik Informatika — STMIK IKMI Cirebon",
+    detail: "Analisis Data, Ilmu Data, Data Management, dan Sistem Basis Data."
+  },
+  {
+    period: "Online Certificate · Complete / Pass",
+    title: "California Institute of the Arts",
+    detail: "Graphic Design, Branding Marketing, Social Marketing, dan Digital Branding."
+  }
+];
+
+export const KEY_SKILLS = [
+  "Graphic Design",
+  "Video Editing",
+  "Social Media Management",
+  "Branding & Digital Marketing",
+  "Cloud Management",
+  "Data Management",
+  "Sales & Client Follow-up"
+];
+
+export const EXPERIENCE_LIST = [
+  {
+    period: "Internship · Sales Representative Junior",
+    title: "Bank Syariah Indonesia (BSI)",
+    detail: "Aktivasi & promosi QRIS serta digital banking (30–100 aktivasi/hari) dan follow-up harian 30 nasabah via WhatsApp."
+  },
+  {
+    period: "August 2023 – December 2023",
+    title: "Schoters by Ruangguru — Graphic Design Intern",
+    detail: "Menyelesaikan desain selaras brand guidelines dalam tenggat 3 hari (3–8 variasi/proyek) untuk mendukung pemasaran digital."
+  },
+  {
+    period: "May 2023 – June 2023",
+    title: "DPRD Kabupaten Cirebon — Administrasi Staff",
+    detail: "Mengelola dokumen & data, administrasi kegiatan/event, serta dokumentasi foto dan video publikasi lembaga."
+  },
+  {
+    period: "December 2020 – December 2022",
+    title: "Ecozest — Graphic Design & Marketing Staff",
+    detail: "Merancang puluhan aset konten digital bulanan dengan CorelDRAW, Illustrator, dan Canva (3–12 aset/proyek dalam 2 hari kerja)."
+  }
+];
+
 export const NAV_ITEMS = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
