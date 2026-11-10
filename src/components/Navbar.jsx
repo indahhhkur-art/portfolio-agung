@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { NAV_ITEMS } from "../data.js";
 import { useScrollSpy } from "../hooks.js";
 
 const IDS = NAV_ITEMS.map(n => n.id);
 
-export default function Navbar() {
+function Navbar() {
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef(null);
   const active = useScrollSpy(IDS);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = e => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <header className="nav">
@@ -21,6 +34,7 @@ export default function Navbar() {
           Agung saeful
         </a>
         <button
+          ref={toggleRef}
           className="nav__toggle"
           aria-label="Buka menu"
           aria-expanded={open}
@@ -44,3 +58,5 @@ export default function Navbar() {
     </header>
   );
 }
+
+export default memo(Navbar);

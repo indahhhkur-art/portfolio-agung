@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { IMG } from "../data.js";
 
-export default function Lightbox({ items, index, closing, onClose, onStep }) {
+function Lightbox({ items, index, closing, onClose, onStep }) {
   const closeRef = useRef(null);
   const figRef = useRef(null);
   const touchRef = useRef({ active: false, startX: 0, dx: 0 });
@@ -89,3 +89,5 @@ export default function Lightbox({ items, index, closing, onClose, onStep }) {
     </div>
   );
 }
+
+export default memo(Lightbox);

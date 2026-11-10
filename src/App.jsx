@@ -20,6 +20,7 @@ export default function App() {
 
   const openImage = useCallback((items, index) => setLightbox({ items, index }), []);
   const closeImage = useCallback(() => setLightbox(null), []);
+  const closeProject = useCallback(() => setProject(null), []);
   const stepImage = useCallback(
     d => setLightbox(lb => lb && { ...lb, index: (lb.index + d + lb.items.length) % lb.items.length }),
     []
@@ -66,7 +67,7 @@ export default function App() {
         <ProjectModal
           project={modalPres.rendered}
           closing={modalPres.closing}
-          onClose={() => setProject(null)}
+          onClose={closeProject}
           onOpenImage={openImage}
         />
       )}

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { IMG } from "../data.js";
 import { useReveal } from "../hooks.js";
+import Picture, { toWebpSrc } from "./Picture.jsx";
 
-export default function CertSwitcher({ items, onOpenImage }) {
+function CertSwitcher({ items, onOpenImage }) {
   const sectionRef = useReveal();
   const trackRef = useRef(null);
   const cardRefs = useRef([]);
@@ -14,15 +15,24 @@ export default function CertSwitcher({ items, onOpenImage }) {
   const syncCards = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
-    const isNarrow = track.clientWidth < 680;
-    const centerX = track.scrollLeft + track.clientWidth / 2;
+
+    // Batch seluruh DOM reads terlebih dahulu sebelum melakukan writes agar tidak memicu layout thrashing
+    const clientW = track.clientWidth;
+    const scrollLeft = track.scrollLeft;
+    const scrollW = track.scrollWidth;
+    const isNarrow = clientW < 680;
+    const centerX = scrollLeft + clientW / 2;
+    const metrics = cardRefs.current.map(card =>
+      card ? { card, left: card.offsetLeft, width: card.offsetWidth } : null
+    );
 
     let closestIdx = 0;
     let closestDist = Infinity;
+    const updates = [];
 
-    cardRefs.current.forEach((card, i) => {
-      if (!card) return;
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+    metrics.forEach((m, i) => {
+      if (!m) return;
+      const cardCenter = m.left + m.width / 2;
       const delta = cardCenter - centerX;
       const absDelta = Math.abs(delta);
       if (absDelta < closestDist) {
@@ -31,17 +41,25 @@ export default function CertSwitcher({ items, onOpenImage }) {
       }
 
       if (isNarrow && !dragRef.current.active) {
-        const norm = Math.max(-1.6, Math.min(1.6, delta / Math.max(card.offsetWidth, 1)));
+        const norm = Math.max(-1.6, Math.min(1.6, delta / Math.max(m.width, 1)));
         const absNorm = Math.abs(norm);
         const scale = 1 - Math.min(absNorm, 1.4) * 0.085;
         const opacity = 1 - Math.min(absNorm, 1.5) * 0.22;
         const shiftY = Math.min(absNorm, 1.4) * 8;
-        card.style.transform = `translate3d(0, ${shiftY.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`;
-        card.style.opacity = opacity.toFixed(3);
+        updates.push({
+          card: m.card,
+          transform: `translate3d(0, ${shiftY.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`,
+          opacity: opacity.toFixed(3)
+        });
       } else {
-        card.style.transform = "";
-        card.style.opacity = "";
+        updates.push({ card: m.card, transform: "", opacity: "" });
       }
+    });
+
+    // Batch seluruh DOM writes sekaligus
+    updates.forEach(u => {
+      if (u.card.style.transform !== u.transform) u.card.style.transform = u.transform;
+      if (u.card.style.opacity !== u.opacity) u.card.style.opacity = u.opacity;
     });
 
     if (Date.now() < scrollLockRef.current.until && scrollLockRef.current.index != null) {
@@ -49,9 +67,9 @@ export default function CertSwitcher({ items, onOpenImage }) {
     }
 
     if (!isNarrow) {
-      const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+      const maxScroll = Math.max(0, scrollW - clientW);
       if (maxScroll > 0) {
-        const progress = Math.max(0, Math.min(1, track.scrollLeft / maxScroll));
+        const progress = Math.max(0, Math.min(1, scrollLeft / maxScroll));
         closestIdx = Math.round(progress * Math.max(1, items.length - 1));
       }
     }
@@ -73,11 +91,12 @@ export default function CertSwitcher({ items, onOpenImage }) {
 
     syncCards();
     track.addEventListener("scroll", scheduleSync, { passive: true });
-    window.addEventListener("resize", scheduleSync, { passive: true });
+    const ro = new ResizeObserver(scheduleSync);
+    ro.observe(track);
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
       track.removeEventListener("scroll", scheduleSync);
-      window.removeEventListener("resize", scheduleSync);
+      ro.disconnect();
     };
   }, [syncCards]);
 
@@ -101,7 +120,6 @@ export default function CertSwitcher({ items, onOpenImage }) {
     scrollToIndex(next);
   }, [active, items.length, scrollToIndex]);
 
-  // Desktop mouse click-and-drag scrolling (menjaga tap/swipe native di layar sentuh)
   useEffect(() => {
     const onMove = e => {
       const d = dragRef.current;
@@ -139,8 +157,7 @@ export default function CertSwitcher({ items, onOpenImage }) {
   }, [syncCards]);
 
   const onPointerDown = e => {
-    if (e.pointerType !== "mouse" || e.button !== 0) return;
-    if (!trackRef.current) return;
+    if (e.pointerType !== "mouse" || e.button !== 0 || !trackRef.current) return;
     dragRef.current = {
       active: true,
       pointerId: e.pointerId,
@@ -226,7 +243,16 @@ export default function CertSwitcher({ items, onOpenImage }) {
                 <span className="cert-app__zoom" aria-hidden="true">↗</span>
               </div>
               <div className="cert-app__screen">
-                <img src={`${IMG}${c.src}`} alt={c.label} loading="lazy" decoding="async" draggable={false} />
+                <Picture
+                  src={`${IMG}${c.src}`}
+                  webpSrc={toWebpSrc(c.src)}
+                  alt={c.label}
+                  width={c.w}
+                  height={c.h}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                />
               </div>
             </button>
           ))}
@@ -249,3 +275,5 @@ export default function CertSwitcher({ items, onOpenImage }) {
     </div>
   );
 }
+
+export default memo(CertSwitcher);

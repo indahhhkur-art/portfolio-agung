@@ -224,6 +224,8 @@ export const PROJECTS = [
 export const CERTS = [
   {
     src: "cert-01.jpg",
+    w: 702,
+    h: 1006,
     label: "Sertifikat Kompetensi — Desainer Grafis Muda (BNSP)",
     shortTitle: "Junior Graphic Designer",
     issuer: "BNSP · LSP Informatika",
@@ -232,6 +234,8 @@ export const CERTS = [
   },
   {
     src: "cert-02.jpg",
+    w: 711,
+    h: 1005,
     label: "Sertifikat Kompetensi — Data Management Staff (BNSP)",
     shortTitle: "Data Management Staff",
     issuer: "BNSP · LSP Teknologi Digital",
@@ -240,6 +244,8 @@ export const CERTS = [
   },
   {
     src: "cert-03.jpg",
+    w: 636,
+    h: 491,
     label: "Google Digital Marketing & E-commerce (Coursera)",
     shortTitle: "Digital Marketing & E-commerce",
     issuer: "Google · Coursera",
@@ -248,6 +254,8 @@ export const CERTS = [
   },
   {
     src: "cert-04.jpg",
+    w: 636,
+    h: 491,
     label: "Graphic Design Specialization — CalArts (Coursera)",
     shortTitle: "Graphic Design Specialization",
     issuer: "CalArts · Coursera",

@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { CATEGORY_LABEL, IMG } from "../data.js";
 
-export default function ProjectModal({ project, closing, onClose, onOpenImage }) {
+function ProjectModal({ project, closing, onClose, onOpenImage }) {
   const panelRef = useRef(null);
   const closeRef = useRef(null);
 
@@ -62,3 +62,5 @@ export default function ProjectModal({ project, closing, onClose, onOpenImage })
     </div>
   );
 }
+
+export default memo(ProjectModal);

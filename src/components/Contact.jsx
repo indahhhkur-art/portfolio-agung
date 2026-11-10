@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { CONTACT } from "../data.js";
 import { useReveal } from "../hooks.js";
 
@@ -9,7 +10,7 @@ const LINKS = [
   { key: "dribbble", label: "Dribbble", href: v => v }
 ].filter(l => CONTACT[l.key]);
 
-export default function Contact() {
+function Contact() {
   const ref = useReveal();
   return (
     <section className="contact" id="contact">
@@ -31,3 +32,5 @@ export default function Contact() {
     </section>
   );
 }
+
+export default memo(Contact);

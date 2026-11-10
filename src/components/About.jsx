@@ -1,6 +1,8 @@
+import { memo } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.js";
 import { useReveal } from "../hooks.js";
 import CertSwitcher from "./CertSwitcher.jsx";
+import Picture, { toWebpSrc } from "./Picture.jsx";
 
 const STATS = [
   { value: "5+", label: "Tahun pengalaman" },
@@ -8,7 +10,7 @@ const STATS = [
   { value: CERTS.length, label: "Sertifikasi" }
 ];
 
-export default function About({ onOpenImage }) {
+function About({ onOpenImage }) {
   const photoRef = useReveal();
   const textRef = useReveal();
   const toolsRef = useReveal();
@@ -18,7 +20,15 @@ export default function About({ onOpenImage }) {
     <section className="about" id="about">
       <div className="container about__inner">
         <div className="about__photo reveal" ref={photoRef}>
-          <img src={`${IMG}agung-photo.jpg`} alt="Foto Agung Saeful" loading="lazy" decoding="async" />
+          <Picture
+            src={`${IMG}agung-photo.jpg`}
+            webpSrc={toWebpSrc("agung-photo.jpg")}
+            alt="Foto Agung Saeful"
+            width={1140}
+            height={1311}
+            loading="lazy"
+            decoding="async"
+          />
         </div>
         <div className="about__text reveal" ref={textRef}>
           <p className="eyebrow">About</p>
@@ -122,3 +132,5 @@ export default function About({ onOpenImage }) {
     </section>
   );
 }
+
+export default memo(About);

@@ -1,11 +1,16 @@
+import { memo, useMemo } from "react";
 import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.js";
 import { useReveal } from "../hooks.js";
+import Picture, { toWebpSrc } from "./Picture.jsx";
 
-export default function Portfolio({ filter, onFilterChange, onOpenProject }) {
+function Portfolio({ filter, onFilterChange, onOpenProject }) {
   const headRef = useReveal();
   const filterRef = useReveal();
 
-  const visible = PROJECTS.filter(p => filter === "all" || p.category === filter);
+  const visible = useMemo(
+    () => PROJECTS.filter(p => filter === "all" || p.category === filter),
+    [filter]
+  );
 
   return (
     <section className="work" id="portfolio">
@@ -45,9 +50,12 @@ export default function Portfolio({ filter, onFilterChange, onOpenProject }) {
               onClick={() => onOpenProject(p)}
             >
               <div className="card__media">
-                <img
+                <Picture
                   src={`${IMG}${p.cover}`}
+                  webpSrc={toWebpSrc(p.cover, "thumbs/")}
                   alt={`Cover proyek ${p.title}`}
+                  width={400}
+                  height={300}
                   loading="lazy"
                   decoding="async"
                 />
@@ -73,3 +81,5 @@ export default function Portfolio({ filter, onFilterChange, onOpenProject }) {
     </section>
   );
 }
+
+export default memo(Portfolio);
