@@ -76,6 +76,24 @@ export const PROJECTS = [
     driveUrl: "https://drive.google.com/drive/folders/1DxQjlqY1MIlzjRy97jjRFSUSTQiK3XI_?usp=drive_link"
   },
   {
+    id: "alumina",
+    category: "social",
+    title: "Alumina (Lumina Lighting Collection)",
+    summary: "Desain kampanye media sosial feeds, promosi digital, roll-up banner offline, dan kemasan produk lampu premium.",
+    bullets: [
+      "Merancang feeds Instagram bernuansa luxury interior ('Crafted for Grand Living' & 'Lumina Prestige Series') untuk produk brass pendant lamp.",
+      "Memproduksi visual listing e-commerce & marketplace informatif untuk produk LED Bulb 9W ramah lingkungan.",
+      "Menyiapkan materi promosi toko offline berupa standing roll-up banner dan desain kemasan produk (packaging box) siap cetak."
+    ],
+    tags: ["Social media", "Marketing", "Instagram", "Packaging", "Branding"],
+    cover: "alumina-05.jpg",
+    images: [
+      "alumina-05.jpg", "alumina-06.jpg", "alumina-07.jpg", "alumina-08.jpg",
+      "alumina-09.jpg", "alumina-10.jpg", "alumina-01.jpg", "alumina-02.jpg",
+      "alumina-03.jpg", "alumina-04.jpg"
+    ]
+  },
+  {
     id: "el-umroh",
     category: "social",
     title: "eL-Umroh",

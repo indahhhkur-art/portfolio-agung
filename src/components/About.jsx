@@ -11,7 +11,7 @@ const EDUCATION = [
 
 const STATS = [
   { value: "5+", label: "Tahun pengalaman" },
-  { value: "11+", label: "Klien & proyek" },
+  { value: "12+", label: "Klien & proyek" },
   { value: CERTS.length, label: "Sertifikasi" }
 ];
 
