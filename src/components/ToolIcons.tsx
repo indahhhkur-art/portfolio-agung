@@ -1,10 +1,11 @@
 import { memo } from "react";
+import type { ToolCode } from "../types.ts";
 
 /**
  * Ikon vektor asli (Adobe Illustrator, CorelDRAW, Canva, Microsoft Office, CapCut, Filmora)
  * dibingkai sempurna dalam lingkaran (round).
  */
-function ToolIcon({ code }) {
+function ToolIcon({ code }: { code: ToolCode }) {
   switch (code) {
     case "Ai":
       return (
@@ -38,7 +39,6 @@ function ToolIcon({ code }) {
             </linearGradient>
           </defs>
           <circle cx="32" cy="32" r="32" fill="url(#cd-bg)" />
-          {/* Ikon balon & mata pena khas CorelDRAW */}
           <path
             fill="#FFFFFF"
             d="M32 13C41.8 13 48 20.2 48 28.8C48 35.6 41.8 40.4 38.4 45.2H25.6C22.2 40.4 16 35.6 16 28.8C16 20.2 22.2 13 32 13Z"
@@ -83,7 +83,6 @@ function ToolIcon({ code }) {
       return (
         <svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true">
           <circle cx="32" cy="32" r="31.2" fill="#FFFFFF" stroke="#F0DFD9" strokeWidth="1.6" />
-          {/* Pita lipat Microsoft Office 3 warna asli */}
           <polygon fill="#DC3E15" points="18.5,24.8 36,15.5 36,24.6 25.4,27.5 25.4,39 18.5,41.6" />
           <polygon fill="#EA4C1D" points="36,15.5 46.5,18.6 46.5,45.4 36,48.5 36,15.5" />
           <polygon fill="#B92B0C" points="18.5,41.6 36,48.5 36,42.8 25.4,39" />
@@ -94,7 +93,6 @@ function ToolIcon({ code }) {
       return (
         <svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true">
           <circle cx="32" cy="32" r="32" fill="#13151A" />
-          {/* Ikon CapCut dual intersecting frame brackets */}
           <path
             fill="#FFFFFF"
             d="M17.5 24.4C17.5 21.8 19.6 19.8 22.2 19.8H32.2L47 34.4C47.8 35.2 47.8 36.5 47 37.3L45.3 39C44.5 39.8 43.2 39.8 42.4 39L30.6 27.3C30 26.8 29.3 26.5 28.5 26.5H23.1C22.4 26.5 21.8 27.1 21.8 27.8V29.8H17.5V24.4Z"
@@ -124,7 +122,6 @@ function ToolIcon({ code }) {
             </linearGradient>
           </defs>
           <circle cx="32" cy="32" r="32" fill="url(#fm-bg)" />
-          {/* Ikon Wondershare Filmora play wings */}
           <rect
             x="22.5"
             y="34.8"
@@ -145,9 +142,6 @@ function ToolIcon({ code }) {
           />
         </svg>
       );
-
-    default:
-      return <span>{code}</span>;
   }
 }
 

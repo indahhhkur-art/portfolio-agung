@@ -1,17 +1,26 @@
 import { memo } from "react";
-import { CONTACT } from "../data.js";
-import { useRevealGroup } from "../hooks.js";
+import { CONTACT } from "../data.ts";
+import { useRevealGroup } from "../hooks.ts";
+import type { ContactConfig } from "../types.ts";
 
-const LINKS = [
-  { key: "email", label: "✉ Email", href: v => `mailto:${v}` },
-  { key: "whatsapp", label: "WhatsApp", href: v => `https://wa.me/${v}` },
-  { key: "instagram", label: "Instagram", href: v => `https://instagram.com/${v}` },
-  { key: "behance", label: "Behance", href: v => v },
-  { key: "dribbble", label: "Dribbble", href: v => v }
-].filter(l => CONTACT[l.key]);
+interface ContactLinkItem {
+  key: keyof ContactConfig;
+  label: string;
+  href: (v: string) => string;
+}
+
+const LINKS: ContactLinkItem[] = (
+  [
+    { key: "email", label: "✉ Email", href: (v: string) => `mailto:${v}` },
+    { key: "whatsapp", label: "WhatsApp", href: (v: string) => `https://wa.me/${v}` },
+    { key: "instagram", label: "Instagram", href: (v: string) => `https://instagram.com/${v}` },
+    { key: "behance", label: "Behance", href: (v: string) => v },
+    { key: "dribbble", label: "Dribbble", href: (v: string) => v }
+  ] satisfies ContactLinkItem[]
+).filter(l => Boolean(CONTACT[l.key]));
 
 function Contact() {
-  const ref = useRevealGroup(95);
+  const ref = useRevealGroup(55);
   return (
     <section className="contact" id="contact">
       <div className="container contact__inner" ref={ref}>

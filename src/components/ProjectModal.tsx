@@ -1,16 +1,35 @@
 import { memo, useEffect, useRef } from "react";
-import { CATEGORY_LABEL, IMG } from "../data.js";
-import { useFocusTrap } from "../hooks.js";
+import { CATEGORY_LABEL, IMG } from "../data.ts";
+import { useFocusTrap } from "../hooks.ts";
+import type { LightboxItem, Project } from "../types.ts";
 
-function ProjectModal({ project, projectIndex = 0, projectTotal = 1, closing, onClose, onStepProject, onOpenImage }) {
-  const modalRef = useRef(null);
-  const panelRef = useRef(null);
-  const closeRef = useRef(null);
+interface ProjectModalProps {
+  project: Project;
+  projectIndex?: number;
+  projectTotal?: number;
+  closing: boolean;
+  onClose: () => void;
+  onStepProject?: (dir: number) => void;
+  onOpenImage: (items: LightboxItem[], index: number) => void;
+}
+
+function ProjectModal({
+  project,
+  projectIndex = 0,
+  projectTotal = 1,
+  closing,
+  onClose,
+  onStepProject,
+  onOpenImage
+}: ProjectModalProps) {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
 
   useFocusTrap(modalRef, !closing);
 
   useEffect(() => {
-    const prev = document.activeElement;
+    const prev = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     return () => prev?.focus?.();
   }, []);
@@ -19,7 +38,10 @@ function ProjectModal({ project, projectIndex = 0, projectTotal = 1, closing, on
     if (panelRef.current) panelRef.current.scrollTop = 0;
   }, [project.id]);
 
-  const items = project.images.map((src, i) => ({ src, label: `${project.title} — ${i + 1}` }));
+  const items: LightboxItem[] = project.images.map((src, i) => ({
+    src,
+    label: `${project.title} — ${i + 1}`
+  }));
 
   return (
     <div

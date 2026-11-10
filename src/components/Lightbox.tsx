@@ -1,13 +1,22 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { IMG } from "../data.js";
-import { useFocusTrap } from "../hooks.js";
+import { IMG } from "../data.ts";
+import { useFocusTrap } from "../hooks.ts";
+import type { LightboxItem } from "../types.ts";
 
-function Lightbox({ items, index, closing, onClose, onStep }) {
-  const rootRef = useRef(null);
-  const closeRef = useRef(null);
-  const figRef = useRef(null);
-  const stageRef = useRef(null);
-  const imgRef = useRef(null);
+interface LightboxProps {
+  items: LightboxItem[];
+  index: number;
+  closing: boolean;
+  onClose: () => void;
+  onStep: (dir: number) => void;
+}
+
+function Lightbox({ items, index, closing, onClose, onStep }: LightboxProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const figRef = useRef<HTMLElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const touchRef = useRef({ active: false, startX: 0, startY: 0, dx: 0, dy: 0 });
   const [zoomed, setZoomed] = useState(false);
 
@@ -17,7 +26,7 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
   useFocusTrap(rootRef, !closing);
 
   useEffect(() => {
-    const prev = document.activeElement;
+    const prev = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     return () => prev?.focus?.();
   }, []);
@@ -32,7 +41,7 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
     }
   }, [zoomed]);
 
-  // Preload 2 gambar tetangga kiri/kanan agar navigasi mulus instan
+  // Preload 2 gambar tetangga kiri/kanan agar navigasi instan tanpa jeda
   useEffect(() => {
     if (single) return;
     const neighbors = [
@@ -40,15 +49,15 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
       (index + 1) % items.length,
       (index + 2) % items.length
     ];
-    new Set(neighbors).forEach(idx => {
+    for (const idx of new Set(neighbors)) {
       const preload = new Image();
       preload.decoding = "async";
       preload.src = `${IMG}${items[idx].src}`;
-    });
+    }
   }, [index, items, single]);
 
   useEffect(() => {
-    const onKey = e => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft" && !single) onStep(-1);
       if (e.key === "ArrowRight" && !single) onStep(1);
@@ -57,31 +66,34 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, onStep, single]);
 
-  const setZoomOrigin = useCallback(e => {
+  const setZoomOrigin = useCallback((clientX: number, clientY: number) => {
     const refEl = stageRef.current || imgRef.current;
-    if (!refEl || !imgRef.current || !e?.clientX) return;
+    if (!refEl || !imgRef.current) return;
     const rect = refEl.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const ox = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-    const oy = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    const ox = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+    const oy = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
     imgRef.current.style.transformOrigin = `${ox.toFixed(1)}% ${oy.toFixed(1)}%`;
   }, []);
 
-  const toggleZoom = useCallback(e => {
-    setZoomed(z => {
-      if (!z && e?.currentTarget?.tagName === "IMG") {
-        setZoomOrigin(e);
-      }
-      return !z;
-    });
-  }, [setZoomOrigin]);
+  const toggleZoom = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      setZoomed(z => {
+        if (!z && e.currentTarget.tagName === "IMG" && e.clientX) {
+          setZoomOrigin(e.clientX, e.clientY);
+        }
+        return !z;
+      });
+    },
+    [setZoomOrigin]
+  );
 
-  const onImgMouseMove = e => {
+  const onStageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!zoomed) return;
-    setZoomOrigin(e);
+    setZoomOrigin(e.clientX, e.clientY);
   };
 
-  const onTouchStart = e => {
+  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (zoomed || e.touches.length !== 1) return;
     touchRef.current = {
       active: true,
@@ -92,7 +104,7 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
     };
   };
 
-  const onTouchMove = e => {
+  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     const t = touchRef.current;
     if (!t.active || e.touches.length !== 1) return;
     t.dx = e.touches[0].clientX - t.startX;
@@ -112,7 +124,7 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
     if (!t.active) return;
     t.active = false;
     if (figRef.current) {
-      figRef.current.style.transition = "transform 0.24s var(--ease-smooth)";
+      figRef.current.style.transition = "transform 0.2s var(--ease-smooth)";
       figRef.current.style.transform = "";
     }
     if (Math.abs(t.dy) > Math.abs(t.dx) && t.dy > 80) {
@@ -134,7 +146,11 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
-      onClick={e => (e.target === e.currentTarget || e.target.tagName === "FIGURE") && onClose()}
+      onClick={e => {
+        if (e.target === e.currentTarget || (e.target instanceof Element && e.target.tagName === "FIGURE")) {
+          onClose();
+        }
+      }}
     >
       <div className="lightbox__tools">
         <button
@@ -142,7 +158,7 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
           className="icon-btn"
           onClick={toggleZoom}
           aria-label={zoomed ? "Perkecil gambar" : "Perbesar gambar"}
-          title={zoomed ? "Reset zoom (100%)" : "Zoom detail (170%)"}
+          title={zoomed ? "Reset zoom (100%)" : "Zoom detail (172%)"}
         >
           {zoomed ? "−" : "+"}
         </button>
@@ -156,7 +172,7 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
         <div
           ref={stageRef}
           className="lightbox__stage"
-          onMouseMove={onImgMouseMove}
+          onMouseMove={onStageMouseMove}
           onClick={e => e.target === stageRef.current && onClose()}
         >
           <img
@@ -164,7 +180,7 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
             key={item.src}
             src={`${IMG}${item.src}`}
             alt={item.label}
-            decoding="async"
+            decoding="sync"
             onClick={toggleZoom}
           />
         </div>

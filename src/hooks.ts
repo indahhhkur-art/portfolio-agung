@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
-let sharedRevealIO = null;
-const revealCallbacks = new WeakMap();
-const pendingRevealNodes = new Set();
+let sharedRevealIO: IntersectionObserver | null = null;
+const revealCallbacks = new WeakMap<Element, () => void>();
+const pendingRevealNodes = new Set<Element>();
 let sweepListenerAttached = false;
 let sweepRaf = 0;
 
-function runRevealSweep() {
+function runRevealSweep(): void {
   sweepRaf = 0;
-  const triggerLine = window.innerHeight * 0.95;
-  pendingRevealNodes.forEach(node => {
-    const rect = node.getBoundingClientRect();
-    if (rect.top <= triggerLine) {
+  const triggerLine = window.innerHeight * 0.99;
+  for (const node of [...pendingRevealNodes]) {
+    if (node.getBoundingClientRect().top <= triggerLine) {
       const cb = revealCallbacks.get(node);
       if (cb) {
         cb();
@@ -20,10 +19,10 @@ function runRevealSweep() {
       pendingRevealNodes.delete(node);
       sharedRevealIO?.unobserve(node);
     }
-  });
+  }
 }
 
-function attachSweep() {
+function attachSweep(): void {
   if (sweepListenerAttached) return;
   sweepListenerAttached = true;
   window.addEventListener(
@@ -37,30 +36,30 @@ function attachSweep() {
   );
 }
 
-function getRevealObserver() {
+function getRevealObserver(): IntersectionObserver {
   if (sharedRevealIO) return sharedRevealIO;
   attachSweep();
   sharedRevealIO = new IntersectionObserver(
     entries => {
-      entries.forEach(en => {
-        if (!en.isIntersecting) return;
+      for (const en of entries) {
+        if (!en.isIntersecting) continue;
         const cb = revealCallbacks.get(en.target);
         if (cb) {
           cb();
           revealCallbacks.delete(en.target);
         }
         pendingRevealNodes.delete(en.target);
-        sharedRevealIO.unobserve(en.target);
-      });
+        sharedRevealIO?.unobserve(en.target);
+      }
     },
-    { rootMargin: "0px 0px -4% 0px", threshold: 0.01 }
+    { rootMargin: "0px 0px -1% 0px", threshold: 0.01 }
   );
   return sharedRevealIO;
 }
 
 /** Mengamati elemen tunggal saat masuk viewport. */
-export function useReveal() {
-  const ref = useRef(null);
+export function useReveal<T extends HTMLElement = HTMLDivElement>(): RefObject<T | null> {
+  const ref = useRef<T | null>(null);
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
@@ -68,7 +67,18 @@ export function useReveal() {
     revealCallbacks.set(node, () => node.classList.add("is-visible"));
     pendingRevealNodes.add(node);
     io.observe(node);
+
+    const raf = window.requestAnimationFrame(() => {
+      if (node.getBoundingClientRect().top <= window.innerHeight * 0.99 && revealCallbacks.has(node)) {
+        node.classList.add("is-visible");
+        revealCallbacks.delete(node);
+        pendingRevealNodes.delete(node);
+        io.unobserve(node);
+      }
+    });
+
     return () => {
+      window.cancelAnimationFrame(raf);
       revealCallbacks.delete(node);
       pendingRevealNodes.delete(node);
       io.unobserve(node);
@@ -78,12 +88,13 @@ export function useReveal() {
 }
 
 /**
- * Mengamati kartu Pendidikan & Pengalaman Kerja agar animasi bertingkat
- * baru terpicu saat kartu benar-benar masuk ke area pandang (~82% viewport),
- * sehingga rangkaian timeline terasa hidup saat dilihat.
+ * Mengamati kartu Pendidikan & Pengalaman Kerja dengan trigger responsif cepat
+ * agar kaskade timeline langsung terasa hidup tanpa terasa menunggu.
  */
-export function useJourneyReveal(settleMs = 1750) {
-  const ref = useRef(null);
+export function useJourneyReveal<T extends HTMLElement = HTMLDivElement>(
+  settleMs = 960
+): RefObject<T | null> {
+  const ref = useRef<T | null>(null);
   useEffect(() => {
     const card = ref.current;
     if (!card) return;
@@ -97,24 +108,24 @@ export function useJourneyReveal(settleMs = 1750) {
 
     const io = new IntersectionObserver(
       entries => {
-        entries.forEach(en => {
+        for (const en of entries) {
           if (en.isIntersecting) {
             activate();
             io.disconnect();
+            break;
           }
-        });
+        }
       },
-      { rootMargin: "0px 0px -16% 0px", threshold: 0.1 }
+      { rootMargin: "0px 0px -4% 0px", threshold: 0.05 }
     );
     io.observe(card);
 
-    // Fallback jika user melompat langsung melewati posisi elemen ke bagian lebih bawah
     let raf = 0;
     const onScrollPast = () => {
       if (raf) return;
       raf = window.requestAnimationFrame(() => {
         raf = 0;
-        if (card.getBoundingClientRect().top <= window.innerHeight * 0.84) {
+        if (card.getBoundingClientRect().top <= window.innerHeight * 0.95) {
           activate();
           io.disconnect();
           window.removeEventListener("scroll", onScrollPast);
@@ -134,9 +145,12 @@ export function useJourneyReveal(settleMs = 1750) {
   return ref;
 }
 
-/** Mengamati elemen kartu individu dengan stagger per-baris dan cleanup settle otomatis. */
-export function useRevealCard(delayMs = 0, resetKey = "") {
-  const ref = useRef(null);
+/** Mengamati elemen kartu individu dengan stagger cepat per-baris dan cleanup settle otomatis. */
+export function useRevealCard<T extends HTMLElement = HTMLButtonElement>(
+  delayMs = 0,
+  resetKey = ""
+): RefObject<T | null> {
+  const ref = useRef<T | null>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -149,7 +163,7 @@ export function useRevealCard(delayMs = 0, resetKey = "") {
       settleTimer = window.setTimeout(() => {
         el.classList.add("is-settled");
         el.style.removeProperty("--reveal-delay");
-      }, 760 + delayMs);
+      }, 460 + delayMs);
     };
 
     const io = getRevealObserver();
@@ -158,7 +172,7 @@ export function useRevealCard(delayMs = 0, resetKey = "") {
     io.observe(el);
 
     const raf = window.requestAnimationFrame(() => {
-      if (el.getBoundingClientRect().top <= window.innerHeight * 0.95 && revealCallbacks.has(el)) {
+      if (el.getBoundingClientRect().top <= window.innerHeight * 0.99 && revealCallbacks.has(el)) {
         show();
         revealCallbacks.delete(el);
         pendingRevealNodes.delete(el);
@@ -177,33 +191,33 @@ export function useRevealCard(delayMs = 0, resetKey = "") {
   return ref;
 }
 
-/**
- * Mengamati kontainer dan memunculkan seluruh child [data-reveal-item] secara bertahap
- * (staggered power3.out), lalu membersihkan delay setelah selesai.
- */
-export function useRevealGroup(staggerMs = 85, triggerKey = "") {
-  const ref = useRef(null);
+/** Memunculkan child [data-reveal-item] secara cepat & responsif saat masuk viewport. */
+export function useRevealGroup<T extends HTMLElement = HTMLDivElement>(
+  staggerMs = 50,
+  triggerKey = ""
+): RefObject<T | null> {
+  const ref = useRef<T | null>(null);
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
-    const items = Array.from(root.querySelectorAll("[data-reveal-item]"));
-    const targets = items.length ? items : [root];
+    const items = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal-item]"));
+    const targets: HTMLElement[] = items.length ? items : [root];
 
-    targets.forEach(el => el.classList.remove("is-shown", "is-settled"));
+    for (const el of targets) el.classList.remove("is-shown", "is-settled");
 
     let settleTimer = 0;
     const triggerShow = () => {
-      const maxDelay = Math.min(targets.length - 1, 10) * staggerMs;
+      const maxDelay = Math.min(targets.length - 1, 8) * staggerMs;
       targets.forEach((el, idx) => {
-        el.style.setProperty("--reveal-delay", `${Math.min(idx, 10) * staggerMs}ms`);
+        el.style.setProperty("--reveal-delay", `${Math.min(idx, 8) * staggerMs}ms`);
         el.classList.add("is-shown");
       });
       settleTimer = window.setTimeout(() => {
-        targets.forEach(el => {
+        for (const el of targets) {
           el.classList.add("is-settled");
           el.style.removeProperty("--reveal-delay");
-        });
-      }, 760 + maxDelay);
+        }
+      }, 460 + maxDelay);
     };
 
     const io = getRevealObserver();
@@ -212,7 +226,7 @@ export function useRevealGroup(staggerMs = 85, triggerKey = "") {
     io.observe(root);
 
     const immediateCheck = window.requestAnimationFrame(() => {
-      if (root.getBoundingClientRect().top <= window.innerHeight * 0.95 && revealCallbacks.has(root)) {
+      if (root.getBoundingClientRect().top <= window.innerHeight * 0.99 && revealCallbacks.has(root)) {
         triggerShow();
         revealCallbacks.delete(root);
         pendingRevealNodes.delete(root);
@@ -231,11 +245,14 @@ export function useRevealGroup(staggerMs = 85, triggerKey = "") {
   return ref;
 }
 
-/** Menghitung angka naik (0 -> target) dengan kurva power2.out saat masuk viewport. */
-export function useCountUp(target, duration = 1500) {
-  const ref = useRef(null);
-  const num = parseInt(String(target), 10) || 0;
-  const suffix = String(target).replace(/[0-9]/g, "");
+/** Menghitung angka naik (0 -> target) dengan kurva easeOut saat masuk viewport. */
+export function useCountUp<T extends HTMLElement = HTMLElement>(
+  target: string | number,
+  duration = 950
+): { ref: RefObject<T | null>; display: string } {
+  const ref = useRef<T | null>(null);
+  const num = Number.parseInt(String(target), 10) || 0;
+  const suffix = String(target).replaceAll(/[0-9]/g, "");
   const [display, setDisplay] = useState(`0${suffix}`);
 
   useEffect(() => {
@@ -244,13 +261,13 @@ export function useCountUp(target, duration = 1500) {
 
     setDisplay(`0${suffix}`);
     let raf = 0;
-    const io = getRevealObserver();
     let started = false;
+    const io = getRevealObserver();
     const startCount = () => {
       if (started) return;
       started = true;
       const start = performance.now();
-      const tick = now => {
+      const tick = (now: number) => {
         const t = Math.min(1, (now - start) / duration);
         const eased = 1 - Math.pow(1 - t, 2.2);
         setDisplay(`${Math.round(num * eased)}${suffix}`);
@@ -263,7 +280,7 @@ export function useCountUp(target, duration = 1500) {
     io.observe(node);
 
     const immediateRaf = window.requestAnimationFrame(() => {
-      if (!started && node.getBoundingClientRect().top <= window.innerHeight * 0.95) {
+      if (!started && node.getBoundingClientRect().top <= window.innerHeight * 0.99) {
         startCount();
         revealCallbacks.delete(node);
         pendingRevealNodes.delete(node);
@@ -283,136 +300,86 @@ export function useCountUp(target, duration = 1500) {
   return { ref, display };
 }
 
-/** Smooth weighted wheel scroll (lerp ala Lenis) untuk desktop tanpa mengganggu modal atau touch. */
-export function useSmoothScroll(disabled) {
+/**
+ * Scroll anchor cepat & bebas lag:
+ * scroll wheel / trackpad / sentuh sepenuhnya berjalan native di compositor browser (0 ms delay),
+ * sementara klik tautan #section memakai animasi GPU easeOutCubic yang langsung berhenti jika user menyentuh scroll.
+ */
+export function useSmoothScroll(disabled: boolean): void {
   useEffect(() => {
     if (disabled) return;
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-
-    let current = window.scrollY;
-    let target = window.scrollY;
-    let lastDrivenY = window.scrollY;
     let raf = 0;
-    let lastTime = 0;
-    let driving = false;
 
-    const maxScroll = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
-    const stopDriving = () => {
+    const cancelAnim = () => {
       if (raf) {
         window.cancelAnimationFrame(raf);
         raf = 0;
       }
-      driving = false;
-      current = window.scrollY;
-      target = current;
-      lastDrivenY = current;
     };
 
-    const step = now => {
-      const dt = Math.min(0.05, Math.max(0.004, (now - lastTime) / 1000));
-      lastTime = now;
-      const alpha = 1 - Math.pow(1 - 0.11, dt * 60);
-      current += (target - current) * alpha;
-
-      if (Math.abs(target - current) < 0.6) {
-        lastDrivenY = target;
-        window.scrollTo({ top: target, behavior: "instant" });
-        driving = false;
-        raf = 0;
+    const animateTo = (targetY: number) => {
+      cancelAnim();
+      const startY = window.scrollY;
+      const dist = targetY - startY;
+      if (Math.abs(dist) < 2) {
+        window.scrollTo({ top: targetY, behavior: "instant" });
         return;
       }
-
-      lastDrivenY = current;
-      window.scrollTo({ top: current, behavior: "instant" });
+      const duration = Math.min(380, Math.max(200, Math.abs(dist) * 0.22));
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        window.scrollTo({ top: startY + dist * eased, behavior: "instant" });
+        if (t < 1) raf = window.requestAnimationFrame(step);
+        else raf = 0;
+      };
       raf = window.requestAnimationFrame(step);
     };
 
-    const kick = () => {
-      if (!raf) {
-        driving = true;
-        lastDrivenY = window.scrollY;
-        lastTime = performance.now();
-        raf = window.requestAnimationFrame(step);
-      }
-    };
-
-    const onWheel = e => {
-      if (e.ctrlKey || e.metaKey) return;
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      if (e.target instanceof Element && e.target.closest(".modal__panel")) return;
-
-      e.preventDefault();
-      if (!driving) {
-        current = window.scrollY;
-        target = current;
-      }
-      const scale = e.deltaMode === 1 ? 36 : e.deltaMode === 2 ? window.innerHeight : 1;
-      target = Math.max(0, Math.min(maxScroll(), target + e.deltaY * scale * 0.92));
-      kick();
-    };
-
-    const onNativeScroll = () => {
-      if (!driving) {
-        current = window.scrollY;
-        target = current;
-      } else if (Math.abs(window.scrollY - lastDrivenY) > 24) {
-        stopDriving();
-      }
-    };
-
-    const onKeyScroll = e => {
-      if (driving && ["PageUp", "PageDown", "Home", "End", "ArrowUp", "ArrowDown", " "].includes(e.key)) {
-        stopDriving();
-      }
-    };
-
-    const onAnchorClick = e => {
+    const onAnchorClick = (e: MouseEvent) => {
       const link = e.target instanceof Element ? e.target.closest('a[href^="#"]') : null;
       if (!link) return;
-      const id = link.getAttribute("href").slice(1);
+      const id = link.getAttribute("href")?.slice(1);
       if (!id) return;
       const destEl = document.getElementById(id);
       if (!destEl) return;
       e.preventDefault();
-      current = window.scrollY;
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
       const offset = id === "home" ? 0 : Math.max(0, destEl.getBoundingClientRect().top + window.scrollY - 76);
-      target = Math.min(maxScroll(), offset);
-      kick();
+      animateTo(Math.min(maxScroll, offset));
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("scroll", onNativeScroll, { passive: true });
-    window.addEventListener("keydown", onKeyScroll, { passive: true });
+    window.addEventListener("wheel", cancelAnim, { passive: true });
+    window.addEventListener("touchstart", cancelAnim, { passive: true });
     document.addEventListener("click", onAnchorClick);
     return () => {
-      if (raf) window.cancelAnimationFrame(raf);
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("scroll", onNativeScroll);
-      window.removeEventListener("keydown", onKeyScroll);
+      cancelAnim();
+      window.removeEventListener("wheel", cancelAnim);
+      window.removeEventListener("touchstart", cancelAnim);
       document.removeEventListener("click", onAnchorClick);
     };
   }, [disabled]);
 }
 
 /** Mengembalikan id section aktif serta flag apakah halaman sudah di-scroll. */
-export function useScrollSpy(ids) {
-  const [state, setState] = useState({ active: ids[0], scrolled: false });
+export function useScrollSpy(ids: readonly string[]): { active: string; scrolled: boolean } {
+  const [state, setState] = useState({ active: ids[0] ?? "", scrolled: false });
   useEffect(() => {
     const io = new IntersectionObserver(
       entries => {
-        entries.forEach(en => {
+        for (const en of entries) {
           if (en.isIntersecting) {
             setState(prev => (prev.active === en.target.id ? prev : { ...prev, active: en.target.id }));
           }
-        });
+        }
       },
       { rootMargin: "-42% 0px -48% 0px" }
     );
-    ids.forEach(id => {
+    for (const id of ids) {
       const n = document.getElementById(id);
       if (n) io.observe(n);
-    });
+    }
 
     let raf = 0;
     const onScrollEdge = () => {
@@ -421,10 +388,10 @@ export function useScrollSpy(ids) {
         raf = 0;
         const doc = document.documentElement;
         const scrolled = window.scrollY > 20;
-        let nextActive = null;
-        if (window.scrollY <= 36) nextActive = ids[0];
+        let nextActive: string | null = null;
+        if (window.scrollY <= 36) nextActive = ids[0] ?? null;
         else if (window.innerHeight + window.scrollY >= doc.scrollHeight - 24) {
-          nextActive = ids[ids.length - 1];
+          nextActive = ids[ids.length - 1] ?? null;
         }
         setState(prev => {
           const active = nextActive || prev.active;
@@ -445,12 +412,12 @@ export function useScrollSpy(ids) {
 }
 
 /** Mengunci focus Tab tetap berputar di dalam dialog aktif demi aksesibilitas penuh. */
-export function useFocusTrap(containerRef, active = true) {
+export function useFocusTrap(containerRef: RefObject<HTMLElement | null>, active = true): void {
   useEffect(() => {
     if (!active) return;
-    const onKeyDown = e => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Tab" || !containerRef.current) return;
-      const focusable = containerRef.current.querySelectorAll(
+      const focusable = containerRef.current.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
       );
       if (!focusable.length) return;
@@ -470,7 +437,7 @@ export function useFocusTrap(containerRef, active = true) {
 }
 
 /** Mengunci scroll body tanpa menyebabkan layout shift akibat hilangnya scrollbar desktop. */
-export function useBodyLock(locked) {
+export function useBodyLock(locked: boolean): void {
   useEffect(() => {
     if (!locked) return;
     const gap = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
@@ -483,9 +450,12 @@ export function useBodyLock(locked) {
   }, [locked]);
 }
 
-/** Menjaga komponen tetap ter-mount selama exit animation agar transisi keluar tetap mulus. */
-export function useAnimatedPresence(value, exitMs = 220) {
-  const [cached, setCached] = useState(value);
+/** Menjaga komponen tetap ter-mount selama exit animation yang cepat. */
+export function useAnimatedPresence<T>(value: T | null, exitMs = 160): {
+  rendered: T | null;
+  closing: boolean;
+} {
+  const [cached, setCached] = useState<T | null>(value);
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
@@ -503,5 +473,5 @@ export function useAnimatedPresence(value, exitMs = 220) {
     return () => window.clearTimeout(id);
   }, [value, exitMs, cached]);
 
-  return { rendered: value || cached, closing: Boolean(!value && cached && closing) };
+  return { rendered: value ?? cached, closing: Boolean(!value && cached && closing) };
 }

@@ -1,17 +1,17 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// base "./" agar hasil build bisa di-hosting di subfolder maupun root domain
+// base "./" agar hasil build kompatibel untuk root maupun subfolder
 export default defineConfig({
   base: "./",
   plugins: [react()],
   build: {
-    target: "es2020",
+    target: "esnext",
     cssMinify: true,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom"]
+        manualChunks(id) {
+          if (id.includes("node_modules/react")) return "vendor";
         }
       }
     }

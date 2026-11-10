@@ -1,27 +1,38 @@
+import type {
+  CategoryKey,
+  Certification,
+  ContactConfig,
+  FilterKey,
+  NavItem,
+  Project,
+  TimelineItem,
+  ToolItem
+} from "./types.ts";
+
 /* ========= KONFIGURASI KONTAK =========
    Isi data di bawah ini agar tombol kontak muncul di bagian "THANKS".
    Biarkan kosong ("") untuk menyembunyikan. */
-export const CONTACT = {
-  email: "",      // contoh: "agung@email.com"
-  whatsapp: "",   // contoh: "6281234567890" (tanpa +)
-  instagram: "",  // contoh: "username"
-  behance: "",    // contoh: "https://www.behance.net/username"
-  dribbble: ""    // contoh: "https://dribbble.com/username"
+export const CONTACT: ContactConfig = {
+  email: "",
+  whatsapp: "",
+  instagram: "",
+  behance: "",
+  dribbble: ""
 };
 
 export const IMG = `${import.meta.env.BASE_URL}img/`;
 
-const seq = (prefix, from, to) =>
+const seq = (prefix: string, from: number, to: number): string[] =>
   Array.from({ length: to - from + 1 }, (_, i) => `${prefix}${String(from + i).padStart(2, "0")}.webp`);
 
-export const CATEGORY_LABEL = {
+export const CATEGORY_LABEL: Record<CategoryKey, string> = {
   ecommerce: "E-Commerce",
   social: "Social Media",
   print: "Packaging & Print",
   illustration: "Icon & Ilustrasi"
 };
 
-export const FILTERS = [
+export const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Semua" },
   { key: "ecommerce", label: "E-Commerce" },
   { key: "social", label: "Social Media" },
@@ -29,7 +40,7 @@ export const FILTERS = [
   { key: "illustration", label: "Icon & Ilustrasi" }
 ];
 
-export const PROJECTS = [
+export const PROJECTS: Project[] = [
   {
     id: "beso-shop",
     category: "ecommerce",
@@ -216,12 +227,14 @@ export const PROJECTS = [
     ],
     tags: ["Icon", "Flat Design", "Illustration"],
     cover: "micro-mockup.webp",
-    images: ["micro-icons-color.webp", "micro-icons-glyph.webp", "micro-icons-line.webp", "micro-mockup.webp",
-             "micro-illustration.webp", "micro-ui.webp", "micro-abstract.webp"]
+    images: [
+      "micro-icons-color.webp", "micro-icons-glyph.webp", "micro-icons-line.webp", "micro-mockup.webp",
+      "micro-illustration.webp", "micro-ui.webp", "micro-abstract.webp"
+    ]
   }
 ];
 
-export const CERTS = [
+export const CERTS: Certification[] = [
   {
     src: "cert-01.webp",
     w: 702,
@@ -264,7 +277,7 @@ export const CERTS = [
   }
 ];
 
-export const TOOLS = [
+export const TOOLS: ToolItem[] = [
   { code: "Ai", name: "Adobe Illustrator", role: "Vector & Brand Design" },
   { code: "Cd", name: "CorelDRAW", role: "Print & Layout Assets" },
   { code: "Cv", name: "Canva", role: "Social Media & Promo" },
@@ -273,7 +286,7 @@ export const TOOLS = [
   { code: "Fm", name: "Filmora", role: "Video Editing" }
 ];
 
-export const EDUCATION_LIST = [
+export const EDUCATION_LIST: TimelineItem[] = [
   {
     period: "Lulus 2025 · IPK 3.82 / 4.00",
     title: "S1 Teknik Informatika — STMIK IKMI Cirebon",
@@ -286,7 +299,7 @@ export const EDUCATION_LIST = [
   }
 ];
 
-export const KEY_SKILLS = [
+export const KEY_SKILLS: string[] = [
   "Graphic Design",
   "Video Editing",
   "Social Media Management",
@@ -296,7 +309,7 @@ export const KEY_SKILLS = [
   "Sales & Client Follow-up"
 ];
 
-export const EXPERIENCE_LIST = [
+export const EXPERIENCE_LIST: TimelineItem[] = [
   {
     period: "Internship · Sales Representative Junior",
     title: "Bank Syariah Indonesia (BSI)",
@@ -319,7 +332,7 @@ export const EXPERIENCE_LIST = [
   }
 ];
 
-export const NAV_ITEMS = [
+export const NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
   { id: "portfolio", label: "Portfolio" },

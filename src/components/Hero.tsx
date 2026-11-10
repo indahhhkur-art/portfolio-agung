@@ -1,13 +1,12 @@
 import { memo, useEffect, useRef } from "react";
-import { IMG } from "../data.js";
-import Picture, { toWebpSrc } from "./Picture.jsx";
+import { IMG } from "../data.ts";
+import Picture, { toWebpSrc } from "./Picture.tsx";
 
 function Hero() {
-  const secRef = useRef(null);
-  const textRef = useRef(null);
-  const artRef = useRef(null);
+  const secRef = useRef<HTMLElement | null>(null);
+  const textRef = useRef<HTMLDivElement | null>(null);
+  const artRef = useRef<HTMLDivElement | null>(null);
 
-  // Subtle GPU-composited scroll parallax saat scroll ke bawah (short-circuit di luar hero)
   useEffect(() => {
     let raf = 0;
     let lastProgress = -1;

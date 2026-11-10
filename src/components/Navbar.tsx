@@ -1,24 +1,24 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { NAV_ITEMS } from "../data.js";
-import { useScrollSpy } from "../hooks.js";
+import { NAV_ITEMS } from "../data.ts";
+import { useScrollSpy } from "../hooks.ts";
 
 const IDS = NAV_ITEMS.map(n => n.id);
 
 function Navbar() {
   const [open, setOpen] = useState(false);
-  const headerRef = useRef(null);
-  const toggleRef = useRef(null);
+  const headerRef = useRef<HTMLElement | null>(null);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
   const { active, scrolled } = useScrollSpy(IDS);
 
   useEffect(() => {
     if (!open) return;
-    const onKey = e => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
         toggleRef.current?.focus();
       }
     };
-    const onPointerDown = e => {
+    const onPointerDown = (e: PointerEvent) => {
       if (headerRef.current && e.target instanceof Node && !headerRef.current.contains(e.target)) {
         setOpen(false);
       }

@@ -1,8 +1,8 @@
 import { memo, useEffect, useRef, useState } from "react";
 
 /** Indikator progres baca atas (GPU scaleX) & tombol cepat Kembali ke Atas. */
-function ScrollUI({ hidden }) {
-  const barRef = useRef(null);
+function ScrollUI({ hidden }: { hidden: boolean }) {
+  const barRef = useRef<HTMLDivElement | null>(null);
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {

@@ -1,8 +1,9 @@
-import { memo } from "react";
-import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.js";
-import { useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.js";
-import CertSwitcher from "./CertSwitcher.jsx";
-import ToolIcon from "./ToolIcons.jsx";
+import { memo, type CSSProperties } from "react";
+import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
+import { useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.ts";
+import type { LightboxItem } from "../types.ts";
+import CertSwitcher from "./CertSwitcher.tsx";
+import ToolIcon from "./ToolIcons.tsx";
 
 const STATS = [
   { value: "5+", label: "Tahun pengalaman" },
@@ -10,8 +11,8 @@ const STATS = [
   { value: String(CERTS.length), label: "Sertifikasi" }
 ];
 
-function StatCounter({ value, label }) {
-  const { ref, display } = useCountUp(value, 1400);
+function StatCounter({ value, label }: { value: string; label: string }) {
+  const { ref, display } = useCountUp<HTMLElement>(value, 950);
   return (
     <div>
       <strong ref={ref}>{display}</strong>
@@ -20,13 +21,18 @@ function StatCounter({ value, label }) {
   );
 }
 
-function About({ onOpenImage, onPrefetchLightbox }) {
-  const photoRef = useReveal();
-  const textRef = useRevealGroup(85);
-  const toolsRef = useRevealGroup(65);
-  const journeyHeadRef = useRevealGroup(80);
-  const eduCardRef = useJourneyReveal(1750);
-  const expCardRef = useJourneyReveal(1850);
+interface AboutProps {
+  onOpenImage: (items: LightboxItem[], index: number) => void;
+  onPrefetchLightbox: () => void;
+}
+
+function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
+  const photoRef = useReveal<HTMLDivElement>();
+  const textRef = useRevealGroup<HTMLDivElement>(50);
+  const toolsRef = useRevealGroup<HTMLDivElement>(45);
+  const journeyHeadRef = useRevealGroup<HTMLDivElement>(45);
+  const eduCardRef = useJourneyReveal<HTMLDivElement>(940);
+  const expCardRef = useJourneyReveal<HTMLDivElement>(1020);
 
   return (
     <section className="about" id="about">
@@ -106,7 +112,7 @@ function About({ onOpenImage, onPrefetchLightbox }) {
             </div>
             <ul className="journey-card__list">
               {EDUCATION_LIST.map((item, idx) => (
-                <li key={item.title} style={{ "--item-i": idx }}>
+                <li key={item.title} style={{ "--item-i": idx } as CSSProperties}>
                   <span className="journey-card__period">{item.period}</span>
                   <h5>{item.title}</h5>
                   <p>{item.detail}</p>
@@ -117,7 +123,7 @@ function About({ onOpenImage, onPrefetchLightbox }) {
               <span className="journey-skills__label">Key Skills</span>
               <div className="journey-skills__tags">
                 {KEY_SKILLS.map((skill, idx) => (
-                  <span key={skill} className="skill-chip" style={{ "--chip-i": idx }}>{skill}</span>
+                  <span key={skill} className="skill-chip" style={{ "--chip-i": idx } as CSSProperties}>{skill}</span>
                 ))}
               </div>
             </div>
@@ -130,7 +136,7 @@ function About({ onOpenImage, onPrefetchLightbox }) {
             </div>
             <ul className="journey-card__list">
               {EXPERIENCE_LIST.map((item, idx) => (
-                <li key={item.title} style={{ "--item-i": idx }}>
+                <li key={item.title} style={{ "--item-i": idx } as CSSProperties}>
                   <span className="journey-card__period">{item.period}</span>
                   <h5>{item.title}</h5>
                   <p>{item.detail}</p>

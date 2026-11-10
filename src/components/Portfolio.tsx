@@ -1,10 +1,25 @@
 import { memo, useMemo, useRef } from "react";
-import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.js";
-import { useRevealCard, useRevealGroup } from "../hooks.js";
-import Picture, { toWebpSrc } from "./Picture.jsx";
+import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.ts";
+import { useRevealCard, useRevealGroup } from "../hooks.ts";
+import type { FilterKey, Project } from "../types.ts";
+import Picture, { toWebpSrc } from "./Picture.tsx";
 
-const ProjectCard = memo(function ProjectCard({ project, index, filter, onOpen, onPrefetch }) {
-  const cardRef = useRevealCard((index % 4) * 55, filter);
+interface ProjectCardProps {
+  project: Project;
+  index: number;
+  filter: FilterKey;
+  onOpen: (project: Project) => void;
+  onPrefetch: () => void;
+}
+
+const ProjectCard = memo(function ProjectCard({
+  project,
+  index,
+  filter,
+  onOpen,
+  onPrefetch
+}: ProjectCardProps) {
+  const cardRef = useRevealCard<HTMLButtonElement>((index % 4) * 40, filter);
 
   return (
     <button
@@ -45,15 +60,22 @@ const ProjectCard = memo(function ProjectCard({ project, index, filter, onOpen, 
   );
 });
 
-function Portfolio({ filter, onFilterChange, onOpenProject, onPrefetchModal }) {
-  const headRef = useRevealGroup(80);
-  const tabRefs = useRef([]);
+interface PortfolioProps {
+  filter: FilterKey;
+  onFilterChange: (next: FilterKey) => void;
+  onOpenProject: (project: Project) => void;
+  onPrefetchModal: () => void;
+}
+
+function Portfolio({ filter, onFilterChange, onOpenProject, onPrefetchModal }: PortfolioProps) {
+  const headRef = useRevealGroup<HTMLDivElement>(45);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const counts = useMemo(() => {
-    const map = { all: PROJECTS.length };
-    PROJECTS.forEach(p => {
+    const map: Record<string, number> = { all: PROJECTS.length };
+    for (const p of PROJECTS) {
       map[p.category] = (map[p.category] || 0) + 1;
-    });
+    }
     return map;
   }, []);
 
@@ -62,8 +84,8 @@ function Portfolio({ filter, onFilterChange, onOpenProject, onPrefetchModal }) {
     [filter]
   );
 
-  const onTabKeyDown = (idx, e) => {
-    let next = null;
+  const onTabKeyDown = (idx: number, e: React.KeyboardEvent<HTMLButtonElement>) => {
+    let next: number | null = null;
     if (e.key === "ArrowRight") next = (idx + 1) % FILTERS.length;
     else if (e.key === "ArrowLeft") next = (idx - 1 + FILTERS.length) % FILTERS.length;
     else if (e.key === "Home") next = 0;
