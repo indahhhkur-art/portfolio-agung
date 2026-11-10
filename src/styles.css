@@ -376,7 +376,6 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   padding: 18px var(--pad-x) 28px;
   scroll-padding-inline: var(--pad-x);
   scroll-snap-type: x proximity;
-  scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;

@@ -1,45 +1,131 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IMG } from "../data.js";
 import { useRevealGroup } from "../hooks.js";
 
+const COPIES = 4;
+
 function CertSwitcher({ items, onOpenImage, onPrefetch }) {
+  const count = items.length;
+  const repeated = useMemo(
+    () =>
+      count > 1
+        ? Array.from({ length: COPIES }, (_, copy) =>
+            items.map((item, idx) => ({ item, idx, copy, slot: copy * count + idx }))
+          ).flat()
+        : items.map((item, idx) => ({ item, idx, copy: 0, slot: idx })),
+    [items, count]
+  );
+
   const sectionRef = useRevealGroup(95);
   const trackRef = useRef(null);
   const cardRefs = useRef([]);
   const dragRef = useRef({ active: false, pointerId: null, startX: 0, startScroll: 0, moved: false });
   const suppressClickRef = useRef(false);
-  const scrollLockRef = useRef({ index: null, until: 0 });
-  const [active, setActive] = useState(0);
+  const scrollLockRef = useRef({ until: 0 });
+  const settleTimerRef = useRef(0);
+  const initializedRef = useRef(false);
+  const [activeSlot, setActiveSlot] = useState(count > 1 ? count : 0);
+  const active = count > 0 ? ((activeSlot % count) + count) % count : 0;
+
+  const getTrackMetrics = useCallback(
+    track => {
+      const padLeft = parseFloat(window.getComputedStyle(track).paddingLeft) || 0;
+      const first = cardRefs.current[0];
+      const nextSet = count > 1 ? cardRefs.current[count] : null;
+      const setWidth =
+        first && nextSet ? Math.max(1, nextSet.offsetLeft - first.offsetLeft) : track.scrollWidth;
+      return { padLeft, setWidth, isNarrow: track.clientWidth < 680 };
+    },
+    [count]
+  );
+
+  const getSlotTargetScroll = useCallback((track, slot, metrics) => {
+    const card = cardRefs.current[slot];
+    if (!card) return 0;
+    const raw = metrics.isNarrow
+      ? card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2
+      : card.offsetLeft - metrics.padLeft;
+    return Math.max(0, Math.min(track.scrollWidth - track.clientWidth, raw));
+  }, []);
+
+  const normalizeBoundary = useCallback(
+    (track, metrics) => {
+      if (count <= 1 || metrics.setWidth <= 0) return false;
+      const low = metrics.setWidth * 0.55;
+      const high = metrics.setWidth * (COPIES - 1.45);
+      let delta = 0;
+      if (track.scrollLeft < low) delta = metrics.setWidth;
+      else if (track.scrollLeft >= high) delta = -metrics.setWidth;
+      if (!delta) return false;
+
+      const prevSnap = track.style.scrollSnapType;
+      track.style.scrollSnapType = "none";
+      track.scrollLeft += delta;
+      if (dragRef.current.active) dragRef.current.startScroll += delta;
+      window.requestAnimationFrame(() => {
+        if (trackRef.current && !dragRef.current.active) {
+          trackRef.current.style.scrollSnapType = prevSnap;
+        }
+      });
+      return true;
+    },
+    [count]
+  );
+
+  const findNearestSlot = useCallback(
+    (track, metrics) => {
+      const anchor = metrics.isNarrow
+        ? track.scrollLeft + track.clientWidth / 2
+        : track.scrollLeft + metrics.padLeft;
+      let closestSlot = 0;
+      let closestDist = Infinity;
+      for (let i = 0; i < cardRefs.current.length; i++) {
+        const card = cardRefs.current[i];
+        if (!card) continue;
+        const point = metrics.isNarrow ? card.offsetLeft + card.offsetWidth / 2 : card.offsetLeft;
+        const d = Math.abs(point - anchor);
+        if (d < closestDist) {
+          closestDist = d;
+          closestSlot = i;
+        }
+      }
+      return closestSlot;
+    },
+    []
+  );
 
   const syncCards = useCallback(() => {
     const track = trackRef.current;
-    if (!track) return;
+    if (!track || count === 0) return;
 
-    // Batch seluruh DOM reads terlebih dahulu sebelum melakukan writes agar tidak memicu layout thrashing
+    const metrics = getTrackMetrics(track);
+    if (!dragRef.current.active && (!scrollLockRef.current.until || Date.now() >= scrollLockRef.current.until)) {
+      normalizeBoundary(track, metrics);
+    }
+
+    // Batch seluruh DOM reads terlebih dahulu sebelum writes (cegah layout thrashing)
     const clientW = track.clientWidth;
-    const scrollLeft = track.scrollLeft;
-    const scrollW = track.scrollWidth;
-    const isNarrow = clientW < 680;
-    const centerX = scrollLeft + clientW / 2;
-    const metrics = cardRefs.current.map(card =>
+    const centerX = track.scrollLeft + clientW / 2;
+    const anchor = metrics.isNarrow ? centerX : track.scrollLeft + metrics.padLeft;
+    const itemsMetrics = cardRefs.current.map(card =>
       card ? { card, left: card.offsetLeft, width: card.offsetWidth } : null
     );
 
-    let closestIdx = 0;
+    let closestSlot = 0;
     let closestDist = Infinity;
     const updates = [];
 
-    metrics.forEach((m, i) => {
+    itemsMetrics.forEach((m, i) => {
       if (!m) return;
-      const cardCenter = m.left + m.width / 2;
-      const delta = cardCenter - centerX;
-      const absDelta = Math.abs(delta);
+      const point = metrics.isNarrow ? m.left + m.width / 2 : m.left;
+      const absDelta = Math.abs(point - anchor);
       if (absDelta < closestDist) {
         closestDist = absDelta;
-        closestIdx = i;
+        closestSlot = i;
       }
 
-      if (isNarrow && !dragRef.current.active) {
+      if (metrics.isNarrow && !dragRef.current.active) {
+        const delta = m.left + m.width / 2 - centerX;
         const norm = Math.max(-1.6, Math.min(1.6, delta / Math.max(m.width, 1)));
         const absNorm = Math.abs(norm);
         const scale = 1 - Math.min(absNorm, 1.4) * 0.085;
@@ -55,30 +141,26 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
       }
     });
 
-    // Batch seluruh DOM writes sekaligus
     updates.forEach(u => {
       if (u.card.style.transform !== u.transform) u.card.style.transform = u.transform;
       if (u.card.style.opacity !== u.opacity) u.card.style.opacity = u.opacity;
     });
 
-    if (Date.now() < scrollLockRef.current.until && scrollLockRef.current.index != null) {
-      return;
-    }
-
-    if (!isNarrow) {
-      const maxScroll = Math.max(0, scrollW - clientW);
-      if (maxScroll > 0) {
-        const progress = Math.max(0, Math.min(1, scrollLeft / maxScroll));
-        closestIdx = Math.round(progress * Math.max(1, items.length - 1));
-      }
-    }
-
-    setActive(prev => (prev === closestIdx ? prev : closestIdx));
-  }, [items.length]);
+    if (Date.now() < scrollLockRef.current.until) return;
+    setActiveSlot(prev => (prev === closestSlot ? prev : closestSlot));
+  }, [count, getTrackMetrics, normalizeBoundary]);
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track) return;
+    if (!track || count === 0) return;
+
+    if (!initializedRef.current && count > 1) {
+      initializedRef.current = true;
+      const metrics = getTrackMetrics(track);
+      const startSlot = count; // Copy ke-1 sebagai posisi awal agar kiri & kanan bebas digeser
+      track.scrollTo({ left: getSlotTargetScroll(track, startSlot, metrics), behavior: "instant" });
+    }
+
     let raf = 0;
     const scheduleSync = () => {
       if (raf) return;
@@ -94,30 +176,89 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
     ro.observe(track);
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
+      if (settleTimerRef.current) window.clearTimeout(settleTimerRef.current);
       track.removeEventListener("scroll", scheduleSync);
       ro.disconnect();
     };
-  }, [syncCards]);
+  }, [count, getSlotTargetScroll, getTrackMetrics, syncCards]);
 
-  const scrollToIndex = useCallback(index => {
-    const track = trackRef.current;
-    const card = cardRefs.current[index];
-    if (!track || !card) return;
-    scrollLockRef.current = { index, until: Date.now() + 450 };
-    const isNarrow = track.clientWidth < 680;
-    const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
-    const target = isNarrow
-      ? card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2
-      : maxScroll * (index / Math.max(1, items.length - 1));
-    const clamped = Math.max(0, Math.min(maxScroll, target));
-    track.scrollTo({ left: clamped, behavior: "smooth" });
-    setActive(index);
-  }, [items.length]);
+  const animateToSlot = useCallback(
+    slot => {
+      const track = trackRef.current;
+      if (!track || count === 0) return;
+      const metrics = getTrackMetrics(track);
 
-  const step = useCallback(dir => {
-    const next = Math.max(0, Math.min(items.length - 1, active + dir));
-    scrollToIndex(next);
-  }, [active, items.length, scrollToIndex]);
+      // Pastikan slot target punya ruang buffer kiri/kanan sebelum smooth-scroll
+      let safeSlot = slot;
+      if (count > 1) {
+        while (safeSlot < count) {
+          track.scrollLeft += metrics.setWidth;
+          safeSlot += count;
+        }
+        while (safeSlot >= (COPIES - 1) * count) {
+          track.scrollLeft -= metrics.setWidth;
+          safeSlot -= count;
+        }
+      }
+
+      const target = getSlotTargetScroll(track, safeSlot, metrics);
+      scrollLockRef.current = { until: Date.now() + 460 };
+      track.scrollTo({ left: target, behavior: "smooth" });
+      setActiveSlot(safeSlot);
+
+      if (settleTimerRef.current) window.clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = window.setTimeout(() => {
+        if (trackRef.current) {
+          const m = getTrackMetrics(trackRef.current);
+          const wrapped = normalizeBoundary(trackRef.current, m);
+          if (wrapped) {
+            setActiveSlot(findNearestSlot(trackRef.current, m));
+          } else {
+            syncCards();
+          }
+        }
+      }, 480);
+    },
+    [count, findNearestSlot, getSlotTargetScroll, getTrackMetrics, normalizeBoundary, syncCards]
+  );
+
+  const step = useCallback(
+    dir => {
+      const track = trackRef.current;
+      if (!track || count === 0) return;
+      const curSlot = findNearestSlot(track, getTrackMetrics(track));
+      animateToSlot(curSlot + dir);
+    },
+    [animateToSlot, count, findNearestSlot, getTrackMetrics]
+  );
+
+  const scrollToLogical = useCallback(
+    logicalIndex => {
+      const track = trackRef.current;
+      if (!track || count <= 1) return;
+      const metrics = getTrackMetrics(track);
+      const anchor = metrics.isNarrow
+        ? track.scrollLeft + track.clientWidth / 2
+        : track.scrollLeft + metrics.padLeft;
+
+      // Cari salinan kartu terdekat agar perpindahan ke dot target menempuh jarak paling singkat
+      let bestSlot = logicalIndex;
+      let bestDist = Infinity;
+      for (let copy = 0; copy < COPIES; copy++) {
+        const s = copy * count + logicalIndex;
+        const card = cardRefs.current[s];
+        if (!card) continue;
+        const pt = metrics.isNarrow ? card.offsetLeft + card.offsetWidth / 2 : card.offsetLeft;
+        const d = Math.abs(pt - anchor);
+        if (d < bestDist) {
+          bestDist = d;
+          bestSlot = s;
+        }
+      }
+      animateToSlot(bestSlot);
+    },
+    [animateToSlot, count, getTrackMetrics]
+  );
 
   useEffect(() => {
     const onMove = e => {
@@ -131,6 +272,16 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
       }
       if (d.moved) {
         track.scrollLeft = d.startScroll - dx * 1.15;
+        if (count > 1) {
+          const metrics = getTrackMetrics(track);
+          if (track.scrollLeft < metrics.setWidth * 0.5) {
+            track.scrollLeft += metrics.setWidth;
+            d.startScroll += metrics.setWidth;
+          } else if (track.scrollLeft >= metrics.setWidth * (COPIES - 1.5)) {
+            track.scrollLeft -= metrics.setWidth;
+            d.startScroll -= metrics.setWidth;
+          }
+        }
       }
     };
     const onEnd = e => {
@@ -139,10 +290,15 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
       if (!d.active || e.pointerId !== d.pointerId) return;
       if (d.moved) {
         suppressClickRef.current = true;
-        window.setTimeout(() => { suppressClickRef.current = false; }, 120);
+        window.setTimeout(() => {
+          suppressClickRef.current = false;
+        }, 120);
       }
       d.active = false;
-      track?.classList.remove("is-dragging");
+      if (track) {
+        track.classList.remove("is-dragging");
+        track.style.scrollSnapType = "";
+      }
       syncCards();
     };
     window.addEventListener("pointermove", onMove, { passive: true });
@@ -153,10 +309,11 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
       window.removeEventListener("pointerup", onEnd);
       window.removeEventListener("pointercancel", onEnd);
     };
-  }, [syncCards]);
+  }, [count, getTrackMetrics, syncCards]);
 
   const onPointerDown = e => {
     if (e.pointerType !== "mouse" || e.button !== 0 || !trackRef.current) return;
+    scrollLockRef.current = { until: 0 };
     dragRef.current = {
       active: true,
       pointerId: e.pointerId,
@@ -166,13 +323,13 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
     };
   };
 
-  const onCardClick = (index, e) => {
+  const onCardClick = (logicalIndex, e) => {
     if (suppressClickRef.current) {
       e.preventDefault();
       e.stopPropagation();
       return;
     }
-    onOpenImage(items, index);
+    onOpenImage(items, logicalIndex);
   };
 
   const onTrackKeyDown = e => {
@@ -190,15 +347,14 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
       <div className="container certs__head" data-reveal-item>
         <div>
           <h3 className="certs__title">Certification</h3>
-          <p className="certs__sub">Geser kiri ke kanan atau klik kartu untuk memperbesar</p>
+          <p className="certs__sub">Geser tanpa batas kiri ke kanan atau klik kartu untuk memperbesar</p>
         </div>
         <div className="certs__nav" aria-label="Navigasi sertifikat">
-          <span className="certs__counter">{active + 1} / {items.length}</span>
+          <span className="certs__counter">{active + 1} / {count}</span>
           <button
             type="button"
             className="icon-btn certs__arrow"
             onClick={() => step(-1)}
-            disabled={active === 0}
             aria-label="Sertifikat sebelumnya"
           >
             ‹
@@ -207,7 +363,6 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
             type="button"
             className="icon-btn certs__arrow"
             onClick={() => step(1)}
-            disabled={active === items.length - 1}
             aria-label="Sertifikat berikutnya"
           >
             ›
@@ -222,18 +377,19 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
           onPointerDown={onPointerDown}
           onDragStart={e => e.preventDefault()}
           role="region"
-          aria-label="Daftar sertifikasi model recent apps kiri ke kanan"
+          aria-label="Daftar sertifikasi model recent apps geser tanpa batas"
         >
-          {items.map((c, i) => (
+          {repeated.map(({ item: c, idx, copy, slot }) => (
             <button
-              key={c.src}
-              ref={el => { cardRefs.current[i] = el; }}
+              key={`${copy}-${c.src}`}
+              ref={el => { cardRefs.current[slot] = el; }}
               type="button"
-              className={`cert-app${active === i ? " is-focused" : ""}`}
+              tabIndex={count > 1 ? (copy === 1 ? 0 : -1) : 0}
+              className={`cert-app${activeSlot === slot ? " is-focused" : ""}`}
               aria-label={`Lihat ${c.label}`}
               onPointerEnter={onPrefetch}
               onFocus={onPrefetch}
-              onClick={e => onCardClick(i, e)}
+              onClick={e => onCardClick(idx, e)}
             >
               <div className="cert-app__bar">
                 <span className="cert-app__badge">{c.badge || "CERT"}</span>
@@ -268,7 +424,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
             aria-selected={active === i}
             aria-label={c.shortTitle || c.label}
             className={`certs__dot${active === i ? " is-active" : ""}`}
-            onClick={() => scrollToIndex(i)}
+            onClick={() => scrollToLogical(i)}
           />
         ))}
       </div>
