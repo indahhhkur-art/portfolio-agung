@@ -2,7 +2,7 @@ import { memo, useEffect, useRef } from "react";
 import { CATEGORY_LABEL, IMG } from "../data.js";
 import { useFocusTrap } from "../hooks.js";
 
-function ProjectModal({ project, closing, onClose, onOpenImage }) {
+function ProjectModal({ project, projectIndex = 0, projectTotal = 1, closing, onClose, onStepProject, onOpenImage }) {
   const modalRef = useRef(null);
   const panelRef = useRef(null);
   const closeRef = useRef(null);
@@ -12,8 +12,11 @@ function ProjectModal({ project, closing, onClose, onOpenImage }) {
   useEffect(() => {
     const prev = document.activeElement;
     closeRef.current?.focus();
-    if (panelRef.current) panelRef.current.scrollTop = 0;
     return () => prev?.focus?.();
+  }, []);
+
+  useEffect(() => {
+    if (panelRef.current) panelRef.current.scrollTop = 0;
   }, [project.id]);
 
   const items = project.images.map((src, i) => ({ src, label: `${project.title} — ${i + 1}` }));
@@ -63,16 +66,35 @@ function ProjectModal({ project, closing, onClose, onOpenImage }) {
               onClick={() => onOpenImage(items, i)}
             >
               <img
-                ref={el => { if (el?.complete) el.classList.add("is-loaded"); }}
+                ref={el => {
+                  if (el?.complete) {
+                    el.classList.add("is-loaded");
+                    el.parentElement?.classList.add("is-img-ready");
+                  }
+                }}
                 src={`${IMG}${it.src}`}
                 alt={it.label}
                 loading="lazy"
                 decoding="async"
-                onLoad={e => e.currentTarget.classList.add("is-loaded")}
+                onLoad={e => {
+                  e.currentTarget.classList.add("is-loaded");
+                  e.currentTarget.parentElement?.classList.add("is-img-ready");
+                }}
               />
             </button>
           ))}
         </div>
+        {projectTotal > 1 && onStepProject && (
+          <div className="modal__pager">
+            <button type="button" className="modal__pager-btn" onClick={() => onStepProject(-1)}>
+              ← Proyek Sebelumnya
+            </button>
+            <span className="modal__pager-pos">{projectIndex + 1} / {projectTotal}</span>
+            <button type="button" className="modal__pager-btn" onClick={() => onStepProject(1)}>
+              Proyek Berikutnya →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

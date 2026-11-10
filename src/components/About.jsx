@@ -34,8 +34,8 @@ function About({ onOpenImage, onPrefetchLightbox }) {
           <img
             src={`${IMG}agung-photo.webp`}
             alt="Foto Agung Saeful"
-            width={1140}
-            height={1311}
+            width={960}
+            height={1104}
             loading="lazy"
             decoding="async"
           />

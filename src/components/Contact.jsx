@@ -17,13 +17,18 @@ function Contact() {
       <div className="container contact__inner" ref={ref}>
         <h2 data-reveal-item>THANKS</h2>
         <p data-reveal-item>Tertarik bekerja sama atau punya proyek desain? Mari ngobrol.</p>
-        {LINKS.length > 0 && (
-          <div className="contact__links" data-reveal-item>
-            {LINKS.map(l => (
-              <a key={l.key} href={l.href(CONTACT[l.key])} target="_blank" rel="noopener noreferrer">{l.label}</a>
-            ))}
-          </div>
-        )}
+        <div className="contact__links" data-reveal-item>
+          {LINKS.map(l => (
+            <a key={l.key} href={l.href(CONTACT[l.key])} target="_blank" rel="noopener noreferrer">{l.label}</a>
+          ))}
+          <a
+            href="https://linkedin.com/in/agungsaeful"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            LinkedIn — Agung Saeful ↗
+          </a>
+        </div>
         <p className="contact__note" data-reveal-item>
           Karya microstock tersedia di Adobe Stock, Shutterstock, PNGtree, dan Dribbble dengan nama pena{" "}
           <strong>Hani Suwaryo</strong>.

@@ -6,6 +6,8 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
   const rootRef = useRef(null);
   const closeRef = useRef(null);
   const figRef = useRef(null);
+  const stageRef = useRef(null);
+  const imgRef = useRef(null);
   const touchRef = useRef({ active: false, startX: 0, startY: 0, dx: 0, dy: 0 });
   const [zoomed, setZoomed] = useState(false);
 
@@ -23,6 +25,12 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
   useEffect(() => {
     setZoomed(false);
   }, [index]);
+
+  useEffect(() => {
+    if (!zoomed && imgRef.current) {
+      imgRef.current.style.transformOrigin = "";
+    }
+  }, [zoomed]);
 
   // Preload 2 gambar tetangga kiri/kanan agar navigasi mulus instan
   useEffect(() => {
@@ -49,7 +57,29 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, onStep, single]);
 
-  const toggleZoom = useCallback(() => setZoomed(z => !z), []);
+  const setZoomOrigin = useCallback(e => {
+    const refEl = stageRef.current || imgRef.current;
+    if (!refEl || !imgRef.current || !e?.clientX) return;
+    const rect = refEl.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const ox = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const oy = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    imgRef.current.style.transformOrigin = `${ox.toFixed(1)}% ${oy.toFixed(1)}%`;
+  }, []);
+
+  const toggleZoom = useCallback(e => {
+    setZoomed(z => {
+      if (!z && e?.currentTarget?.tagName === "IMG") {
+        setZoomOrigin(e);
+      }
+      return !z;
+    });
+  }, [setZoomOrigin]);
+
+  const onImgMouseMove = e => {
+    if (!zoomed) return;
+    setZoomOrigin(e);
+  };
 
   const onTouchStart = e => {
     if (zoomed || e.touches.length !== 1) return;
@@ -123,14 +153,25 @@ function Lightbox({ items, index, closing, onClose, onStep }) {
         <button className="icon-btn lightbox__nav lightbox__prev" onClick={() => onStep(-1)} aria-label="Sebelumnya">‹</button>
       )}
       <figure ref={figRef} className={zoomed ? "is-zoomed" : ""}>
-        <img
-          key={item.src}
-          src={`${IMG}${item.src}`}
-          alt={item.label}
-          decoding="async"
-          onClick={toggleZoom}
-        />
-        <figcaption>{`${item.label} (${index + 1}/${items.length})`}</figcaption>
+        <div
+          ref={stageRef}
+          className="lightbox__stage"
+          onMouseMove={onImgMouseMove}
+          onClick={e => e.target === stageRef.current && onClose()}
+        >
+          <img
+            ref={imgRef}
+            key={item.src}
+            src={`${IMG}${item.src}`}
+            alt={item.label}
+            decoding="async"
+            onClick={toggleZoom}
+          />
+        </div>
+        <figcaption>
+          <span>{item.label}</span>
+          <span className="lightbox__counter">{index + 1} / {items.length}</span>
+        </figcaption>
       </figure>
       {!single && (
         <button className="icon-btn lightbox__nav lightbox__next" onClick={() => onStep(1)} aria-label="Berikutnya">›</button>

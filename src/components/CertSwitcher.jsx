@@ -245,7 +245,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }) {
               </div>
               <div className="cert-app__screen">
                 <img
-                  src={`${IMG}${c.src}`}
+                  src={`${IMG}thumbs/${c.src}`}
                   alt={c.label}
                   width={c.w}
                   height={c.h}

@@ -7,15 +7,18 @@ function Hero() {
   const textRef = useRef(null);
   const artRef = useRef(null);
 
-  // Subtle GPU-composited scroll parallax saat scroll ke bawah (ala GSAP scrub)
+  // Subtle GPU-composited scroll parallax saat scroll ke bawah (short-circuit di luar hero)
   useEffect(() => {
     let raf = 0;
+    let lastProgress = -1;
     const update = () => {
       raf = 0;
       const sec = secRef.current;
       if (!sec) return;
       const h = Math.max(sec.offsetHeight, 400);
       const progress = Math.max(0, Math.min(1, window.scrollY / h));
+      if (Math.abs(progress - lastProgress) < 0.001) return;
+      lastProgress = progress;
       if (textRef.current) {
         textRef.current.style.transform = progress ? `translate3d(0, ${(-progress * 38).toFixed(1)}px, 0)` : "";
         textRef.current.style.opacity = progress ? String(Math.max(0.15, 1 - progress * 0.95).toFixed(3)) : "";
@@ -57,7 +60,7 @@ function Hero() {
             width={1136}
             height={1193}
             fetchPriority="high"
-            decoding="async"
+            decoding="sync"
           />
         </div>
       </div>

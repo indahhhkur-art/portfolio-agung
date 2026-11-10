@@ -1,10 +1,10 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, useRef } from "react";
 import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.js";
 import { useRevealCard, useRevealGroup } from "../hooks.js";
 import Picture, { toWebpSrc } from "./Picture.jsx";
 
 const ProjectCard = memo(function ProjectCard({ project, index, filter, onOpen, onPrefetch }) {
-  const cardRef = useRevealCard((index % 4) * 70, filter);
+  const cardRef = useRevealCard((index % 4) * 55, filter);
 
   return (
     <button
@@ -47,6 +47,7 @@ const ProjectCard = memo(function ProjectCard({ project, index, filter, onOpen, 
 
 function Portfolio({ filter, onFilterChange, onOpenProject, onPrefetchModal }) {
   const headRef = useRevealGroup(80);
+  const tabRefs = useRef([]);
 
   const counts = useMemo(() => {
     const map = { all: PROJECTS.length };
@@ -61,6 +62,19 @@ function Portfolio({ filter, onFilterChange, onOpenProject, onPrefetchModal }) {
     [filter]
   );
 
+  const onTabKeyDown = (idx, e) => {
+    let next = null;
+    if (e.key === "ArrowRight") next = (idx + 1) % FILTERS.length;
+    else if (e.key === "ArrowLeft") next = (idx - 1 + FILTERS.length) % FILTERS.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = FILTERS.length - 1;
+    if (next !== null) {
+      e.preventDefault();
+      onFilterChange(FILTERS[next].key);
+      tabRefs.current[next]?.focus();
+    }
+  };
+
   return (
     <section className="work" id="portfolio">
       <div className="container">
@@ -73,17 +87,20 @@ function Portfolio({ filter, onFilterChange, onOpenProject, onPrefetchModal }) {
               </h2>
               <p className="section-sub">Klik proyek untuk melihat seluruh karya dan detail pekerjaannya.</p>
             </div>
-            <span className="work__total">{visible.length} Proyek Ditampilkan</span>
+            <span className="work__total" aria-live="polite">{visible.length} Proyek Ditampilkan</span>
           </div>
 
           <div className="filters" role="tablist" aria-label="Filter kategori" data-reveal-item>
-            {FILTERS.map(f => (
+            {FILTERS.map((f, idx) => (
               <button
                 key={f.key}
+                ref={el => { tabRefs.current[idx] = el; }}
                 role="tab"
                 aria-selected={filter === f.key}
+                tabIndex={filter === f.key ? 0 : -1}
                 className={`chip${filter === f.key ? " is-active" : ""}`}
                 onClick={() => onFilterChange(f.key)}
+                onKeyDown={e => onTabKeyDown(idx, e)}
               >
                 {f.label} <span className="chip__num">{counts[f.key] || 0}</span>
               </button>

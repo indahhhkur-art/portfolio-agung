@@ -245,7 +245,10 @@ export function useCountUp(target, duration = 1500) {
     setDisplay(`0${suffix}`);
     let raf = 0;
     const io = getRevealObserver();
+    let started = false;
     const startCount = () => {
+      if (started) return;
+      started = true;
       const start = performance.now();
       const tick = now => {
         const t = Math.min(1, (now - start) / duration);
@@ -259,7 +262,17 @@ export function useCountUp(target, duration = 1500) {
     pendingRevealNodes.add(node);
     io.observe(node);
 
+    const immediateRaf = window.requestAnimationFrame(() => {
+      if (!started && node.getBoundingClientRect().top <= window.innerHeight * 0.95) {
+        startCount();
+        revealCallbacks.delete(node);
+        pendingRevealNodes.delete(node);
+        io.unobserve(node);
+      }
+    });
+
     return () => {
+      window.cancelAnimationFrame(immediateRaf);
       if (raf) window.cancelAnimationFrame(raf);
       revealCallbacks.delete(node);
       pendingRevealNodes.delete(node);
@@ -278,11 +291,23 @@ export function useSmoothScroll(disabled) {
 
     let current = window.scrollY;
     let target = window.scrollY;
+    let lastDrivenY = window.scrollY;
     let raf = 0;
     let lastTime = 0;
     let driving = false;
 
     const maxScroll = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+    const stopDriving = () => {
+      if (raf) {
+        window.cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      driving = false;
+      current = window.scrollY;
+      target = current;
+      lastDrivenY = current;
+    };
 
     const step = now => {
       const dt = Math.min(0.05, Math.max(0.004, (now - lastTime) / 1000));
@@ -291,12 +316,14 @@ export function useSmoothScroll(disabled) {
       current += (target - current) * alpha;
 
       if (Math.abs(target - current) < 0.6) {
+        lastDrivenY = target;
         window.scrollTo({ top: target, behavior: "instant" });
         driving = false;
         raf = 0;
         return;
       }
 
+      lastDrivenY = current;
       window.scrollTo({ top: current, behavior: "instant" });
       raf = window.requestAnimationFrame(step);
     };
@@ -304,6 +331,7 @@ export function useSmoothScroll(disabled) {
     const kick = () => {
       if (!raf) {
         driving = true;
+        lastDrivenY = window.scrollY;
         lastTime = performance.now();
         raf = window.requestAnimationFrame(step);
       }
@@ -328,6 +356,14 @@ export function useSmoothScroll(disabled) {
       if (!driving) {
         current = window.scrollY;
         target = current;
+      } else if (Math.abs(window.scrollY - lastDrivenY) > 24) {
+        stopDriving();
+      }
+    };
+
+    const onKeyScroll = e => {
+      if (driving && ["PageUp", "PageDown", "Home", "End", "ArrowUp", "ArrowDown", " "].includes(e.key)) {
+        stopDriving();
       }
     };
 
@@ -347,11 +383,13 @@ export function useSmoothScroll(disabled) {
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("scroll", onNativeScroll, { passive: true });
+    window.addEventListener("keydown", onKeyScroll, { passive: true });
     document.addEventListener("click", onAnchorClick);
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", onNativeScroll);
+      window.removeEventListener("keydown", onKeyScroll);
       document.removeEventListener("click", onAnchorClick);
     };
   }, [disabled]);
