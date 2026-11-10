@@ -130,17 +130,7 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 }
 .about__name-link:hover { color: #0077b5; transform: translate3d(4px, 0, 0); }
 .about__name-link:active { transform: scale(0.98); transition-duration: 0.08s; }
-.about__lead { color: var(--muted); margin-bottom: 1.8rem; font-family: "Montserrat", sans-serif; }
-.edu { display: grid; gap: 1.1rem; margin-bottom: 2rem; }
-.edu li {
-  display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 1.2rem; border-radius: 14px;
-  background: var(--bg); border-left: 4px solid var(--blue); contain: layout style paint;
-  transition: transform .25s var(--ease-smooth), box-shadow .25s var(--ease-smooth);
-}
-.edu li:hover { transform: translate3d(4px, 0, 0); box-shadow: 0 4px 14px rgba(70, 80, 140, .07); }
-.edu__icon { font-size: 1.4rem; line-height: 1.2; }
-.edu h3 { font-size: 1rem; font-weight: 600; }
-.edu p { font-size: .88rem; color: var(--muted); font-family: "Montserrat", sans-serif; }
+.about__lead { color: var(--muted); margin-bottom: 2rem; font-family: "Montserrat", sans-serif; max-width: 44rem; line-height: 1.75; }
 .stats { display: flex; gap: 2.2rem; flex-wrap: wrap; }
 .stats strong { display: block; font-size: 2.1rem; font-weight: 800; line-height: 1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .stats span { font-size: .8rem; color: var(--muted); }

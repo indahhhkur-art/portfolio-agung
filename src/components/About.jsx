@@ -2,14 +2,6 @@ import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "
 import { useReveal } from "../hooks.js";
 import CertSwitcher from "./CertSwitcher.jsx";
 
-const SUMMARY_EDU = [
-  { school: "STMIK IKMI Cirebon", detail: "S1 Teknik Informatika (Lulus 2025 · IPK 3.82/4.00)" },
-  {
-    school: "California Institute of the Arts",
-    detail: "Online Certificate Graphic Design, Branding & Digital Marketing (Complete/Pass)."
-  }
-];
-
 const STATS = [
   { value: "5+", label: "Tahun pengalaman" },
   { value: "12+", label: "Klien & proyek" },
@@ -47,18 +39,6 @@ export default function About({ onOpenImage }) {
             perusahaan, serta mengelola konten digital untuk kebutuhan pemasaran. Memiliki minat besar untuk
             berkarier di industri perbankan dan layanan digital.
           </p>
-
-          <ul className="edu">
-            {SUMMARY_EDU.map(e => (
-              <li key={e.school}>
-                <span className="edu__icon" aria-hidden="true">🎓</span>
-                <div>
-                  <h3>{e.school}</h3>
-                  <p>{e.detail}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
 
           <div className="stats">
             {STATS.map(s => (
