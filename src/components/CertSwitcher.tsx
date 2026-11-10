@@ -12,6 +12,7 @@ interface CertCardProps {
   copy: number;
   total: number;
   focused: boolean;
+  eager: boolean;
   setCardRef: (slot: number, el: HTMLButtonElement | null) => void;
   onPrefetch: () => void;
   onCardClick: (logicalIndex: number, e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -24,6 +25,7 @@ const CertCard = memo(function CertCard({
   copy,
   total,
   focused,
+  eager,
   setCardRef,
   onPrefetch,
   onCardClick
@@ -53,7 +55,7 @@ const CertCard = memo(function CertCard({
           alt={cert.label}
           width={cert.w}
           height={cert.h}
-          loading="lazy"
+          loading={eager ? "eager" : "lazy"}
           decoding="async"
           draggable={false}
         />
@@ -97,8 +99,26 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
   const animRafRef = useRef(0);
   const targetSlotRef = useRef<number | null>(null);
   const initializedRef = useRef(false);
+  const [eagerImgs, setEagerImgs] = useState(false);
   const [activeSlot, setActiveSlot] = useState(count > 1 ? count : 0);
   const active = count > 0 ? ((activeSlot % count) + count) % count : 0;
+
+  // Muat seluruh salinan sertifikat begitu section mendekati viewport agar swipe unlimited tanpa gambar kosong
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || eagerImgs) return;
+    const io = new IntersectionObserver(
+      entries => {
+        if (entries.some(en => en.isIntersecting)) {
+          setEagerImgs(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "350px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [eagerImgs, sectionRef]);
 
   const setCardRef = useCallback((slot: number, el: HTMLButtonElement | null) => {
     cardRefs.current[slot] = el;
@@ -539,6 +559,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
               copy={copy}
               total={count}
               focused={activeSlot === slot}
+              eager={eagerImgs}
               setCardRef={setCardRef}
               onPrefetch={onPrefetch}
               onCardClick={onCardClick}
