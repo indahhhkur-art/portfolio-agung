@@ -28,6 +28,18 @@ export default function ProjectModal({ project, onClose, onOpenImage }) {
           <div className="tags">
             {project.tags.map(t => <span key={t} className="tag">{t}</span>)}
           </div>
+          {project.driveUrl && (
+            <div className="modal__drive">
+              <a
+                href={project.driveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn--drive"
+              >
+                <span aria-hidden="true">📁</span> Buka Folder di Google Drive ↗
+              </a>
+            </div>
+          )}
         </div>
         <div className="gallery">
           {items.map((it, i) => (

@@ -15,6 +15,7 @@ const seq = (prefix, from, to) =>
   Array.from({ length: to - from + 1 }, (_, i) => `${prefix}${String(from + i).padStart(2, "0")}.jpg`);
 
 export const CATEGORY_LABEL = {
+  ecommerce: "E-Commerce",
   social: "Social Media",
   print: "Packaging & Print",
   illustration: "Icon & Ilustrasi"
@@ -22,6 +23,7 @@ export const CATEGORY_LABEL = {
 
 export const FILTERS = [
   { key: "all", label: "Semua" },
+  { key: "ecommerce", label: "E-Commerce" },
   { key: "social", label: "Social Media" },
   { key: "print", label: "Packaging & Print" },
   { key: "illustration", label: "Icon & Ilustrasi" }
@@ -29,7 +31,54 @@ export const FILTERS = [
 
 export const PROJECTS = [
   {
-    id: "schoters", category: "social", title: "Schoters by Ruangguru",
+    id: "beso-shop",
+    category: "ecommerce",
+    title: "Beso Shop",
+    summary: "Desain feeds katalog produk marketplace & visual highlight peralatan dapur stainless steel.",
+    bullets: [
+      "Mendesain layout katalog produk marketplace (Shopee, Tokopedia, Lazada) yang informatif dan menarik perhatian pembeli.",
+      "Menyusun visualisasi varian ukuran (14/16/18/20 cm), keunggulan stainless steel, serta label BPA Free & Best Quality.",
+      "Menyematkan trust badges (Pengiriman 24 Jam, 7 Hari Bebas Pengembalian, 100% Original) untuk memaksimalkan rasio konversi."
+    ],
+    tags: ["E-Commerce", "Marketplace", "Product Catalog", "Feed"],
+    cover: "beso-01.jpg",
+    images: seq("beso-", 1, 18),
+    driveUrl: "https://drive.google.com/drive/folders/1cBGb6LCzinVt7YpQimy271-3GaI8I1OV?usp=sharing"
+  },
+  {
+    id: "nestiora",
+    category: "ecommerce",
+    title: "Nestiora",
+    summary: "Desain banner etalase toko dan feeds katalog produk kitchenware & home living modern.",
+    bullets: [
+      "Merancang banner toko dan katalog feeds produk dengan identitas warna brand yang clean, segar, dan profesional.",
+      "Menampilkan detail panduan ukuran, spesifikasi stainless steel, dan label 100% Food Grade secara informatif.",
+      "Menciptakan konsistensi visual etalase marketplace untuk memperkuat kredibilitas dan citra brand."
+    ],
+    tags: ["E-Commerce", "Marketplace", "Banner Toko", "Kitchenware"],
+    cover: "nestiora-01.jpg",
+    images: ["nestiora-banner.jpg", ...seq("nestiora-", 1, 18)],
+    driveUrl: "https://drive.google.com/drive/folders/19bWaCSk_bTSZoj3Jzw3pGaPt2pIw4pwa?usp=sharing"
+  },
+  {
+    id: "klyroa-essence",
+    category: "ecommerce",
+    title: "Klyroa Essence",
+    summary: "Visual branding dan listing feeds katalog produk perlengkapan dapur & F&B premium.",
+    bullets: [
+      "Mendesain visual listing produk bertekstur marmer mewah dengan integrasi logo branding Klyroa Essence yang berkelas.",
+      "Menyajikan info spesifikasi material stainless steel, variasi ukuran inch, serta badge jaminan mutu Food Grade.",
+      "Menghasilkan materi visual konsisten yang meningkatkan daya tarik produk di platform e-commerce."
+    ],
+    tags: ["E-Commerce", "Marketplace", "Branding", "Premium Kitchen"],
+    cover: "klyroa-01.jpg",
+    images: seq("klyroa-", 1, 18),
+    driveUrl: "https://drive.google.com/drive/folders/1DxQjlqY1MIlzjRy97jjRFSUSTQiK3XI_?usp=drive_link"
+  },
+  {
+    id: "schoters",
+    category: "social",
+    title: "Schoters by Ruangguru",
     summary: "Konten Instagram untuk platform persiapan studi & beasiswa luar negeri.",
     bullets: [
       "Mendesain tampilan digital kreatif untuk media sosial.",
@@ -41,7 +90,9 @@ export const PROJECTS = [
     images: seq("schoters-", 1, 27)
   },
   {
-    id: "disbudpar", category: "social", title: "DPRD Kabupaten Cirebon / Disbudpar",
+    id: "disbudpar",
+    category: "social",
+    title: "DPRD Kabupaten Cirebon / Disbudpar",
     summary: "Poster dan konten visual promosi wisata & infografis daerah.",
     bullets: [
       "Menentukan dan mengatur posisi subjek, properti, serta pencahayaan, dan memilih sudut kamera untuk hasil akhir terbaik.",
@@ -53,7 +104,9 @@ export const PROJECTS = [
     images: seq("disbudpar-", 1, 7)
   },
   {
-    id: "yabinu", category: "social", title: "Yayasan Bina Ummah Cirebon / Amal Yabinu",
+    id: "yabinu",
+    category: "social",
+    title: "Yayasan Bina Ummah Cirebon / Amal Yabinu",
     summary: "Konten dakwah, kurban, zakat, infaq & sedekah untuk lembaga filantropi.",
     bullets: [
       "Desain feed Instagram bertema Ramadan, kurban, dan edukasi zakat.",
@@ -65,7 +118,9 @@ export const PROJECTS = [
     images: ["yabinu-flyer.jpg", "yabinu-29.jpg", "yabinu-30.jpg", ...seq("yabinu-", 1, 28)]
   },
   {
-    id: "ecozest-social", category: "social", title: "Ecozest — Social Media",
+    id: "ecozest-social",
+    category: "social",
+    title: "Ecozest — Social Media",
     summary: "Desain konten promosi produk organik & natural untuk Instagram.",
     bullets: [
       "Membuat desain digital, brosur, banner, dan signage untuk media sosial.",
@@ -77,7 +132,9 @@ export const PROJECTS = [
     images: seq("ecozest-", 1, 27)
   },
   {
-    id: "ecozest-packaging", category: "print", title: "Ecozest — Packaging & Label",
+    id: "ecozest-packaging",
+    category: "print",
+    title: "Ecozest — Packaging & Label",
     summary: "Desain kemasan keripik & kerupuk sehat beserta label produknya.",
     bullets: [
       "Mendesain grafis kemasan dengan sistem warna dan tipografi yang konsisten.",
@@ -89,7 +146,9 @@ export const PROJECTS = [
     images: ["ecozest-packaging.jpg", "ecozest-label.jpg"]
   },
   {
-    id: "aba", category: "print", title: "ABA Tahfidz Institute",
+    id: "aba",
+    category: "print",
+    title: "ABA Tahfidz Institute",
     summary: "Poster open recruitment, agenda virtual, dan banner penyambutan.",
     bullets: [
       "Mengembangkan desain kreatif untuk materi cetak, brosur, banner, dan signage.",
@@ -100,7 +159,9 @@ export const PROJECTS = [
     images: ["aba-poster.jpg", "aba-03.jpg", "aba-01.jpg", "aba-02.jpg"]
   },
   {
-    id: "microstock", category: "illustration", title: "Microstock — Icon, Flat Design & Illustration",
+    id: "microstock",
+    category: "illustration",
+    title: "Microstock — Icon, Flat Design & Illustration",
     summary: "Karya freelance untuk marketplace microstock: ikon, ilustrasi, dan aset vektor.",
     bullets: [
       "Membuat desain template.",
