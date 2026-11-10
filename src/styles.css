@@ -105,18 +105,20 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .nav__toggle[aria-expanded="true"] span:first-child { top: 19px; transform: rotate(45deg); }
 .nav__toggle[aria-expanded="true"] span:last-child { top: 19px; transform: rotate(-45deg); }
 
-/* Hero (Versi Lama Bersih + Skala Fleksibel) */
-.hero { padding: 120px 0 64px; overflow: hidden; background: radial-gradient(circle at 10% 20%, #fff 0, var(--bg) 60%); }
-.hero__inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); align-items: center; gap: clamp(2rem, 4vw, 4.5rem); }
+/* Hero (Pas Kanan & Bawah Tanpa Blur Putih) */
+.hero { padding: 66px 0 0; overflow: hidden; background: #ffffff; }
+.hero__inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); align-items: stretch; gap: clamp(2rem, 4vw, 4rem); }
+.hero__text { align-self: center; padding: 64px 0 88px; }
 .hero h1 { font-weight: 800; font-size: clamp(2.6rem, 5.5vw, 4.8rem); line-height: 1.05; color: #46464b; margin: .2rem 0 1rem; }
 .hero h1 span { display: block; font-size: .55em; font-weight: 700; margin-top: .3rem; }
 .hero__lead { max-width: 35rem; color: var(--muted); margin-bottom: 2rem; font-family: "Montserrat", sans-serif; font-size: clamp(.94rem, 1.08vw, 1.06rem); }
 .hero__cta { display: flex; gap: 1rem; flex-wrap: wrap; }
-.hero__art { display: flex; justify-content: flex-end; }
+.hero__art {
+  display: flex; align-items: flex-end; justify-content: flex-end;
+  margin-right: calc(-1 * var(--pad-x));
+}
 .hero__art img {
-  width: 100%; max-width: 660px; mix-blend-mode: multiply;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 94%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 94%, transparent 100%);
+  width: 100%; max-width: 740px; display: block;
 }
 
 /* About (Versi Sebelumnya + LinkedIn & Deskripsi BSI) */
@@ -530,8 +532,9 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 @media (max-width: 900px) {
   .hero__inner, .about__inner, .journey__grid { grid-template-columns: 1fr; }
   .tools__grid { grid-template-columns: repeat(2, 1fr); }
-  .hero { padding-top: 110px; }
-  .hero__art { order: -1; max-width: 420px; margin-inline: auto; }
+  .hero { padding: 96px 0 36px; }
+  .hero__text { padding: 0; }
+  .hero__art { order: -1; margin-right: 0; max-width: 420px; margin-inline: auto; justify-content: center; }
   .about__photo { max-width: 340px; margin-inline: auto; }
 }
 
