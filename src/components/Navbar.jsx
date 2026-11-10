@@ -9,8 +9,8 @@ export default function Navbar() {
   const active = useScrollSpy(IDS);
 
   return (
-    <header className="nav-wrap">
-      <div className="container nav-pill">
+    <header className="nav">
+      <div className="container nav__inner">
         <a
           href="https://linkedin.com/in/agungsaeful"
           target="_blank"
@@ -18,10 +18,16 @@ export default function Navbar() {
           className="nav__brand"
           title="Kunjungi profil LinkedIn Agung Saeful"
         >
-          <span className="nav__avatar" aria-hidden="true">A</span>
-          <span>Agung saeful</span>
+          Agung saeful
         </a>
-
+        <button
+          className="nav__toggle"
+          aria-label="Buka menu"
+          aria-expanded={open}
+          onClick={() => setOpen(o => !o)}
+        >
+          <span /><span />
+        </button>
         <nav className={`nav__links${open ? " is-open" : ""}`}>
           {NAV_ITEMS.map(n => (
             <a
@@ -34,25 +40,6 @@ export default function Navbar() {
             </a>
           ))}
         </nav>
-
-        <div className="nav__actions">
-          <a
-            href="https://linkedin.com/in/agungsaeful"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nav__cta"
-          >
-            LinkedIn ↗
-          </a>
-          <button
-            className="nav__toggle"
-            aria-label="Buka menu"
-            aria-expanded={open}
-            onClick={() => setOpen(o => !o)}
-          >
-            <span /><span />
-          </button>
-        </div>
       </div>
     </header>
   );
