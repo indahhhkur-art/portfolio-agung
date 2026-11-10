@@ -76,6 +76,34 @@ export const PROJECTS = [
     driveUrl: "https://drive.google.com/drive/folders/1DxQjlqY1MIlzjRy97jjRFSUSTQiK3XI_?usp=drive_link"
   },
   {
+    id: "el-umroh",
+    category: "social",
+    title: "eL-Umroh",
+    summary: "Desain feed edukasi, tips perlengkapan ibadah, dan materi promosi biro perjalanan umroh.",
+    bullets: [
+      "Merancang konten visual edukasi jamaah ('Umroh Starter Kit', tips manasik, dan panduan ibadah) dengan estetika islami modern yang elegan.",
+      "Membuat carousel series Instagram informatif yang mudah dipahami dan engaging bagi calon jamaah.",
+      "Menghadirkan materi promosi paket keberangkatan resmi berizin PPIU Kemenag yang terpercaya."
+    ],
+    tags: ["Social media", "Marketing", "Instagram", "Travel Umroh"],
+    cover: "elumroh-01.jpg",
+    images: seq("elumroh-", 1, 13)
+  },
+  {
+    id: "gudang-tenda",
+    category: "social",
+    title: "Gudang Tenda",
+    summary: "Konten visual branding, katalog jenis tenda membran/canopy, dan carousel edukasi event & rigging.",
+    bullets: [
+      "Mendesain feeds dan carousel Instagram interaktif seputar pilihan jenis tenda paling populer dan aplikasinya.",
+      "Mengombinasikan tipografi bold, elemen grafis geometris modern, dan skema warna kuning-abu yang dinamis.",
+      "Memproduksi materi visual promosi sewa & fabrikasi tenda untuk kebutuhan acara, kafe, dan industri."
+    ],
+    tags: ["Social media", "Marketing", "Instagram", "Branding"],
+    cover: "gudangtenda-01.jpg",
+    images: seq("gudangtenda-", 1, 16)
+  },
+  {
     id: "schoters",
     category: "social",
     title: "Schoters by Ruangguru",
