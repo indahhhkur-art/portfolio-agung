@@ -2,9 +2,44 @@ import { useEffect, useRef, useState } from "react";
 
 let sharedRevealIO = null;
 const revealCallbacks = new WeakMap();
+const pendingRevealNodes = new Set();
+let sweepListenerAttached = false;
+let sweepRaf = 0;
+
+function runRevealSweep() {
+  sweepRaf = 0;
+  const triggerLine = window.innerHeight * 0.94;
+  pendingRevealNodes.forEach(node => {
+    const rect = node.getBoundingClientRect();
+    if (rect.top <= triggerLine) {
+      const cb = revealCallbacks.get(node);
+      if (cb) {
+        cb();
+        revealCallbacks.delete(node);
+      }
+      pendingRevealNodes.delete(node);
+      sharedRevealIO?.unobserve(node);
+    }
+  });
+}
+
+function attachSweep() {
+  if (sweepListenerAttached) return;
+  sweepListenerAttached = true;
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!sweepRaf && pendingRevealNodes.size > 0) {
+        sweepRaf = window.requestAnimationFrame(runRevealSweep);
+      }
+    },
+    { passive: true }
+  );
+}
 
 function getRevealObserver() {
   if (sharedRevealIO) return sharedRevealIO;
+  attachSweep();
   sharedRevealIO = new IntersectionObserver(
     entries => {
       entries.forEach(en => {
@@ -14,15 +49,16 @@ function getRevealObserver() {
           cb();
           revealCallbacks.delete(en.target);
         }
+        pendingRevealNodes.delete(en.target);
         sharedRevealIO.unobserve(en.target);
       });
     },
-    { rootMargin: "0px 0px -32px 0px", threshold: 0.06 }
+    { rootMargin: "0px 0px -5% 0px", threshold: 0.01 }
   );
   return sharedRevealIO;
 }
 
-/** Menambahkan class "is-visible" saat elemen masuk viewport via shared observer tunggal. */
+/** Mengamati elemen tunggal saat masuk viewport. */
 export function useReveal() {
   const ref = useRef(null);
   useEffect(() => {
@@ -30,23 +66,209 @@ export function useReveal() {
     if (!node) return;
     const io = getRevealObserver();
     revealCallbacks.set(node, () => node.classList.add("is-visible"));
+    pendingRevealNodes.add(node);
     io.observe(node);
     return () => {
       revealCallbacks.delete(node);
+      pendingRevealNodes.delete(node);
       io.unobserve(node);
     };
   }, []);
   return ref;
 }
 
-/** Mengembalikan id section aktif dengan penanganan akurat di ujung atas dan bawah halaman. */
+/**
+ * Mengamati kontainer dan memunculkan seluruh child [data-reveal-item] secara bertahap
+ * (staggered power3.out ala ScrollTrigger), lalu membersihkan delay setelah selesai.
+ */
+export function useRevealGroup(staggerMs = 85, triggerKey = "") {
+  const ref = useRef(null);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const items = Array.from(root.querySelectorAll("[data-reveal-item]"));
+    const targets = items.length ? items : [root];
+
+    // Reset state saat filter kategori berganti agar animasi masuk terputar rapi
+    targets.forEach(el => el.classList.remove("is-shown", "is-settled"));
+
+    let settleTimer = 0;
+    const triggerShow = () => {
+      const maxDelay = Math.min(targets.length - 1, 10) * staggerMs;
+      targets.forEach((el, idx) => {
+        el.style.setProperty("--reveal-delay", `${Math.min(idx, 10) * staggerMs}ms`);
+        el.classList.add("is-shown");
+      });
+      settleTimer = window.setTimeout(() => {
+        targets.forEach(el => {
+          el.classList.add("is-settled");
+          el.style.removeProperty("--reveal-delay");
+        });
+      }, 760 + maxDelay);
+    };
+
+    const io = getRevealObserver();
+    revealCallbacks.set(root, triggerShow);
+    pendingRevealNodes.add(root);
+    io.observe(root);
+
+    // Jika node sudah terlihat langsung (misal setelah klik filter portfolio)
+    const immediateCheck = window.requestAnimationFrame(() => {
+      if (root.getBoundingClientRect().top <= window.innerHeight * 0.94 && revealCallbacks.has(root)) {
+        triggerShow();
+        revealCallbacks.delete(root);
+        pendingRevealNodes.delete(root);
+        io.unobserve(root);
+      }
+    });
+
+    return () => {
+      window.cancelAnimationFrame(immediateCheck);
+      if (settleTimer) window.clearTimeout(settleTimer);
+      revealCallbacks.delete(root);
+      pendingRevealNodes.delete(root);
+      io.unobserve(root);
+    };
+  }, [staggerMs, triggerKey]);
+  return ref;
+}
+
+/** Menghitung angka naik (0 -> target) dengan kurva power2.out saat masuk viewport. */
+export function useCountUp(target, duration = 1500) {
+  const ref = useRef(null);
+  const num = parseInt(String(target), 10) || 0;
+  const suffix = String(target).replace(/[0-9]/g, "");
+  const [display, setDisplay] = useState(`0${suffix}`);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || !num) return;
+
+    setDisplay(`0${suffix}`);
+    let raf = 0;
+    const io = getRevealObserver();
+    const startCount = () => {
+      const start = performance.now();
+      const tick = now => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 2.2);
+        setDisplay(`${Math.round(num * eased)}${suffix}`);
+        if (t < 1) raf = window.requestAnimationFrame(tick);
+      };
+      raf = window.requestAnimationFrame(tick);
+    };
+    revealCallbacks.set(node, startCount);
+    pendingRevealNodes.add(node);
+    io.observe(node);
+
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      revealCallbacks.delete(node);
+      pendingRevealNodes.delete(node);
+      io.unobserve(node);
+    };
+  }, [num, suffix, duration]);
+
+  return { ref, display };
+}
+
+/** Smooth weighted wheel scroll (lerp ala Lenis) untuk desktop tanpa mengganggu modal atau touch. */
+export function useSmoothScroll(disabled) {
+  useEffect(() => {
+    if (disabled) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    let current = window.scrollY;
+    let target = window.scrollY;
+    let raf = 0;
+    let lastTime = 0;
+    let driving = false;
+
+    const maxScroll = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+    const step = now => {
+      const dt = Math.min(0.05, Math.max(0.004, (now - lastTime) / 1000));
+      lastTime = now;
+      const alpha = 1 - Math.pow(1 - 0.11, dt * 60);
+      current += (target - current) * alpha;
+
+      if (Math.abs(target - current) < 0.6) {
+        window.scrollTo({ top: target, behavior: "instant" });
+        driving = false;
+        raf = 0;
+        return;
+      }
+
+      window.scrollTo({ top: current, behavior: "instant" });
+      raf = window.requestAnimationFrame(step);
+    };
+
+    const kick = () => {
+      if (!raf) {
+        driving = true;
+        lastTime = performance.now();
+        raf = window.requestAnimationFrame(step);
+      }
+    };
+
+    const onWheel = e => {
+      if (e.ctrlKey || e.metaKey) return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if (e.target instanceof Element && e.target.closest(".modal__panel")) return;
+
+      e.preventDefault();
+      if (!driving) {
+        current = window.scrollY;
+        target = current;
+      }
+      const scale = e.deltaMode === 1 ? 36 : e.deltaMode === 2 ? window.innerHeight : 1;
+      target = Math.max(0, Math.min(maxScroll(), target + e.deltaY * scale * 0.92));
+      kick();
+    };
+
+    const onNativeScroll = () => {
+      if (!driving) {
+        current = window.scrollY;
+        target = current;
+      }
+    };
+
+    const onAnchorClick = e => {
+      const link = e.target instanceof Element ? e.target.closest('a[href^="#"]') : null;
+      if (!link) return;
+      const id = link.getAttribute("href").slice(1);
+      if (!id) return;
+      const destEl = document.getElementById(id);
+      if (!destEl) return;
+      e.preventDefault();
+      current = window.scrollY;
+      const offset = id === "home" ? 0 : Math.max(0, destEl.getBoundingClientRect().top + window.scrollY - 76);
+      target = Math.min(maxScroll(), offset);
+      kick();
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("scroll", onNativeScroll, { passive: true });
+    document.addEventListener("click", onAnchorClick);
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("scroll", onNativeScroll);
+      document.removeEventListener("click", onAnchorClick);
+    };
+  }, [disabled]);
+}
+
+/** Mengembalikan id section aktif serta flag apakah halaman sudah di-scroll. */
 export function useScrollSpy(ids) {
-  const [active, setActive] = useState(ids[0]);
+  const [state, setState] = useState({ active: ids[0], scrolled: false });
   useEffect(() => {
     const io = new IntersectionObserver(
       entries => {
         entries.forEach(en => {
-          if (en.isIntersecting) setActive(en.target.id);
+          if (en.isIntersecting) {
+            setState(prev => (prev.active === en.target.id ? prev : { ...prev, active: en.target.id }));
+          }
         });
       },
       { rootMargin: "-42% 0px -48% 0px" }
@@ -62,12 +284,20 @@ export function useScrollSpy(ids) {
       raf = window.requestAnimationFrame(() => {
         raf = 0;
         const doc = document.documentElement;
-        if (window.scrollY <= 36) setActive(ids[0]);
+        const scrolled = window.scrollY > 20;
+        let nextActive = null;
+        if (window.scrollY <= 36) nextActive = ids[0];
         else if (window.innerHeight + window.scrollY >= doc.scrollHeight - 24) {
-          setActive(ids[ids.length - 1]);
+          nextActive = ids[ids.length - 1];
         }
+        setState(prev => {
+          const active = nextActive || prev.active;
+          if (prev.active === active && prev.scrolled === scrolled) return prev;
+          return { active, scrolled };
+        });
       });
     };
+    onScrollEdge();
     window.addEventListener("scroll", onScrollEdge, { passive: true });
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
@@ -75,7 +305,7 @@ export function useScrollSpy(ids) {
       io.disconnect();
     };
   }, [ids]);
-  return active;
+  return state;
 }
 
 /** Mengunci scroll body tanpa menyebabkan layout shift akibat hilangnya scrollbar desktop. */

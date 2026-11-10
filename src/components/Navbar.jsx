@@ -7,7 +7,7 @@ const IDS = NAV_ITEMS.map(n => n.id);
 function Navbar() {
   const [open, setOpen] = useState(false);
   const toggleRef = useRef(null);
-  const active = useScrollSpy(IDS);
+  const { active, scrolled } = useScrollSpy(IDS);
 
   useEffect(() => {
     if (!open) return;
@@ -22,7 +22,7 @@ function Navbar() {
   }, [open]);
 
   return (
-    <header className="nav">
+    <header className={`nav${scrolled ? " is-scrolled" : ""}`}>
       <div className="container nav__inner">
         <a
           href="https://linkedin.com/in/agungsaeful"

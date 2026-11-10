@@ -1,10 +1,10 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { IMG } from "../data.js";
-import { useReveal } from "../hooks.js";
+import { useRevealGroup } from "../hooks.js";
 import Picture, { toWebpSrc } from "./Picture.jsx";
 
 function CertSwitcher({ items, onOpenImage }) {
-  const sectionRef = useReveal();
+  const sectionRef = useRevealGroup(95);
   const trackRef = useRef(null);
   const cardRefs = useRef([]);
   const dragRef = useRef({ active: false, pointerId: null, startX: 0, startScroll: 0, moved: false });
@@ -187,8 +187,8 @@ function CertSwitcher({ items, onOpenImage }) {
   };
 
   return (
-    <div className="certs reveal" ref={sectionRef}>
-      <div className="container certs__head">
+    <div className="certs" ref={sectionRef}>
+      <div className="container certs__head" data-reveal-item>
         <div>
           <h3 className="certs__title">Certification</h3>
           <p className="certs__sub">Geser kiri ke kanan atau klik kartu untuk memperbesar</p>
@@ -216,7 +216,7 @@ function CertSwitcher({ items, onOpenImage }) {
         </div>
       </div>
 
-      <div className="certs-recent" onKeyDown={onTrackKeyDown}>
+      <div className="certs-recent" onKeyDown={onTrackKeyDown} data-reveal-item>
         <div
           className="certs-recent__track"
           ref={trackRef}
@@ -259,7 +259,7 @@ function CertSwitcher({ items, onOpenImage }) {
         </div>
       </div>
 
-      <div className="container certs__dots" role="tablist" aria-label="Pilih sertifikat">
+      <div className="container certs__dots" role="tablist" aria-label="Pilih sertifikat" data-reveal-item>
         {items.map((c, i) => (
           <button
             key={c.src}

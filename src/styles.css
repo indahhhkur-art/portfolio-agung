@@ -19,7 +19,8 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+html { scroll-padding-top: 76px; }
+@media (pointer: coarse) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
   padding-right: var(--sb-gap);
@@ -73,11 +74,18 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .btn--ghost:hover { background: var(--blue); color: #fff; transform: translate3d(0, -2px, 0); }
 .btn:active { transform: translate3d(0, 1px, 0) scale(0.96); transition-duration: 0.08s; }
 
-/* Nav (Versi Lama Bersih) */
+/* Nav (Versi Lama Bersih dengan Transisi Scroll) */
 .nav {
-  position: fixed; inset: 0 0 auto 0; z-index: 50; background: rgba(255,255,255,.92);
+  position: fixed; inset: 0 0 auto 0; z-index: 50; background: rgba(255,255,255,.78);
   padding-right: var(--sb-gap);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 2px 20px rgba(0,0,0,.06);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition: background-color .4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .4s cubic-bezier(0.4, 0, 0.2, 1), border-color .4s ease;
+}
+.nav.is-scrolled {
+  background: rgba(255,255,255,.94);
+  border-bottom-color: rgba(91, 127, 199, .10);
+  box-shadow: 0 4px 24px rgba(35, 45, 95, .07);
 }
 .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 66px; }
 .nav__brand {
@@ -334,11 +342,6 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .chip.is-active { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(120, 110, 200, .3); }
 .chip.is-active:hover { transform: translate3d(0, -2px, 0); box-shadow: 0 8px 20px rgba(120, 110, 200, .4); }
 
-@keyframes cardEnter {
-  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.975); }
-  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: clamp(1.3rem, 2vw, 1.9rem); }
 .card {
   background: var(--card); border-radius: 22px; overflow: hidden;
@@ -347,7 +350,6 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   text-align: left; padding: .8rem .8rem 1.25rem; font: inherit; color: inherit;
   display: flex; flex-direction: column; contain: layout style paint;
 }
-.card--enter { animation: cardEnter .38s var(--ease-smooth) var(--stagger, 0ms) both; }
 .card:hover { transform: translate3d(0, -8px, 0); border-color: rgba(91, 127, 199, .35); box-shadow: 0 22px 44px rgba(70, 80, 140, .18); }
 .card:active {
   transform: translate3d(0, -2px, 0) scale(0.982);
@@ -515,21 +517,22 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .footer__author { color: var(--blue); font-weight: 600; transition: color 0.2s ease; }
 .footer__author:hover { color: #0077b5; text-decoration: underline; }
 
-/* Reveal */
+/* Scroll Reveal Choreography (power3.out ala ScrollTrigger + Stagger) */
 .reveal {
-  opacity: 0; transform: translate3d(0, 22px, 0);
-  transition: opacity .62s var(--ease-smooth), transform .62s var(--ease-smooth);
+  opacity: 0; transform: translate3d(0, 34px, 0);
+  transition: opacity .72s cubic-bezier(0.22, 1, 0.36, 1), transform .72s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal.is-visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .reveal { opacity: 1; transform: none; transition: none; }
-  .card--enter, .modal.is-open .modal__panel, .modal.is-open .modal__backdrop, .modal.is-closing .modal__panel,
-  .modal.is-closing .modal__backdrop, .lightbox.is-open, .lightbox.is-open figure, .lightbox.is-closing,
-  .lightbox.is-closing figure, .lightbox img {
-    animation: none !important;
-  }
+[data-reveal-item]:not(.is-shown) {
+  opacity: 0;
+  transform: translate3d(0, 38px, 0);
+}
+[data-reveal-item].is-shown:not(.is-settled) {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity .72s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+              transform .72s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
 }
 
 /* Responsive */

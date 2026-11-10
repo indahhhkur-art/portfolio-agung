@@ -1,20 +1,30 @@
 import { memo } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.js";
-import { useReveal } from "../hooks.js";
+import { useCountUp, useReveal, useRevealGroup } from "../hooks.js";
 import CertSwitcher from "./CertSwitcher.jsx";
 import Picture, { toWebpSrc } from "./Picture.jsx";
 
 const STATS = [
   { value: "5+", label: "Tahun pengalaman" },
   { value: "12+", label: "Klien & proyek" },
-  { value: CERTS.length, label: "Sertifikasi" }
+  { value: String(CERTS.length), label: "Sertifikasi" }
 ];
+
+function StatCounter({ value, label }) {
+  const { ref, display } = useCountUp(value, 1400);
+  return (
+    <div>
+      <strong ref={ref}>{display}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
 
 function About({ onOpenImage }) {
   const photoRef = useReveal();
-  const textRef = useReveal();
-  const toolsRef = useReveal();
-  const journeyRef = useReveal();
+  const textRef = useRevealGroup(85);
+  const toolsRef = useRevealGroup(65);
+  const journeyRef = useRevealGroup(95);
 
   return (
     <section className="about" id="about">
@@ -30,9 +40,9 @@ function About({ onOpenImage }) {
             decoding="async"
           />
         </div>
-        <div className="about__text reveal" ref={textRef}>
-          <p className="eyebrow">About</p>
-          <h2>
+        <div className="about__text" ref={textRef}>
+          <p className="eyebrow" data-reveal-item>About</p>
+          <h2 data-reveal-item>
             <a
               href="https://linkedin.com/in/agungsaeful"
               target="_blank"
@@ -43,24 +53,24 @@ function About({ onOpenImage }) {
               AGUNG SAEFUL
             </a>
           </h2>
-          <p className="about__lead">
+          <p className="about__lead" data-reveal-item>
             Lulusan Teknologi Informasi dengan pengalaman magang di Bank Syariah Indonesia pada bidang
             operasional, administrasi, dan layanan nasabah. Terbiasa bekerja dalam tim, mendukung kegiatan event
             perusahaan, serta mengelola konten digital untuk kebutuhan pemasaran. Memiliki minat besar untuk
             berkarier di industri perbankan dan layanan digital.
           </p>
 
-          <div className="stats">
+          <div className="stats" data-reveal-item>
             {STATS.map(s => (
-              <div key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>
+              <StatCounter key={s.label} value={s.value} label={s.label} />
             ))}
           </div>
         </div>
       </div>
 
       {/* Perangkat Kerja & Desain */}
-      <div className="container tools-block reveal" ref={toolsRef}>
-        <div className="section-center-head">
+      <div className="container tools-block" ref={toolsRef}>
+        <div className="section-center-head" data-reveal-item>
           <p className="eyebrow">My Tools</p>
           <h3 className="section-heading">
             Perangkat <span className="text-grad">Kerja & Desain</span>
@@ -68,7 +78,7 @@ function About({ onOpenImage }) {
         </div>
         <div className="tools__grid">
           {TOOLS.map(t => (
-            <div className="tool-pill" key={t.code}>
+            <div className="tool-pill" key={t.code} data-reveal-item>
               <div className="tool-pill__icon" aria-hidden="true">{t.code}</div>
               <strong>{t.name}</strong>
               <span>{t.role}</span>
@@ -78,15 +88,15 @@ function About({ onOpenImage }) {
       </div>
 
       {/* Pendidikan & Pengalaman Kerja */}
-      <div className="container journey reveal" ref={journeyRef}>
-        <div className="section-center-head">
+      <div className="container journey" ref={journeyRef}>
+        <div className="section-center-head" data-reveal-item>
           <p className="eyebrow">Education & Experience</p>
           <h3 className="section-heading">
             Pendidikan & <span className="text-grad">Pengalaman Kerja</span>
           </h3>
         </div>
         <div className="journey__grid">
-          <div className="journey-card">
+          <div className="journey-card" data-reveal-item>
             <div className="journey-card__head">
               <span className="journey-card__icon" aria-hidden="true">🎓</span>
               <h4>Education</h4>
@@ -110,7 +120,7 @@ function About({ onOpenImage }) {
             </div>
           </div>
 
-          <div className="journey-card">
+          <div className="journey-card" data-reveal-item>
             <div className="journey-card__head">
               <span className="journey-card__icon" aria-hidden="true">💼</span>
               <h4>Work Experience</h4>

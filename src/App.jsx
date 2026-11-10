@@ -6,7 +6,7 @@ import Portfolio from "./components/Portfolio.jsx";
 import Contact from "./components/Contact.jsx";
 import ProjectModal from "./components/ProjectModal.jsx";
 import Lightbox from "./components/Lightbox.jsx";
-import { useAnimatedPresence, useBodyLock } from "./hooks.js";
+import { useAnimatedPresence, useBodyLock, useSmoothScroll } from "./hooks.js";
 
 export default function App() {
   const [filter, setFilter] = useState("all");
@@ -15,8 +15,10 @@ export default function App() {
 
   const modalPres = useAnimatedPresence(project, 220);
   const lbPres = useAnimatedPresence(lightbox, 200);
+  const overlayOpen = Boolean(modalPres.rendered || lbPres.rendered);
 
-  useBodyLock(Boolean(modalPres.rendered || lbPres.rendered));
+  useBodyLock(overlayOpen);
+  useSmoothScroll(overlayOpen);
 
   const openImage = useCallback((items, index) => setLightbox({ items, index }), []);
   const closeImage = useCallback(() => setLightbox(null), []);

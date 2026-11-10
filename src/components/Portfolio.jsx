@@ -1,11 +1,11 @@
 import { memo, useMemo } from "react";
 import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.js";
-import { useReveal } from "../hooks.js";
+import { useRevealGroup } from "../hooks.js";
 import Picture, { toWebpSrc } from "./Picture.jsx";
 
 function Portfolio({ filter, onFilterChange, onOpenProject }) {
-  const headRef = useReveal();
-  const filterRef = useReveal();
+  const headRef = useRevealGroup(80);
+  const cardsRef = useRevealGroup(65, filter);
 
   const visible = useMemo(
     () => PROJECTS.filter(p => filter === "all" || p.category === filter),
@@ -15,38 +15,40 @@ function Portfolio({ filter, onFilterChange, onOpenProject }) {
   return (
     <section className="work" id="portfolio">
       <div className="container">
-        <div className="section-split reveal" ref={headRef}>
-          <div>
-            <p className="eyebrow">Portfolio</p>
-            <h2 className="section-heading">
-              Karya <span className="text-grad">Pilihan</span>
-            </h2>
-            <p className="section-sub">Klik proyek untuk melihat seluruh karya dan detail pekerjaannya.</p>
+        <div ref={headRef}>
+          <div className="section-split" data-reveal-item>
+            <div>
+              <p className="eyebrow">Portfolio</p>
+              <h2 className="section-heading">
+                Karya <span className="text-grad">Pilihan</span>
+              </h2>
+              <p className="section-sub">Klik proyek untuk melihat seluruh karya dan detail pekerjaannya.</p>
+            </div>
+            <span className="work__total">{visible.length} Proyek Ditampilkan</span>
           </div>
-          <span className="work__total">{visible.length} Proyek Ditampilkan</span>
+
+          <div className="filters" role="tablist" aria-label="Filter kategori" data-reveal-item>
+            {FILTERS.map(f => (
+              <button
+                key={f.key}
+                role="tab"
+                aria-selected={filter === f.key}
+                className={`chip${filter === f.key ? " is-active" : ""}`}
+                onClick={() => onFilterChange(f.key)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="filters reveal" ref={filterRef} role="tablist" aria-label="Filter kategori">
-          {FILTERS.map(f => (
-            <button
-              key={f.key}
-              role="tab"
-              aria-selected={filter === f.key}
-              className={`chip${filter === f.key ? " is-active" : ""}`}
-              onClick={() => onFilterChange(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="cards" key={filter}>
-          {visible.map((p, idx) => (
+        <div className="cards" key={filter} ref={cardsRef}>
+          {visible.map(p => (
             <button
               key={p.id}
               type="button"
-              className="card card--enter"
-              style={{ "--stagger": `${Math.min(idx, 8) * 35}ms` }}
+              className="card"
+              data-reveal-item
               onClick={() => onOpenProject(p)}
             >
               <div className="card__media">
