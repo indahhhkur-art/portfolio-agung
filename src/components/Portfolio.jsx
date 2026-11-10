@@ -32,11 +32,22 @@ export default function Portfolio({ onOpenProject }) {
           ))}
         </div>
 
-        <div className="cards">
-          {visible.map(p => (
-            <button key={p.id} type="button" className="card" onClick={() => onOpenProject(p)}>
+        <div className="cards" key={filter}>
+          {visible.map((p, idx) => (
+            <button
+              key={p.id}
+              type="button"
+              className="card card--enter"
+              style={{ "--stagger": `${Math.min(idx, 8) * 35}ms` }}
+              onClick={() => onOpenProject(p)}
+            >
               <div className="card__media">
-                <img src={`${IMG}${p.cover}`} alt={`Cover proyek ${p.title}`} loading="lazy" />
+                <img
+                  src={`${IMG}${p.cover}`}
+                  alt={`Cover proyek ${p.title}`}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <span className="card__count">{p.images.length} karya</span>
               </div>
               <div className="card__body">

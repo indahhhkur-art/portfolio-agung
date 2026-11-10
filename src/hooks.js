@@ -13,7 +13,7 @@ export function useReveal() {
           io.disconnect();
         }
       },
-      { threshold: 0.12 }
+      { rootMargin: "0px 0px -36px 0px", threshold: 0.08 }
     );
     io.observe(node);
     return () => io.disconnect();
@@ -38,10 +38,39 @@ export function useScrollSpy(ids) {
   return active;
 }
 
-/** Mengunci scroll body selama `locked` true. */
+/** Mengunci scroll body tanpa menyebabkan layout shift akibat hilangnya scrollbar desktop. */
 export function useBodyLock(locked) {
   useEffect(() => {
-    document.body.style.overflow = locked ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!locked) return;
+    const gap = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+    document.documentElement.style.setProperty("--sb-gap", `${gap}px`);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.setProperty("--sb-gap", "0px");
+      document.body.style.overflow = "";
+    };
   }, [locked]);
+}
+
+/** Menjaga komponen tetap ter-mount selama exit animation agar transisi keluar tetap mulus. */
+export function useAnimatedPresence(value, exitMs = 220) {
+  const [cached, setCached] = useState(value);
+  const [closing, setClosing] = useState(false);
+
+  useEffect(() => {
+    if (value) {
+      setCached(value);
+      setClosing(false);
+      return;
+    }
+    if (!cached) return;
+    setClosing(true);
+    const id = window.setTimeout(() => {
+      setCached(null);
+      setClosing(false);
+    }, exitMs);
+    return () => window.clearTimeout(id);
+  }, [value, exitMs, cached]);
+
+  return { rendered: value || cached, closing: Boolean(!value && cached && closing) };
 }

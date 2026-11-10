@@ -6,13 +6,16 @@ import Portfolio from "./components/Portfolio.jsx";
 import Contact from "./components/Contact.jsx";
 import ProjectModal from "./components/ProjectModal.jsx";
 import Lightbox from "./components/Lightbox.jsx";
-import { useBodyLock } from "./hooks.js";
+import { useAnimatedPresence, useBodyLock } from "./hooks.js";
 
 export default function App() {
   const [project, setProject] = useState(null);
   const [lightbox, setLightbox] = useState(null); // { items, index }
 
-  useBodyLock(Boolean(project || lightbox));
+  const modalPres = useAnimatedPresence(project, 220);
+  const lbPres = useAnimatedPresence(lightbox, 200);
+
+  useBodyLock(Boolean(modalPres.rendered || lbPres.rendered));
 
   const openImage = useCallback((items, index) => setLightbox({ items, index }), []);
   const closeImage = useCallback(() => setLightbox(null), []);
@@ -58,11 +61,22 @@ export default function App() {
         </div>
       </footer>
 
-      {project && (
-        <ProjectModal project={project} onClose={() => setProject(null)} onOpenImage={openImage} />
+      {modalPres.rendered && (
+        <ProjectModal
+          project={modalPres.rendered}
+          closing={modalPres.closing}
+          onClose={() => setProject(null)}
+          onOpenImage={openImage}
+        />
       )}
-      {lightbox && (
-        <Lightbox items={lightbox.items} index={lightbox.index} onClose={closeImage} onStep={stepImage} />
+      {lbPres.rendered && (
+        <Lightbox
+          items={lbPres.rendered.items}
+          index={lbPres.rendered.index}
+          closing={lbPres.closing}
+          onClose={closeImage}
+          onStep={stepImage}
+        />
       )}
     </>
   );

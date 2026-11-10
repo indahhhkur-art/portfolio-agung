@@ -23,6 +23,8 @@ export default function Hero() {
           <img
             src={`${IMG}hero-art.jpg`}
             alt="Ilustrasi desainer grafis memegang gambar, palet warna, dan ikon tipografi"
+            fetchPriority="high"
+            decoding="async"
           />
         </div>
       </div>

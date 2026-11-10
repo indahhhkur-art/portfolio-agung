@@ -222,10 +222,38 @@ export const PROJECTS = [
 ];
 
 export const CERTS = [
-  { src: "cert-01.jpg", label: "Sertifikat Kompetensi — Operator Aplikasi Perkantoran (BNSP)" },
-  { src: "cert-02.jpg", label: "Sertifikat Kompetensi — Data Management Staff (BNSP)" },
-  { src: "cert-03.jpg", label: "Google Digital Marketing & E-commerce (Coursera)" },
-  { src: "cert-04.jpg", label: "Graphic Design — California Institute of the Arts (Coursera)" }
+  {
+    src: "cert-01.jpg",
+    label: "Sertifikat Kompetensi — Desainer Grafis Muda (BNSP)",
+    shortTitle: "Junior Graphic Designer",
+    issuer: "BNSP · LSP Informatika",
+    year: "2023",
+    badge: "BNSP"
+  },
+  {
+    src: "cert-02.jpg",
+    label: "Sertifikat Kompetensi — Data Management Staff (BNSP)",
+    shortTitle: "Data Management Staff",
+    issuer: "BNSP · LSP Teknologi Digital",
+    year: "2022",
+    badge: "BNSP"
+  },
+  {
+    src: "cert-03.jpg",
+    label: "Google Digital Marketing & E-commerce (Coursera)",
+    shortTitle: "Digital Marketing & E-commerce",
+    issuer: "Google · Coursera",
+    year: "2023",
+    badge: "Google"
+  },
+  {
+    src: "cert-04.jpg",
+    label: "Graphic Design Specialization — CalArts (Coursera)",
+    shortTitle: "Graphic Design Specialization",
+    issuer: "CalArts · Coursera",
+    year: "2023",
+    badge: "CalArts"
+  }
 ];
 
 export const NAV_ITEMS = [

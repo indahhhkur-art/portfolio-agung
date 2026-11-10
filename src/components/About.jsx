@@ -1,5 +1,6 @@
 import { CERTS, IMG } from "../data.js";
 import { useReveal } from "../hooks.js";
+import CertSwitcher from "./CertSwitcher.jsx";
 
 const EDUCATION = [
   { school: "STMIK IKMI Cirebon", detail: "Sarjana (S1), Teknik Informatika" },
@@ -18,13 +19,12 @@ const STATS = [
 export default function About({ onOpenImage }) {
   const photoRef = useReveal();
   const textRef = useReveal();
-  const certRef = useReveal();
 
   return (
     <section className="about" id="about">
       <div className="container about__inner">
         <div className="about__photo reveal" ref={photoRef}>
-          <img src={`${IMG}agung-photo.jpg`} alt="Foto Agung Saeful" loading="lazy" />
+          <img src={`${IMG}agung-photo.jpg`} alt="Foto Agung Saeful" loading="lazy" decoding="async" />
         </div>
         <div className="about__text reveal" ref={textRef}>
           <p className="eyebrow">About</p>
@@ -66,22 +66,7 @@ export default function About({ onOpenImage }) {
         </div>
       </div>
 
-      <div className="container certs reveal" ref={certRef}>
-        <h3 className="certs__title">Certification</h3>
-        <div className="certs__grid">
-          {CERTS.map((c, i) => (
-            <button
-              key={c.src}
-              type="button"
-              className="cert"
-              aria-label={`Lihat ${c.label}`}
-              onClick={() => onOpenImage(CERTS, i)}
-            >
-              <img src={`${IMG}${c.src}`} alt={c.label} loading="lazy" />
-            </button>
-          ))}
-        </div>
-      </div>
+      <CertSwitcher items={CERTS} onOpenImage={onOpenImage} />
     </section>
   );
 }
