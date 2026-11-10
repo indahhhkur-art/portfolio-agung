@@ -11,7 +11,15 @@ export default function Navbar() {
   return (
     <header className="nav">
       <div className="container nav__inner">
-        <a href="#home" className="nav__brand">Agung saeful</a>
+        <a
+          href="https://linkedin.com/in/agungsaeful"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav__brand"
+          title="Kunjungi profil LinkedIn Agung Saeful"
+        >
+          Agung saeful
+        </a>
         <button
           className="nav__toggle"
           aria-label="Buka menu"

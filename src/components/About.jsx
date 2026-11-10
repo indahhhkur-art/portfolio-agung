@@ -28,10 +28,22 @@ export default function About({ onOpenImage }) {
         </div>
         <div className="about__text reveal" ref={textRef}>
           <p className="eyebrow">About</p>
-          <h2>AGUNG SAEFUL</h2>
+          <h2>
+            <a
+              href="https://linkedin.com/in/agungsaeful"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="about__name-link"
+              title="Kunjungi profil LinkedIn Agung Saeful"
+            >
+              AGUNG SAEFUL
+            </a>
+          </h2>
           <p className="about__lead">
-            Graphic Designer yang menguasai pembuatan logo, materi pemasaran, dan pemasaran digital.
-            Berpengalaman bekerja sebagai desainer grafis selama lebih dari 5 tahun.
+            Lulusan Teknologi Informasi dengan pengalaman magang di Bank Syariah Indonesia pada bidang
+            operasional, administrasi, dan layanan nasabah. Terbiasa bekerja dalam tim, mendukung kegiatan event
+            perusahaan, serta mengelola konten digital untuk kebutuhan pemasaran. Memiliki minat besar untuk
+            berkarier di industri perbankan dan layanan digital.
           </p>
 
           <ul className="edu">

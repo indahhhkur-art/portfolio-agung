@@ -41,7 +41,19 @@ export default function App() {
 
       <footer className="footer">
         <div className="container">
-          <span>© {new Date().getFullYear()} Agung Saeful. All rights reserved.</span>
+          <span>
+            © {new Date().getFullYear()}{" "}
+            <a
+              href="https://linkedin.com/in/agungsaeful"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer__author"
+              title="Kunjungi profil LinkedIn Agung Saeful"
+            >
+              Agung Saeful
+            </a>
+            . All rights reserved.
+          </span>
           <a href="#home">Kembali ke atas ↑</a>
         </div>
       </footer>
