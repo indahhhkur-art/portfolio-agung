@@ -2,6 +2,7 @@ import { memo } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.js";
 import { useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.js";
 import CertSwitcher from "./CertSwitcher.jsx";
+import ToolIcon from "./ToolIcons.jsx";
 
 const STATS = [
   { value: "5+", label: "Tahun pengalaman" },
@@ -79,7 +80,9 @@ function About({ onOpenImage, onPrefetchLightbox }) {
         <div className="tools__grid">
           {TOOLS.map(t => (
             <div className="tool-pill" key={t.code} data-reveal-item>
-              <div className="tool-pill__icon" aria-hidden="true">{t.code}</div>
+              <div className="tool-pill__icon" aria-hidden="true">
+                <ToolIcon code={t.code} />
+              </div>
               <strong>{t.name}</strong>
               <span>{t.role}</span>
             </div>
