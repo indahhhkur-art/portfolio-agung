@@ -1,6 +1,7 @@
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
 import { useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.ts";
+import { isSaveData } from "../prefetch.ts";
 import type { LightboxItem } from "../types.ts";
 import CertSwitcher from "./CertSwitcher.tsx";
 import ToolIcon from "./ToolIcons.tsx";
@@ -28,24 +29,63 @@ interface AboutProps {
 
 function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
   const photoRef = useReveal<HTMLDivElement>();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const textRef = useRevealGroup<HTMLDivElement>(50);
   const toolsRef = useRevealGroup<HTMLDivElement>(45);
   const journeyHeadRef = useRevealGroup<HTMLDivElement>(45);
   const eduCardRef = useJourneyReveal<HTMLDivElement>(940);
   const expCardRef = useJourneyReveal<HTMLDivElement>(1020);
 
+  // Lazy load & playback video About hanya saat mendekati viewport & tab aktif (hemat bandwidth & baterai)
+  useEffect(() => {
+    const wrap = photoRef.current;
+    const vid = videoRef.current;
+    if (!wrap || !vid || isSaveData() || typeof IntersectionObserver === "undefined") return;
+
+    let visible = false;
+    const syncPlayback = () => {
+      if (visible && !document.hidden) {
+        vid.defaultMuted = true;
+        vid.muted = true;
+        if (vid.paused) void vid.play().catch(() => {});
+      } else if (!vid.paused) {
+        vid.pause();
+      }
+    };
+
+    const io = new IntersectionObserver(
+      entries => {
+        for (const en of entries) visible = en.isIntersecting;
+        syncPlayback();
+      },
+      { threshold: 0.18 }
+    );
+    io.observe(wrap);
+    document.addEventListener("visibilitychange", syncPlayback);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", syncPlayback);
+    };
+  }, [photoRef]);
+
   return (
     <section className="about" id="about">
       <div className="container about__inner">
         <div className="about__photo reveal" ref={photoRef}>
-          <img
-            src={`${IMG}agung-photo.webp`}
-            alt="Foto Agung Saeful"
-            width={960}
-            height={1104}
-            loading="lazy"
-            decoding="async"
-          />
+          <video
+            ref={videoRef}
+            poster={`${IMG}agung-about-poster.webp`}
+            width={760}
+            height={600}
+            muted
+            loop
+            playsInline
+            preload="none"
+            aria-label="Video perkenalan Agung Saeful dengan latar grafis desain"
+          >
+            <source src={`${import.meta.env.BASE_URL}video/about.webm`} type="video/webm" />
+            <source src={`${import.meta.env.BASE_URL}video/about.mp4`} type="video/mp4" />
+          </video>
         </div>
         <div className="about__text" ref={textRef}>
           <p className="eyebrow" data-reveal-item>About</p>
