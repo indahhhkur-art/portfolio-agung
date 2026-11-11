@@ -87,6 +87,7 @@ export default function App() {
       <Navbar />
       <main id="main">
         <Hero />
+        <SpecialtyRibbon />
         <About onOpenImage={openImage} onPrefetchLightbox={loadLightbox} />
         <Portfolio
           filter={filter}
@@ -94,7 +95,6 @@ export default function App() {
           onOpenProject={setProject}
           onPrefetchModal={loadModal}
         />
-        <SpecialtyRibbon />
         <Contact />
       </main>
 

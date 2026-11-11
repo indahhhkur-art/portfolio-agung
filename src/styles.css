@@ -474,7 +474,7 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .certs__dot.is-active { width: 26px; background: var(--grad); }
 
 /* Portfolio (Kartu Ditingkatkan dari Referensi UI + Palet Warna Lama) */
-.work { padding: 90px 0 64px; }
+.work { padding: 90px 0; }
 .work__total {
   font-size: .82rem; font-weight: 600; color: var(--blue);
   background: #fff; border: 1.5px solid #e1e5f5; padding: .45rem 1rem; border-radius: 999px;
@@ -536,15 +536,15 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 }
 .card:hover .card__arrow { background: var(--grad); transform: scale(1.08) rotate(10deg); }
 
-/* Specialty Marquee Ribbon (Di Bawah Portfolio, Loop GPU Seamless) */
+/* Specialty Marquee Ribbon (Tepat Di Bawah Hero, Loop GPU Seamless) */
 @keyframes marqueeScroll {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-50%, 0, 0); }
 }
-.ribbon-band { background: var(--bg); padding: 0 0 56px; }
+.ribbon-band { background: #fff; padding: 0; position: relative; z-index: 2; }
 .ribbon {
   background: linear-gradient(90deg, var(--purple) 0%, var(--blue) 52%, var(--cyan) 100%);
-  color: #fff; overflow: hidden; padding: .88rem 0;
+  color: #fff; overflow: hidden; padding: .9rem 0;
   box-shadow: 0 8px 24px rgba(100, 105, 195, .18);
 }
 .ribbon__track {

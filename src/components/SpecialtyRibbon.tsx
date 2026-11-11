@@ -26,7 +26,7 @@ function RibbonGroup({ suffix }: { suffix: string }) {
   );
 }
 
-/** Pita marquee keahlian desain dengan loop GPU tanpa jeda di bawah section Portfolio. */
+/** Pita marquee keahlian desain dengan loop GPU tanpa jeda tepat di bawah Hero. */
 function SpecialtyRibbon() {
   return (
     <div className="ribbon-band" aria-hidden="true">
