@@ -524,7 +524,17 @@ export function useTheme(): { theme: ThemeMode; toggleTheme: () => void } {
     syncThemeDom(initial);
     setTheme(prev => (prev === initial ? prev : initial));
 
-    if (typeof window.matchMedia !== "function") return;
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== null && e.key !== THEME_STORAGE_KEY) return;
+      const next = readStoredTheme() ?? readSystemTheme();
+      syncThemeDom(next);
+      setTheme(prev => (prev === next ? prev : next));
+    };
+    window.addEventListener("storage", onStorage);
+
+    if (typeof window.matchMedia !== "function") {
+      return () => window.removeEventListener("storage", onStorage);
+    }
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onSystemChange = (e: MediaQueryListEvent) => {
       if (readStoredTheme()) return;
@@ -532,13 +542,19 @@ export function useTheme(): { theme: ThemeMode; toggleTheme: () => void } {
       syncThemeDom(next);
       setTheme(next);
     };
-    return addMediaChangeListener(mq, onSystemChange);
+    const removeMedia = addMediaChangeListener(mq, onSystemChange);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      removeMedia();
+    };
   }, []);
 
   const toggleTheme = () => {
     const next: ThemeMode = theme === "dark" ? "light" : "dark";
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, next);
+      // Kembali mengikuti tema sistem device secara otomatis saat user mengembalikan pilihan ke tema OS saat ini
+      if (next === readSystemTheme()) localStorage.removeItem(THEME_STORAGE_KEY);
+      else localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {
       // Abaikan saat private mode membatasi storage
     }
