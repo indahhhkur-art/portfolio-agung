@@ -260,6 +260,9 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 /* Tools Strip (Sesuai Referensi Screenshot: Kapsul Oval 3 Kolom x 2 Baris) */
 .section-center-head { text-align: center; margin-bottom: 2rem; }
 .tools-block { padding: clamp(96px, 12vh, 148px) 0 40px; }
+@media (min-width: 901px) {
+  .tools-block { min-height: clamp(500px, calc(100svh - 106px), 700px); display: flex; flex-direction: column; justify-content: center; }
+}
 .tools__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
 .tool-pill {
   background: var(--surface-item); border: 1.5px solid var(--border-strong); border-radius: 999px;
@@ -289,7 +292,7 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .tool-pill span { font-size: .76rem; color: var(--muted); font-family: "Montserrat", sans-serif; line-height: 1.35; }
 
 /* Education & Work Experience Cards (Animasi Timeline & Kaskade Terasa Hidup) */
-.journey { padding: 64px 0 20px; }
+.journey { padding: clamp(96px, 12vh, 148px) 0 28px; }
 .journey__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem; align-items: stretch; }
 .journey-card {
   position: relative; overflow: hidden;
