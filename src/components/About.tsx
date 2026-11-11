@@ -1,4 +1,4 @@
-import { memo, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
 import { useCountUp, useJourneyReveal, useLoopingVideo, useReveal, useRevealGroup } from "../hooks.ts";
 import { isSaveData } from "../prefetch.ts";
@@ -35,8 +35,29 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
   const journeyHeadRef = useRevealGroup<HTMLDivElement>(45);
   const eduCardRef = useJourneyReveal<HTMLDivElement>(940);
   const expCardRef = useJourneyReveal<HTMLDivElement>(1020);
+  const [aboutPosterReady, setAboutPosterReady] = useState(false);
 
-  // Putar video About saat mendekati viewport & biarkan looping mulus tanpa jeda
+  // Pasang poster & putar video About hanya saat mendekati viewport agar initial load hemat bandwidth
+  useEffect(() => {
+    const el = photoRef.current;
+    if (!el || aboutPosterReady) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setAboutPosterReady(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      entries => {
+        if (entries.some(e => e.isIntersecting)) {
+          setAboutPosterReady(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "450px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [aboutPosterReady, photoRef]);
+
   useLoopingVideo(videoRef, isSaveData(), true);
 
   return (
@@ -45,7 +66,7 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
         <div className="about__photo reveal" ref={photoRef}>
           <video
             ref={videoRef}
-            poster={`${IMG}agung-about-poster.webp?v=4`}
+            poster={aboutPosterReady ? `${IMG}agung-about-poster.webp?v=4` : undefined}
             width={760}
             height={600}
             muted

@@ -65,11 +65,10 @@ function Hero() {
               poster={`${IMG}hero-intro-poster.webp?v=2`}
               width={902}
               height={684}
-              autoPlay
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="none"
               disablePictureInPicture
               disableRemotePlayback
               controlsList="nodownload nofullscreen noremoteplayback"

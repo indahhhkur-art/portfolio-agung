@@ -17,7 +17,8 @@ if (!finalHtml.includes('<div id="root"></div>')) {
 }
 
 // Pertahankan stylesheet eksternal immutable (/assets/*.css) agar CSP style-src 'self' bebas 'unsafe-inline',
-// buang fallback .woff lawas dari CSS yang dihasilkan, dan taruh font/style preloads di atas <link rel="stylesheet">.
+// buang fallback .woff lawas dari CSS yang dihasilkan, utamakan CSS & font preloads sebelum <script type="module">/<link rel="modulepreload">,
+// serta hapus <link rel="preload" as="style"> ganda.
 let cssHrefMatched = "";
 finalHtml = finalHtml.replace(
   /<link\s+[^>]*rel="stylesheet"[^>]*href="([^"]*\/assets\/[^"]+\.css)"[^>]*>/i,
@@ -56,15 +57,26 @@ if (fs.existsSync(assetsDir)) {
     .map(f => `  <link rel="preload" as="font" type="font/woff2" href="/assets/${f}" crossorigin>`)
     .join("\n");
 
-  const earlyHints = [
-    cssHrefMatched ? `  <link rel="preload" as="style" href="${cssHrefMatched}" crossorigin>` : "",
-    fontPreloads
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const moduleTags = [];
+  finalHtml = finalHtml.replace(
+    /[ \t]*(?:<script\s+[^>]*type="module"[^>]*><\/script>|<link\s+[^>]*rel="modulepreload"[^>]*>)\r?\n?/gi,
+    m => {
+      moduleTags.push(m.trim());
+      return "";
+    }
+  );
 
-  if (earlyHints) {
-    finalHtml = finalHtml.replace(/<link\s+[^>]*rel="stylesheet"[^>]*>/i, m => `${earlyHints}\n  ${m}`);
+  if (fontPreloads) {
+    finalHtml = finalHtml.replace(
+      /<link\s+[^>]*rel="stylesheet"[^>]*>/i,
+      m => `${m}\n${fontPreloads}`
+    );
+  }
+  if (moduleTags.length) {
+    finalHtml = finalHtml.replace(
+      /<\/head>/i,
+      () => `  ${moduleTags.join("\n  ")}\n</head>`
+    );
   }
 }
 

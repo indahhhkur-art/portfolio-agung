@@ -10,13 +10,6 @@ import "@fontsource/montserrat/latin-700.css";
 import App from "./App.tsx";
 import "./styles.css";
 
-if (
-  typeof document !== "undefined" &&
-  !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-) {
-  document.documentElement.classList.add("js-reveal");
-}
-
 const rootEl = document.getElementById("root");
 if (rootEl) {
   const app = (
@@ -24,20 +17,34 @@ if (rootEl) {
       <App />
     </StrictMode>
   );
+  const enableReveal = () => {
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.add("js-reveal");
+    }
+  };
   if (rootEl.hasChildNodes()) {
-    // Pastikan browser mem-paint SSR Hero & poster terlebih dahulu sebelum hidrasi JS dimulai
-    window.requestAnimationFrame(() => hydrateRoot(rootEl, app));
+    // Paint SSR Hero & poster terlebih dahulu, hidrasi di frame berikutnya, lalu aktifkan js-reveal tanpa long task
+    window.requestAnimationFrame(() => {
+      hydrateRoot(rootEl, app);
+      globalThis.setTimeout(enableReveal, 0);
+    });
   } else {
+    enableReveal();
     createRoot(rootEl).render(app);
   }
 }
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
-  window.addEventListener(
-    "load",
-    () => {
-      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
-    },
-    { once: true }
-  );
+  const scheduleSw = () => {
+    globalThis.setTimeout(() => {
+      const register = () => navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(register, { timeout: 1000 });
+      } else {
+        register();
+      }
+    }, 2400);
+  };
+  if (document.readyState === "complete") scheduleSw();
+  else window.addEventListener("load", scheduleSw, { once: true });
 }

@@ -60,13 +60,12 @@ function getRevealObserver(): IntersectionObserver {
   return sharedRevealIO;
 }
 
-/** Mengamati kemunculan elemen lewat satu shared IntersectionObserver & satu batched rAF sweep. */
+/** Mengamati kemunculan elemen lewat satu shared IntersectionObserver (scroll sweep menjadi fallback tanpa paksa layout saat mount). */
 function observeReveal(node: Element, onEnter: () => void): () => void {
   const io = getRevealObserver();
   revealCallbacks.set(node, onEnter);
   pendingRevealNodes.add(node);
   io.observe(node);
-  scheduleRevealSweep();
 
   return () => {
     revealCallbacks.delete(node);
@@ -432,41 +431,50 @@ export function useLoopingVideo(
       return;
     }
 
-    let active = !deferUntilView;
+    let active = false;
     const ensurePlay = () => {
       if (!active || document.hidden) return;
-      if (deferUntilView && vid.preload === "none") vid.preload = "auto";
+      if (vid.preload === "none") vid.preload = "auto";
       vid.defaultMuted = true;
       vid.muted = true;
       if (vid.paused) void vid.play().catch(() => {});
     };
 
-    if (active) ensurePlay();
-
-    let io: IntersectionObserver | undefined;
-    if (typeof IntersectionObserver !== "undefined") {
-      io = new IntersectionObserver(
-        entries => {
-          if (!entries.some(e => e.isIntersecting)) return;
-          active = true;
-          ensurePlay();
-          if (deferUntilView) {
-            io?.disconnect();
-            io = undefined;
-          }
-        },
-        deferUntilView ? { threshold: 0.08 } : { rootMargin: "320px 0px" }
-      );
-      io.observe(vid);
-    } else {
+    const startNow = () => {
       active = true;
       ensurePlay();
+    };
+
+    let io: IntersectionObserver | undefined;
+    let onWindowLoad: (() => void) | undefined;
+
+    if (deferUntilView) {
+      if (typeof IntersectionObserver !== "undefined") {
+        io = new IntersectionObserver(
+          entries => {
+            if (!entries.some(e => e.isIntersecting)) return;
+            startNow();
+            io?.disconnect();
+            io = undefined;
+          },
+          { threshold: 0.08 }
+        );
+        io.observe(vid);
+      } else {
+        startNow();
+      }
+    } else if (document.readyState === "complete") {
+      startNow();
+    } else {
+      onWindowLoad = () => startNow();
+      window.addEventListener("load", onWindowLoad, { once: true });
     }
 
     vid.addEventListener("canplay", ensurePlay);
     document.addEventListener("visibilitychange", ensurePlay);
     return () => {
       io?.disconnect();
+      if (onWindowLoad) window.removeEventListener("load", onWindowLoad);
       vid.removeEventListener("canplay", ensurePlay);
       document.removeEventListener("visibilitychange", ensurePlay);
     };

@@ -11,7 +11,7 @@ interface CertCardProps {
   slot: number;
   logicalIndex: number;
   copy: number;
-  total: number;
+  copies: number;
   focused: boolean;
   eager: boolean;
   setCardRef: (slot: number, el: HTMLButtonElement | null) => void;
@@ -24,7 +24,7 @@ const CertCard = memo(function CertCard({
   slot,
   logicalIndex,
   copy,
-  total,
+  copies,
   focused,
   eager,
   setCardRef,
@@ -40,7 +40,7 @@ const CertCard = memo(function CertCard({
     <button
       ref={el => setCardRef(slot, el)}
       type="button"
-      tabIndex={total > 1 ? (copy === 1 ? 0 : -1) : 0}
+      tabIndex={copies > 1 ? (copy === 1 ? 0 : -1) : 0}
       className={`cert-app${focused ? " is-focused" : ""}`}
       aria-label={`Lihat ${cert.label}`}
       onPointerEnter={warmCert}
@@ -88,10 +88,6 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
   const count = items.length;
   const [infiniteReady, setInfiniteReady] = useState(false);
 
-  useEffect(() => {
-    setInfiniteReady(true);
-  }, []);
-
   const copies = infiniteReady && count > 1 ? COPIES : 1;
   const repeated = useMemo(
     () =>
@@ -124,22 +120,28 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
   const [activeSlot, setActiveSlot] = useState(0);
   const active = count > 0 ? ((activeSlot % count) + count) % count : 0;
 
-  // Muat seluruh salinan sertifikat begitu section mendekati viewport agar swipe unlimited tanpa gambar kosong
+  // Aktifkan kloning infinite & muat gambar sertifikat begitu section mendekati viewport agar hidrasi awal 0 long task
   useEffect(() => {
     const el = sectionRef.current;
-    if (!el || eagerImgs) return;
+    if (!el || (eagerImgs && infiniteReady)) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setInfiniteReady(true);
+      setEagerImgs(true);
+      return;
+    }
     const io = new IntersectionObserver(
       entries => {
         if (entries.some(en => en.isIntersecting)) {
+          setInfiniteReady(true);
           setEagerImgs(true);
           io.disconnect();
         }
       },
-      { rootMargin: "350px 0px" }
+      { rootMargin: "550px 0px" }
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [eagerImgs, sectionRef]);
+  }, [eagerImgs, infiniteReady, sectionRef]);
 
   const setCardRef = useCallback((slot: number, el: HTMLButtonElement | null) => {
     cardRefs.current[slot] = el;
@@ -279,7 +281,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track || count === 0) return;
+    if (!track || count === 0 || !infiniteReady) return;
 
     cardRefs.current.length = repeated.length;
 
@@ -582,7 +584,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
               slot={slot}
               logicalIndex={idx}
               copy={copy}
-              total={count}
+              copies={copies}
               focused={activeSlot === slot}
               eager={eagerImgs}
               setCardRef={setCardRef}
