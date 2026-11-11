@@ -64,7 +64,14 @@ const CertCard = memo(function CertCard({
           height={cert.h}
           loading={eager ? "eager" : "lazy"}
           decoding="async"
+          fetchPriority="low"
           draggable={false}
+          onError={e => {
+            const img = e.currentTarget;
+            if (img.dataset.fallbackTried) return;
+            img.dataset.fallbackTried = "1";
+            img.src = `${IMG}${cert.src}`;
+          }}
         />
       </div>
     </button>

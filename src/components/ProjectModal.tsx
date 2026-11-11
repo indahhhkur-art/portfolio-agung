@@ -127,6 +127,7 @@ function ProjectModal({
                   alt={it.label}
                   loading={i < 4 ? "eager" : "lazy"}
                   decoding="async"
+                  fetchPriority={i < 2 ? "high" : "low"}
                   onLoad={e => {
                     e.currentTarget.classList.add("is-loaded");
                     e.currentTarget.parentElement?.classList.add("is-img-ready");

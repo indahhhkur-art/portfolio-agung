@@ -188,6 +188,19 @@ export function prefersReducedMotion(): boolean {
   );
 }
 
+function addMediaChangeListener(mq: MediaQueryList, handler: (e: MediaQueryListEvent) => void): () => void {
+  if (typeof mq.addEventListener === "function") {
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }
+  const legacy = mq as MediaQueryList & {
+    addListener?: (cb: (e: MediaQueryListEvent) => void) => void;
+    removeListener?: (cb: (e: MediaQueryListEvent) => void) => void;
+  };
+  legacy.addListener?.(handler);
+  return () => legacy.removeListener?.(handler);
+}
+
 /** Menghitung angka naik (0 -> target) dengan kurva easeOut saat masuk viewport. */
 export function useCountUp<T extends HTMLElement = HTMLElement>(
   target: string | number,
@@ -414,14 +427,14 @@ export function useLoopingVideo(
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    if (disabled) {
+    if (disabled || prefersReducedMotion()) {
       vid.pause();
       return;
     }
 
     let active = !deferUntilView;
     const ensurePlay = () => {
-      if (!active || document.hidden) return;
+      if (!active || document.hidden || prefersReducedMotion()) return;
       if (deferUntilView && vid.preload === "none") vid.preload = "auto";
       vid.defaultMuted = true;
       vid.muted = true;
@@ -442,7 +455,7 @@ export function useLoopingVideo(
             io = undefined;
           }
         },
-        deferUntilView ? { threshold: 0.08 } : { rootMargin: "320px 0px" }
+        deferUntilView ? { rootMargin: "220px 0px", threshold: 0.01 } : { rootMargin: "320px 0px" }
       );
       io.observe(vid);
     } else {
@@ -450,10 +463,20 @@ export function useLoopingVideo(
       ensurePlay();
     }
 
+    let detachMotion: (() => void) | undefined;
+    if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      detachMotion = addMediaChangeListener(mq, e => {
+        if (e.matches) vid.pause();
+        else ensurePlay();
+      });
+    }
+
     vid.addEventListener("canplay", ensurePlay);
     document.addEventListener("visibilitychange", ensurePlay);
     return () => {
       io?.disconnect();
+      detachMotion?.();
       vid.removeEventListener("canplay", ensurePlay);
       document.removeEventListener("visibilitychange", ensurePlay);
     };
@@ -504,8 +527,7 @@ export function useTheme(): { theme: ThemeMode; toggleTheme: () => void } {
       syncThemeDom(next);
       setTheme(next);
     };
-    mq.addEventListener("change", onSystemChange);
-    return () => mq.removeEventListener("change", onSystemChange);
+    return addMediaChangeListener(mq, onSystemChange);
   }, []);
 
   const toggleTheme = () => {

@@ -6,7 +6,8 @@ export default defineConfig(({ isSsrBuild }) => ({
   base: "/",
   plugins: [react()],
   build: {
-    target: "esnext",
+    target: ["es2020", "edge88", "firefox88", "chrome87", "safari14.1"],
+    cssTarget: ["chrome87", "edge88", "firefox88", "safari14.1"],
     cssMinify: true,
     rolldownOptions: isSsrBuild
       ? undefined

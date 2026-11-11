@@ -202,6 +202,7 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .hero__inner { display: grid; grid-template-columns: minmax(0, .94fr) minmax(0, 1.14fr); align-items: stretch; gap: clamp(2rem, 4vw, 4rem); }
 @media (min-width: 901px) {
   .hero {
+    min-height: clamp(540px, calc(100vh - 52px), 900px);
     min-height: clamp(540px, calc(100svh - 52px), 900px);
     display: flex; flex-direction: column;
   }
@@ -235,7 +236,10 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .about { padding: 80px 0 40px; background: var(--surface); transition: background-color .3s ease; }
 .about__inner { display: grid; grid-template-columns: minmax(280px, .86fr) minmax(0, 1.14fr); gap: clamp(2rem, 4vw, 4.5rem); align-items: center; }
 @media (min-width: 901px) {
-  .about__inner { min-height: clamp(500px, calc(100svh - 146px), 720px); }
+  .about__inner {
+    min-height: clamp(500px, calc(100vh - 146px), 720px);
+    min-height: clamp(500px, calc(100svh - 146px), 720px);
+  }
 }
 .about__photo video,
 .about__photo img {
@@ -261,7 +265,11 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .section-center-head { text-align: center; margin-bottom: 2rem; }
 .tools-block { padding: clamp(96px, 12vh, 148px) 0 40px; }
 @media (min-width: 901px) {
-  .tools-block { min-height: clamp(500px, calc(100svh - 106px), 700px); display: flex; flex-direction: column; justify-content: center; }
+  .tools-block {
+    min-height: clamp(500px, calc(100vh - 106px), 700px);
+    min-height: clamp(500px, calc(100svh - 106px), 700px);
+    display: flex; flex-direction: column; justify-content: center;
+  }
 }
 .tools__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
 .tool-pill {
@@ -560,7 +568,7 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
 .certs__dot.is-active::after { width: 26px; background: var(--grad-contrast); }
 
 /* Portfolio (Kartu Ditingkatkan dari Referensi UI + Palet Warna Lama) */
-.work { padding: 90px 0; }
+.work { padding: 90px 0; content-visibility: auto; contain-intrinsic-size: auto 1280px; }
 .work__total {
   font-size: .82rem; font-weight: 600; color: var(--blue-ink);
   background: var(--card); border: 1.5px solid var(--border); padding: .45rem 1rem; border-radius: 999px;
@@ -884,6 +892,7 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
 }
 @media (min-width: 901px) {
   .contact {
+    min-height: clamp(460px, calc(100vh - 134px), 780px);
     min-height: clamp(460px, calc(100svh - 134px), 780px);
     display: grid;
     align-content: center;
@@ -1193,10 +1202,37 @@ html[data-theme="dark"] .icon-btn.back-top {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
   .ribbon__track { animation-duration: 60s; }
-  .hero__text .eyebrow, .hero__lead, .hero__cta { animation: none; }
+  .hero__text .eyebrow, .hero__lead, .hero__cta, .gallery button::after { animation: none !important; }
   .reveal, [data-reveal-item], .journey-card {
     opacity: 1 !important; transform: none !important; transition: none !important;
   }
   .contact__orb { animation: orbCalmPulse 6.5s ease-in-out infinite; }
   .contact__orb-ring { animation-duration: 40s; }
+}
+
+@media (forced-colors: active) {
+  .eyebrow, .text-grad, .stats strong {
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    color: CanvasText !important;
+  }
+  .btn, .chip, .card, .tool-pill, .journey-card, .cert-app, .icon-btn, .theme-toggle {
+    border: 1.5px solid ButtonText !important;
+  }
+}
+
+@media print {
+  .nav, .scroll-progress, .icon-btn.back-top, .hero__art, .about__photo, .ribbon-band, .certs__nav, .certs__dots, .filters, .contact__stage {
+    display: none !important;
+  }
+  body, .hero, .about, .work, .contact, .footer {
+    background: #fff !important; color: #000 !important;
+  }
+  .hero, .about__inner, .tools-block, .contact {
+    min-height: 0 !important; padding: 1.2rem 0 !important;
+  }
+  .reveal, [data-reveal-item], .journey-card {
+    opacity: 1 !important; transform: none !important;
+  }
 }

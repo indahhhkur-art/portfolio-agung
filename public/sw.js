@@ -1,7 +1,7 @@
-const SHELL_CACHE = "agung-shell-v5";
-const IMG_CACHE = "agung-img-v5";
+const SHELL_CACHE = "agung-shell-v6";
+const IMG_CACHE = "agung-img-v6";
 const MAX_IMG_ENTRIES = 60;
-const PRECACHE_ASSETS = ["/", "/theme-init.js", "/icon.svg", "/icon-192.png", "/site.webmanifest", "/img/hero-intro-poster.webp?v=2"];
+const PRECACHE_ASSETS = ["/", "/theme-init.js", "/icon.svg", "/icon-192.png", "/apple-touch-icon.png", "/site.webmanifest", "/img/hero-intro-poster.webp?v=2"];
 
 async function trimCache(cacheName, maxItems) {
   const cache = await caches.open(cacheName);
@@ -46,6 +46,32 @@ self.addEventListener("fetch", event => {
 
   // Abaikan partial video stream / non-cacheable endpoints
   if (url.pathname.startsWith("/video/")) return;
+
+  // Shell scripts & icons (/theme-init.js, /icon.svg, /icon-192.png, /apple-touch-icon.png, /site.webmanifest) -> Stale-While-Revalidate di SHELL_CACHE
+  if (
+    url.pathname === "/theme-init.js" ||
+    url.pathname === "/site.webmanifest" ||
+    url.pathname === "/icon.svg" ||
+    url.pathname === "/icon-192.png" ||
+    url.pathname === "/icon-512.png" ||
+    url.pathname === "/apple-touch-icon.png"
+  ) {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        const net = fetch(request)
+          .then(res => {
+            if (isCacheableBasic(res)) {
+              const copy = res.clone();
+              caches.open(SHELL_CACHE).then(c => c.put(request, copy));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || net;
+      })
+    );
+    return;
+  }
 
   // Immutable hashed assets (/assets/*.js, *.css, *.woff2) -> Cache-First di SHELL_CACHE
   if (url.pathname.startsWith("/assets/")) {

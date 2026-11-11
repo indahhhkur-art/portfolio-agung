@@ -80,6 +80,7 @@ if (fs.existsSync(distSwPath) && precacheCoreAssets.length) {
     "/theme-init.js",
     "/icon.svg",
     "/icon-192.png",
+    "/apple-touch-icon.png",
     "/site.webmanifest",
     "/img/hero-intro-poster.webp?v=2",
     ...precacheCoreAssets
@@ -105,7 +106,10 @@ const notFoundHtml = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#4361ab">
+  <meta name="color-scheme" content="light dark">
+  <script src="/theme-init.js"></script>
   <meta name="robots" content="noindex">
   <title>404 — Halaman Tidak Ditemukan | Agung Saeful</title>
   <link rel="icon" type="image/svg+xml" href="/icon.svg">

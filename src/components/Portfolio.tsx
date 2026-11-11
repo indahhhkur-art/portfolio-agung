@@ -44,6 +44,7 @@ const ProjectCard = memo(function ProjectCard({
           height={300}
           loading="lazy"
           decoding="async"
+          fetchPriority="low"
           onError={e => {
             const img = e.currentTarget;
             if (img.dataset.fallbackTried) return;
