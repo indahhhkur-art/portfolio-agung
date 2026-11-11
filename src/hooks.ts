@@ -327,12 +327,14 @@ export function useScrollSpy(ids: readonly string[]): { active: string; scrolled
       if (raf) return;
       raf = window.requestAnimationFrame(() => {
         raf = 0;
-        const doc = document.documentElement;
         const scrolled = window.scrollY > 20;
         let nextActive: string | null = null;
         if (window.scrollY <= 36) nextActive = ids[0] ?? null;
-        else if (window.innerHeight + window.scrollY >= doc.scrollHeight - 24) {
-          nextActive = ids[ids.length - 1] ?? null;
+        else {
+          const doc = document.documentElement;
+          if (window.innerHeight + window.scrollY >= doc.scrollHeight - 24) {
+            nextActive = ids[ids.length - 1] ?? null;
+          }
         }
         setState(prev => {
           const active = nextActive || prev.active;

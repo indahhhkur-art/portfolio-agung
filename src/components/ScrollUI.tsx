@@ -22,7 +22,7 @@ function ScrollUI({ hidden }: { hidden: boolean }) {
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update);
     };
-    update();
+    if (window.scrollY > 0) update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
 

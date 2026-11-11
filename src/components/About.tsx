@@ -52,7 +52,7 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
           io.disconnect();
         }
       },
-      { rootMargin: "450px 0px" }
+      { rootMargin: "60px 0px" }
     );
     io.observe(el);
     return () => io.disconnect();
