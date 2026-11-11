@@ -1,4 +1,4 @@
-import { memo, type CSSProperties } from "react";
+import { memo } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
 import { useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.ts";
 import type { LightboxItem } from "../types.ts";
@@ -111,8 +111,8 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
               <h4>Education</h4>
             </div>
             <ul className="journey-card__list">
-              {EDUCATION_LIST.map((item, idx) => (
-                <li key={item.title} style={{ "--item-i": idx } as CSSProperties}>
+              {EDUCATION_LIST.map(item => (
+                <li key={item.title}>
                   <span className="journey-card__period">{item.period}</span>
                   <h5>{item.title}</h5>
                   <p>{item.detail}</p>
@@ -122,8 +122,8 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
             <div className="journey-skills">
               <span className="journey-skills__label">Key Skills</span>
               <div className="journey-skills__tags">
-                {KEY_SKILLS.map((skill, idx) => (
-                  <span key={skill} className="skill-chip" style={{ "--chip-i": idx } as CSSProperties}>{skill}</span>
+                {KEY_SKILLS.map(skill => (
+                  <span key={skill} className="skill-chip">{skill}</span>
                 ))}
               </div>
             </div>
@@ -135,8 +135,8 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
               <h4>Work Experience</h4>
             </div>
             <ul className="journey-card__list">
-              {EXPERIENCE_LIST.map((item, idx) => (
-                <li key={item.title} style={{ "--item-i": idx } as CSSProperties}>
+              {EXPERIENCE_LIST.map(item => (
+                <li key={item.title}>
                   <span className="journey-card__period">{item.period}</span>
                   <h5>{item.title}</h5>
                   <p>{item.detail}</p>

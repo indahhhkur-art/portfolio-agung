@@ -1,7 +1,7 @@
-const SHELL_CACHE = "agung-shell-v2";
-const IMG_CACHE = "agung-img-v2";
+const SHELL_CACHE = "agung-shell-v3";
+const IMG_CACHE = "agung-img-v3";
 const MAX_IMG_ENTRIES = 60;
-const PRECACHE_ASSETS = ["/", "/icon.svg", "/site.webmanifest", "/img/hero-intro-poster.webp"];
+const PRECACHE_ASSETS = ["/", "/icon.svg", "/icon-192.png", "/site.webmanifest", "/img/hero-intro-poster.webp"];
 
 async function trimCache(cacheName, maxItems) {
   const cache = await caches.open(cacheName);
@@ -10,6 +10,8 @@ async function trimCache(cacheName, maxItems) {
   const excess = keys.length - maxItems;
   await Promise.all(keys.slice(0, excess).map(k => cache.delete(k)));
 }
+
+const isCacheableBasic = res => Boolean(res && res.ok && res.status === 200 && res.type === "basic");
 
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -40,18 +42,18 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET" || request.headers.has("range")) return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+  if ((url.protocol !== "http:" && url.protocol !== "https:") || url.origin !== self.location.origin) return;
 
   // Abaikan partial video stream / non-cacheable endpoints
   if (url.pathname.startsWith("/video/")) return;
 
-  // Immutable hashed assets (/assets/*.js, *.woff2) -> Cache-First di SHELL_CACHE
+  // Immutable hashed assets (/assets/*.js, *.css, *.woff2) -> Cache-First di SHELL_CACHE
   if (url.pathname.startsWith("/assets/")) {
     event.respondWith(
       caches.match(request).then(cached => {
         if (cached) return cached;
         return fetch(request).then(res => {
-          if (res.status === 200) {
+          if (isCacheableBasic(res)) {
             const copy = res.clone();
             caches.open(SHELL_CACHE).then(c => c.put(request, copy));
           }
@@ -67,7 +69,7 @@ self.addEventListener("fetch", event => {
     event.respondWith(
       fetch(request)
         .then(res => {
-          if (res.status === 200) {
+          if (isCacheableBasic(res)) {
             const copy = res.clone();
             caches.open(SHELL_CACHE).then(c => c.put(request, copy));
           }
@@ -78,13 +80,13 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Gambar -> Stale-While-Revalidate di IMG_CACHE dengan batas entri (bounded FIFO eviction)
+  // Gambar -> Stale-While-Revalidate di IMG_CACHE dengan bounded FIFO eviction
   if (url.pathname.startsWith("/img/")) {
     event.respondWith(
       caches.match(request).then(cached => {
         const net = fetch(request)
           .then(res => {
-            if (res.status === 200) {
+            if (isCacheableBasic(res)) {
               const copy = res.clone();
               caches
                 .open(IMG_CACHE)

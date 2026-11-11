@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CONTACT, MICROSTOCK_LINKS } from "../data.ts";
 import { prefersReducedMotion, useRevealGroup } from "../hooks.ts";
 import type { ContactConfig } from "../types.ts";
@@ -15,28 +15,20 @@ interface SparkleSpec {
   id: number;
   zone: "tl" | "br";
   kind: "star" | "ring" | "dot" | "diamond";
-  sx: string;
-  sy: string;
-  dx: string;
-  dy: string;
-  rot: string;
   size: number;
-  delay: string;
 }
 
 const SPARKLES: SparkleSpec[] = [
-  // Zona bola atas-kiri (LinkedIn, Shutterstock, THANKS)
-  { id: 1, zone: "tl", kind: "star", sx: "16%", sy: "22%", dx: "-40px", dy: "-52px", rot: "-35deg", size: 16, delay: "0ms" },
-  { id: 2, zone: "tl", kind: "ring", sx: "26%", sy: "30%", dx: "44px", dy: "-42px", rot: "20deg", size: 13, delay: "35ms" },
-  { id: 3, zone: "tl", kind: "star", sx: "36%", sy: "20%", dx: "-48px", dy: "-42px", rot: "-24deg", size: 14, delay: "20ms" },
-  { id: 4, zone: "tl", kind: "dot", sx: "46%", sy: "14%", dx: "8px", dy: "-54px", rot: "0deg", size: 9, delay: "15ms" },
-  { id: 5, zone: "tl", kind: "star", sx: "22%", sy: "44%", dx: "-58px", dy: "16px", rot: "-28deg", size: 13, delay: "40ms" },
-  // Zona bola bawah-kanan (Adobe Stock, PNGtree, THANKS)
-  { id: 6, zone: "br", kind: "diamond", sx: "64%", sy: "20%", dx: "50px", dy: "-48px", rot: "42deg", size: 12, delay: "45ms" },
-  { id: 7, zone: "br", kind: "star", sx: "78%", sy: "68%", dx: "48px", dy: "52px", rot: "38deg", size: 16, delay: "30ms" },
-  { id: 8, zone: "br", kind: "diamond", sx: "86%", sy: "76%", dx: "-34px", dy: "48px", rot: "-45deg", size: 12, delay: "55ms" },
-  { id: 9, zone: "br", kind: "ring", sx: "70%", sy: "82%", dx: "-46px", dy: "34px", rot: "18deg", size: 13, delay: "25ms" },
-  { id: 10, zone: "br", kind: "dot", sx: "76%", sy: "44%", dx: "60px", dy: "-14px", rot: "0deg", size: 10, delay: "30ms" }
+  { id: 1, zone: "tl", kind: "star", size: 16 },
+  { id: 2, zone: "tl", kind: "ring", size: 13 },
+  { id: 3, zone: "tl", kind: "star", size: 14 },
+  { id: 4, zone: "tl", kind: "dot", size: 9 },
+  { id: 5, zone: "tl", kind: "star", size: 13 },
+  { id: 6, zone: "br", kind: "diamond", size: 12 },
+  { id: 7, zone: "br", kind: "star", size: 16 },
+  { id: 8, zone: "br", kind: "diamond", size: 12 },
+  { id: 9, zone: "br", kind: "ring", size: 13 },
+  { id: 10, zone: "br", kind: "dot", size: 10 }
 ];
 
 const MICROSTOCK_TARGET: Record<string, OrbTarget> = {
@@ -230,17 +222,7 @@ function Contact() {
             {activeSparkles.map(sp => (
               <span
                 key={sp.id}
-                className={`contact__sparkle contact__sparkle--${sp.kind}`}
-                style={
-                  {
-                    left: sp.sx,
-                    top: sp.sy,
-                    "--dx": sp.dx,
-                    "--dy": sp.dy,
-                    "--rot": sp.rot,
-                    "--sp-delay": sp.delay
-                  } as CSSProperties
-                }
+                className={`contact__sparkle contact__sparkle--${sp.id} contact__sparkle--${sp.kind}`}
               >
                 <SparkleShape spec={sp} />
               </span>

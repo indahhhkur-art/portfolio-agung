@@ -306,6 +306,10 @@ html.js-reveal .journey-card:not(.is-animated) .journey-card__list li::before { 
 .journey-card.is-animated .journey-card__list li { opacity: 1; transform: translate3d(0, 0, 0); }
 .journey-card.is-animated .journey-card__list li::before { transform: scale(1); }
 
+.journey-card__list li:nth-child(2) { --item-i: 1; }
+.journey-card__list li:nth-child(3) { --item-i: 2; }
+.journey-card__list li:nth-child(4) { --item-i: 3; }
+.journey-card__list li:nth-child(5) { --item-i: 4; }
 .journey-card.is-settled .journey-card__list li {
   transition: transform .18s var(--ease-smooth), background-color .18s ease, border-left-color .18s ease;
 }
@@ -345,6 +349,12 @@ html.js-reveal .journey-card:not(.is-animated) .journey-skills__label { opacity:
 }
 html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transform: scale(0.78) translate3d(0, 12px, 0); }
 .journey-card.is-animated .skill-chip { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+.skill-chip:nth-child(2) { --chip-i: 1; }
+.skill-chip:nth-child(3) { --chip-i: 2; }
+.skill-chip:nth-child(4) { --chip-i: 3; }
+.skill-chip:nth-child(5) { --chip-i: 4; }
+.skill-chip:nth-child(6) { --chip-i: 5; }
+.skill-chip:nth-child(7) { --chip-i: 6; }
 .journey-card.is-settled .skill-chip {
   transition: transform .16s var(--ease-smooth), border-color .16s ease, color .16s ease, box-shadow .16s ease;
 }
@@ -878,6 +888,16 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
   animation: sparkleFly .88s var(--ease-smooth) var(--sp-delay, 0ms) forwards;
 }
 .contact__sparkle--ring, .contact__sparkle--diamond { color: #bfefff; }
+.contact__sparkle--1  { left: 16%; top: 22%; --dx: -40px; --dy: -52px; --rot: -35deg; --sp-delay: 0ms; }
+.contact__sparkle--2  { left: 26%; top: 30%; --dx: 44px;  --dy: -42px; --rot: 20deg;  --sp-delay: 35ms; }
+.contact__sparkle--3  { left: 36%; top: 20%; --dx: -48px; --dy: -42px; --rot: -24deg; --sp-delay: 20ms; }
+.contact__sparkle--4  { left: 46%; top: 14%; --dx: 8px;   --dy: -54px; --rot: 0deg;   --sp-delay: 15ms; }
+.contact__sparkle--5  { left: 22%; top: 44%; --dx: -58px; --dy: 16px;  --rot: -28deg; --sp-delay: 40ms; }
+.contact__sparkle--6  { left: 64%; top: 20%; --dx: 50px;  --dy: -48px; --rot: 42deg;  --sp-delay: 45ms; }
+.contact__sparkle--7  { left: 78%; top: 68%; --dx: 48px;  --dy: 52px;  --rot: 38deg;  --sp-delay: 30ms; }
+.contact__sparkle--8  { left: 86%; top: 76%; --dx: -34px; --dy: 48px;  --rot: -45deg; --sp-delay: 55ms; }
+.contact__sparkle--9  { left: 70%; top: 82%; --dx: -46px; --dy: 34px;  --rot: 18deg;  --sp-delay: 25ms; }
+.contact__sparkle--10 { left: 76%; top: 44%; --dx: 60px;  --dy: -14px; --rot: 0deg;   --sp-delay: 30ms; }
 
 .contact__inner { position: relative; z-index: 2; text-shadow: 0 1px 12px rgba(25, 35, 75, .14); }
 .contact h2 { font-size: clamp(2.6rem, 8vw, 5rem); font-weight: 800; letter-spacing: .04em; margin-bottom: .6rem; line-height: 1.1; }
