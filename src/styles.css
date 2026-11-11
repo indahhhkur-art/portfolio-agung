@@ -234,6 +234,9 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 /* About (Versi Sebelumnya + LinkedIn & Deskripsi BSI) */
 .about { padding: 80px 0 40px; background: var(--surface); transition: background-color .3s ease; }
 .about__inner { display: grid; grid-template-columns: minmax(280px, .86fr) minmax(0, 1.14fr); gap: clamp(2rem, 4vw, 4.5rem); align-items: center; }
+@media (min-width: 901px) {
+  .about__inner { min-height: clamp(500px, calc(100svh - 146px), 720px); }
+}
 .about__photo video,
 .about__photo img {
   width: 100%; height: auto; aspect-ratio: 760 / 600;
@@ -256,7 +259,7 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 
 /* Tools Strip (Sesuai Referensi Screenshot: Kapsul Oval 3 Kolom x 2 Baris) */
 .section-center-head { text-align: center; margin-bottom: 2rem; }
-.tools-block { padding: 72px 0 18px; }
+.tools-block { padding: clamp(96px, 12vh, 148px) 0 40px; }
 .tools__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
 .tool-pill {
   background: var(--surface-item); border: 1.5px solid var(--border-strong); border-radius: 999px;
@@ -286,7 +289,7 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .tool-pill span { font-size: .76rem; color: var(--muted); font-family: "Montserrat", sans-serif; line-height: 1.35; }
 
 /* Education & Work Experience Cards (Animasi Timeline & Kaskade Terasa Hidup) */
-.journey { padding: 48px 0 12px; }
+.journey { padding: 64px 0 20px; }
 .journey__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem; align-items: stretch; }
 .journey-card {
   position: relative; overflow: hidden;
