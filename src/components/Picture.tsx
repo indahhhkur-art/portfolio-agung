@@ -15,7 +15,7 @@ interface PictureProps extends ImgHTMLAttributes<HTMLImageElement> {
 /** Gambar responsif WebP + srcSet adaptif dengan fallback JPEG kompatibel penuh. */
 export default function Picture({ src, webpSrc, webpSrcSet, sizes, alt, ...imgProps }: PictureProps) {
   return (
-    <picture style={{ display: "contents" }}>
+    <picture className="pic-contents">
       <source srcSet={webpSrcSet ?? webpSrc} sizes={sizes} type="image/webp" />
       <img src={src} alt={alt} sizes={sizes} {...imgProps} />
     </picture>

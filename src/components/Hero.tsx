@@ -9,9 +9,11 @@ function Hero() {
 
   useEffect(() => {
     const vid = videoRef.current;
-    if (vid) {
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (vid && !conn?.saveData) {
       vid.defaultMuted = true;
       vid.muted = true;
+      vid.preload = "auto";
       void vid.play().catch(() => {});
     }
 
@@ -76,7 +78,7 @@ function Hero() {
               muted
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
               aria-label="Animasi ilustrasi desainer grafis memegang karya dan palet desain"
             />
           </div>
