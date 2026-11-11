@@ -146,13 +146,9 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   from { transform: translate3d(0, 14px, 0); }
   to { transform: translate3d(0, 0, 0); }
 }
-@keyframes heroArtFloat {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -8px, 0); }
-}
 .hero { padding: 66px 0 0; overflow: hidden; background: #ffffff; }
-.hero__inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); align-items: stretch; gap: clamp(2rem, 4vw, 4rem); }
-.hero__text { align-self: center; padding: 64px 0 88px; }
+.hero__inner { display: grid; grid-template-columns: minmax(0, .94fr) minmax(0, 1.14fr); align-items: stretch; gap: clamp(2rem, 4vw, 4rem); }
+.hero__text { align-self: center; padding: 72px 0 96px; }
 .hero__text .eyebrow, .hero__lead, .hero__cta { animation: heroLiftIn .6s var(--ease-smooth) backwards; }
 .hero__lead { animation-delay: .06s; }
 .hero__cta { animation-delay: .12s; }
@@ -165,15 +161,16 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   margin-right: calc(-1 * var(--pad-x));
   position: relative;
 }
-.hero__art::before {
-  content: ""; position: absolute; width: 72%; aspect-ratio: 1; border-radius: 50%;
-  right: 8%; bottom: 8%; pointer-events: none;
-  background: radial-gradient(circle, rgba(79, 195, 232, .12), rgba(155, 114, 201, .06) 55%, transparent 75%);
+.hero__video-box {
+  position: relative; width: 100%; max-width: 860px;
+  aspect-ratio: 902 / 684; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 7%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 7%);
 }
-.hero__art img {
-  width: 100%; max-width: 740px; aspect-ratio: 1136 / 1193; height: auto; display: block;
-  position: relative; z-index: 1;
-  animation: heroArtFloat 7s ease-in-out infinite;
+.hero__video-box video {
+  position: absolute; left: -21.0643%; top: -2.924%;
+  width: 141.9069%; height: 105.2632%;
+  max-width: none; display: block; pointer-events: none;
 }
 
 /* About (Versi Sebelumnya + LinkedIn & Deskripsi BSI) */
@@ -781,7 +778,11 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   .tools__grid { grid-template-columns: repeat(2, 1fr); }
   .hero { padding: 96px 0 36px; }
   .hero__text { padding: 0; }
-  .hero__art { order: -1; margin-right: 0; width: 100%; max-width: 420px; margin-inline: auto; justify-content: center; }
+  .hero__art { order: -1; margin-right: 0; width: 100%; max-width: 440px; margin-inline: auto; justify-content: center; }
+  .hero__video-box {
+    max-width: 440px;
+    -webkit-mask-image: none; mask-image: none;
+  }
   .about__photo { max-width: 340px; margin-inline: auto; }
 }
 
