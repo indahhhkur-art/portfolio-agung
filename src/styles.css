@@ -1128,34 +1128,22 @@ html[data-theme="dark"] {
   --card-hover-border: rgba(126, 168, 255, .45);
 }
 
-html[data-theme="dark"] .hero {
-  padding: 94px 0 56px;
-}
-html[data-theme="dark"] .hero__text {
-  padding: 44px 0 56px;
-}
-@media (max-width: 900px) {
-  html[data-theme="dark"] .hero { padding: 96px 0 36px; }
-  html[data-theme="dark"] .hero__text { padding: 0; }
-}
-html[data-theme="dark"] .hero__art {
-  margin-right: 0;
-  align-items: center;
-}
 html[data-theme="dark"] .hero__video-box {
   background: #ffffff;
-  border-radius: 26px;
-  border: 1.5px solid rgba(160, 185, 255, .28);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, .45), 0 0 46px rgba(79, 195, 232, .16);
+  border-radius: 26px 0 0 26px;
+  box-shadow: inset 0 0 0 1.5px rgba(160, 185, 255, .28), -16px 20px 54px rgba(0, 0, 0, .44);
   -webkit-mask-image: none;
   mask-image: none;
+}
+@media (max-width: 900px) {
+  html[data-theme="dark"] .hero__video-box {
+    border-radius: 26px;
+  }
 }
 html[data-theme="dark"] .about__photo {
   background: linear-gradient(170deg, #ffffff 0%, #f4f7ff 100%);
   border-radius: 26px;
-  padding: clamp(10px, 1.4vw, 18px) clamp(10px, 1.4vw, 18px) 0;
-  border: 1.5px solid rgba(160, 185, 255, .28);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, .44), 0 0 42px rgba(91, 127, 199, .18);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, .44), 0 0 0 1.5px rgba(160, 185, 255, .28);
   overflow: hidden;
 }
 html[data-theme="dark"] .tool-pill__icon {
@@ -1164,7 +1152,7 @@ html[data-theme="dark"] .tool-pill__icon {
 html[data-theme="dark"] .card__cat {
   background: rgba(12, 16, 32, .88);
   color: #f2f5ff;
-  border: 1px solid rgba(148, 168, 232, .22);
+  box-shadow: inset 0 0 0 1px rgba(148, 168, 232, .22), 0 4px 10px rgba(0, 0, 0, .2);
 }
 html[data-theme="dark"] .theme-toggle {
   box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
@@ -1181,7 +1169,7 @@ html[data-theme="dark"] .back-top {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
-  .ribbon__track { animation: none; }
+  .ribbon__track { animation-duration: 60s; }
   .hero__text .eyebrow, .hero__lead, .hero__cta { animation: none; }
   .reveal, [data-reveal-item], .journey-card {
     opacity: 1 !important; transform: none !important; transition: none !important;
