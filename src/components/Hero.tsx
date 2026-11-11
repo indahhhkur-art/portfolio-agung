@@ -70,6 +70,10 @@ function Hero() {
               loop
               playsInline
               preload="metadata"
+              disablePictureInPicture
+              disableRemotePlayback
+              controlsList="nodownload nofullscreen noremoteplayback"
+              tabIndex={-1}
               aria-label="Animasi ilustrasi desainer grafis memegang karya dan palet desain"
             >
               <source src={`${import.meta.env.BASE_URL}video/intro.webm?v=2`} type="video/webm" />

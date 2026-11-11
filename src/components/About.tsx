@@ -52,6 +52,10 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
             loop
             playsInline
             preload="none"
+            disablePictureInPicture
+            disableRemotePlayback
+            controlsList="nodownload nofullscreen noremoteplayback"
+            tabIndex={-1}
             aria-label="Video perkenalan Agung Saeful dengan latar grafis desain"
           >
             <source src={`${import.meta.env.BASE_URL}video/about.webm?v=4`} type="video/webm" />

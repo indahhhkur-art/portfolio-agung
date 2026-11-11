@@ -9,7 +9,7 @@ let sweepRaf = 0;
 function runRevealSweep(): void {
   sweepRaf = 0;
   if (pendingRevealNodes.size === 0) return;
-  const triggerLine = window.innerHeight * 0.99;
+  const triggerLine = window.innerHeight + 90;
   // Fase baca layout terlebih dahulu untuk mencegah interleaved read/write layout thrashing
   const matched: Array<{ node: Element; cb: () => void }> = [];
   for (const node of pendingRevealNodes) {
@@ -55,7 +55,7 @@ function getRevealObserver(): IntersectionObserver {
       }
       for (const cb of toRun) cb();
     },
-    { rootMargin: "0px 0px -1% 0px", threshold: 0.01 }
+    { rootMargin: "0px 0px 90px 0px", threshold: 0.01 }
   );
   return sharedRevealIO;
 }

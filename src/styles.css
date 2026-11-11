@@ -98,15 +98,15 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   will-change: transform;
 }
 
-.back-top {
+.icon-btn.back-top {
   position: fixed; right: 22px; bottom: 22px; z-index: 45;
-  background: var(--grad-contrast); color: #fff; font-weight: 800; font-size: 1.15rem;
+  border: 0; background: var(--grad-contrast); color: #fff; font-weight: 800; font-size: 1.15rem;
   opacity: 0; pointer-events: none; transform: translate3d(0, 14px, 0) scale(0.9);
   transition: opacity .28s var(--ease-smooth), transform .28s var(--ease-smooth), box-shadow .22s ease;
   box-shadow: 0 10px 26px rgba(90, 95, 180, .34);
 }
-.back-top.is-visible { opacity: 1; pointer-events: auto; transform: translate3d(0, 0, 0) scale(1); }
-.back-top:hover { background: var(--grad-contrast); transform: translate3d(0, -3px, 0) scale(1.06); }
+.icon-btn.back-top.is-visible { opacity: 1; pointer-events: auto; transform: translate3d(0, 0, 0) scale(1); }
+.icon-btn.back-top:hover { background: var(--grad-contrast); transform: translate3d(0, -3px, 0) scale(1.06); }
 
 .eyebrow {
   font-weight: 600; font-size: .85rem; letter-spacing: .14em; text-transform: uppercase;
@@ -259,8 +259,9 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .tools-block { padding: 72px 0 18px; }
 .tools__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.15rem; }
 .tool-pill {
-  background: var(--surface-item); border: 1.5px solid var(--border); border-radius: 999px;
+  background: var(--surface-item); border: 1.5px solid var(--border-strong); border-radius: 999px;
   padding: 1.35rem 1.2rem; text-align: center;
+  box-shadow: 0 4px 16px rgba(70, 80, 140, .055);
   display: flex; flex-direction: column; align-items: center; gap: .42rem;
   contain: layout style paint;
   transition: transform .25s var(--ease-smooth), box-shadow .25s var(--ease-smooth), background-color .2s ease, border-color .2s ease;
@@ -285,7 +286,7 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .tool-pill span { font-size: .76rem; color: var(--muted); font-family: "Montserrat", sans-serif; line-height: 1.35; }
 
 /* Education & Work Experience Cards (Animasi Timeline & Kaskade Terasa Hidup) */
-.journey { padding: 60px 0 12px; }
+.journey { padding: 48px 0 12px; }
 .journey__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem; align-items: stretch; }
 .journey-card {
   position: relative; overflow: hidden;
@@ -302,8 +303,8 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .journey-card.is-animated::before { transform: scaleX(1); }
 
 .journey-card--left, .journey-card--right { opacity: 1; }
-html.js-reveal .journey-card--left:not(.is-animated) { opacity: 0; transform: translate3d(-28px, 32px, 0) scale(0.97); }
-html.js-reveal .journey-card--right:not(.is-animated) { opacity: 0; transform: translate3d(28px, 32px, 0) scale(0.97); }
+html.js-reveal .journey-card--left:not(.is-animated) { opacity: 0; transform: translate3d(-20px, 18px, 0) scale(0.985); }
+html.js-reveal .journey-card--right:not(.is-animated) { opacity: 0; transform: translate3d(20px, 18px, 0) scale(0.985); }
 .journey-card--right.is-animated:not(.is-settled) { transition-delay: 60ms; }
 .journey-card.is-animated { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 .journey-card.is-settled {
@@ -1173,8 +1174,8 @@ html[data-theme="dark"] .card__cat {
 html[data-theme="dark"] .theme-toggle {
   box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
 }
-html[data-theme="dark"] .back-top {
-  border-color: var(--border-strong);
+html[data-theme="dark"] .icon-btn.back-top {
+  border: 1.5px solid var(--border-strong);
   box-shadow: 0 10px 28px rgba(0, 0, 0, .5);
 }
 
