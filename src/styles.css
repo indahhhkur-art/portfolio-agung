@@ -817,13 +817,13 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
   width: clamp(190px, 28vw, 340px); right: clamp(-110px, -7vw, -55px); bottom: clamp(-150px, -10vw, -85px);
   transform: translate3d(calc(var(--px) * 32px), calc(var(--py) * 24px), 0);
 }
-.contact.is-energized .contact__orb-wrap--tl {
-  transform: translate3d(calc(var(--px) * -28px + 20px), calc(var(--py) * -22px + 14px), 0) scale(1.07);
+.contact__orb-wrap--tl.is-energized {
+  transform: translate3d(calc(var(--px) * -28px + 22px), calc(var(--py) * -22px + 16px), 0) scale(1.09);
 }
-.contact.is-energized .contact__orb-wrap--br {
-  transform: translate3d(calc(var(--px) * 32px - 20px), calc(var(--py) * 24px - 14px), 0) scale(1.09);
+.contact__orb-wrap--br.is-energized {
+  transform: translate3d(calc(var(--px) * 32px - 22px), calc(var(--py) * 24px - 16px), 0) scale(1.11);
 }
-.contact.is-bursting .contact__orb-wrap { animation: orbBurstPop .75s var(--ease-smooth); }
+.contact__orb-wrap.is-bursting { animation: orbBurstPop .75s var(--ease-smooth); }
 
 .contact__orb {
   position: relative; width: 100%; height: 100%; border-radius: 50%;
@@ -834,8 +834,9 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
 }
 .contact__orb--tl { animation: orbDriftA 8.5s ease-in-out infinite; }
 .contact__orb--br { animation: orbDriftB 9.8s ease-in-out infinite; }
-.contact.is-energized .contact__orb {
-  box-shadow: inset 0 0 48px rgba(255,255,255,.34), 0 0 64px rgba(155, 220, 255, .28);
+.contact__orb-wrap.is-energized .contact__orb,
+.contact__orb-wrap.is-bursting .contact__orb {
+  box-shadow: inset 0 0 54px rgba(255,255,255,.40), 0 0 72px rgba(165, 226, 255, .34);
 }
 
 .contact__orb-ring {
@@ -850,7 +851,8 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
   animation-duration: 32s; animation-direction: reverse;
 }
 .contact__orb--br .contact__orb-ring--outer { animation-direction: normal; animation-duration: 28s; }
-.contact.is-energized .contact__orb-ring { border-color: rgba(255,255,255,.58); }
+.contact__orb-wrap.is-energized .contact__orb-ring,
+.contact__orb-wrap.is-bursting .contact__orb-ring { border-color: rgba(255,255,255,.72); }
 
 .contact__orb-sat {
   position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px;
@@ -887,7 +889,7 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
 }
 .contact__thanks-btn:hover { transform: translate3d(0, -3px, 0) scale(1.03); text-shadow: 0 8px 28px rgba(255,255,255,.35); }
 .contact__thanks-btn:active { transform: scale(0.95); transition-duration: 0.08s; }
-.contact.is-bursting .contact__thanks-btn { animation: thanksPop .55s var(--ease-smooth); }
+.contact.is-bursting-thanks .contact__thanks-btn { animation: thanksPop .55s var(--ease-smooth); }
 .contact__links { display: flex; flex-wrap: wrap; justify-content: center; gap: .9rem; margin: 1.8rem 0; }
 .contact__links a {
   background: #fff; color: var(--blue-ink); padding: .8rem 1.6rem; border-radius: 999px; font-weight: 600;

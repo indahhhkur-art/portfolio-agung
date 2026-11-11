@@ -1,7 +1,9 @@
-import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { CONTACT, MICROSTOCK_LINKS } from "../data.ts";
 import { prefersReducedMotion, useRevealGroup } from "../hooks.ts";
 import type { ContactConfig } from "../types.ts";
+
+type OrbTarget = "tl" | "br" | "both";
 
 interface ContactLinkItem {
   key: keyof ContactConfig;
@@ -11,6 +13,7 @@ interface ContactLinkItem {
 
 interface SparkleSpec {
   id: number;
+  zone: "tl" | "br";
   kind: "star" | "ring" | "dot" | "diamond";
   sx: string;
   sy: string;
@@ -22,17 +25,25 @@ interface SparkleSpec {
 }
 
 const SPARKLES: SparkleSpec[] = [
-  { id: 1, kind: "star", sx: "18%", sy: "24%", dx: "-44px", dy: "-58px", rot: "-35deg", size: 16, delay: "0ms" },
-  { id: 2, kind: "ring", sx: "26%", sy: "32%", dx: "36px", dy: "-48px", rot: "20deg", size: 13, delay: "35ms" },
-  { id: 3, kind: "star", sx: "36%", sy: "20%", dx: "-52px", dy: "-44px", rot: "-24deg", size: 14, delay: "20ms" },
-  { id: 4, kind: "diamond", sx: "64%", sy: "19%", dx: "54px", dy: "-52px", rot: "42deg", size: 12, delay: "45ms" },
-  { id: 5, kind: "dot", sx: "50%", sy: "14%", dx: "6px", dy: "-58px", rot: "0deg", size: 9, delay: "15ms" },
-  { id: 6, kind: "star", sx: "78%", sy: "68%", dx: "48px", dy: "52px", rot: "38deg", size: 16, delay: "30ms" },
-  { id: 7, kind: "diamond", sx: "86%", sy: "76%", dx: "-34px", dy: "48px", rot: "-45deg", size: 12, delay: "55ms" },
-  { id: 8, kind: "ring", sx: "70%", sy: "82%", dx: "-46px", dy: "34px", rot: "18deg", size: 13, delay: "25ms" },
-  { id: 9, kind: "star", sx: "24%", sy: "44%", dx: "-64px", dy: "16px", rot: "-28deg", size: 13, delay: "40ms" },
-  { id: 10, kind: "dot", sx: "76%", sy: "42%", dx: "64px", dy: "-14px", rot: "0deg", size: 10, delay: "30ms" }
+  // Zona bola atas-kiri (LinkedIn, Shutterstock, THANKS)
+  { id: 1, zone: "tl", kind: "star", sx: "16%", sy: "22%", dx: "-40px", dy: "-52px", rot: "-35deg", size: 16, delay: "0ms" },
+  { id: 2, zone: "tl", kind: "ring", sx: "26%", sy: "30%", dx: "44px", dy: "-42px", rot: "20deg", size: 13, delay: "35ms" },
+  { id: 3, zone: "tl", kind: "star", sx: "36%", sy: "20%", dx: "-48px", dy: "-42px", rot: "-24deg", size: 14, delay: "20ms" },
+  { id: 4, zone: "tl", kind: "dot", sx: "46%", sy: "14%", dx: "8px", dy: "-54px", rot: "0deg", size: 9, delay: "15ms" },
+  { id: 5, zone: "tl", kind: "star", sx: "22%", sy: "44%", dx: "-58px", dy: "16px", rot: "-28deg", size: 13, delay: "40ms" },
+  // Zona bola bawah-kanan (Adobe Stock, PNGtree, THANKS)
+  { id: 6, zone: "br", kind: "diamond", sx: "64%", sy: "20%", dx: "50px", dy: "-48px", rot: "42deg", size: 12, delay: "45ms" },
+  { id: 7, zone: "br", kind: "star", sx: "78%", sy: "68%", dx: "48px", dy: "52px", rot: "38deg", size: 16, delay: "30ms" },
+  { id: 8, zone: "br", kind: "diamond", sx: "86%", sy: "76%", dx: "-34px", dy: "48px", rot: "-45deg", size: 12, delay: "55ms" },
+  { id: 9, zone: "br", kind: "ring", sx: "70%", sy: "82%", dx: "-46px", dy: "34px", rot: "18deg", size: 13, delay: "25ms" },
+  { id: 10, zone: "br", kind: "dot", sx: "76%", sy: "44%", dx: "60px", dy: "-14px", rot: "0deg", size: 10, delay: "30ms" }
 ];
+
+const MICROSTOCK_TARGET: Record<string, OrbTarget> = {
+  "Adobe Stock": "br",
+  "Shutterstock": "tl",
+  "PNGtree": "br"
+};
 
 const LINKS: ContactLinkItem[] = (
   [
@@ -79,8 +90,9 @@ function Contact() {
   const burstTimerRef = useRef(0);
 
   const [inView, setInView] = useState(false);
-  const [energized, setEnergized] = useState(false);
+  const [hoverTarget, setHoverTarget] = useState<OrbTarget | null>(null);
   const [bursting, setBursting] = useState(false);
+  const [burstTarget, setBurstTarget] = useState<OrbTarget>("both");
   const [burstId, setBurstId] = useState(0);
 
   useEffect(() => {
@@ -102,12 +114,24 @@ function Contact() {
     };
   }, []);
 
-  const triggerBurst = useCallback(() => {
+  const triggerBurst = useCallback((target: OrbTarget) => {
+    setBurstTarget(target);
     setBursting(true);
     setBurstId(id => id + 1);
     if (burstTimerRef.current) window.clearTimeout(burstTimerRef.current);
     burstTimerRef.current = window.setTimeout(() => setBursting(false), 920);
   }, []);
+
+  const bindTarget = useCallback(
+    (target: OrbTarget) => ({
+      onClick: () => triggerBurst(target),
+      onPointerEnter: () => setHoverTarget(target),
+      onPointerLeave: () => setHoverTarget(prev => (prev === target ? null : prev)),
+      onFocus: () => setHoverTarget(target),
+      onBlur: () => setHoverTarget(prev => (prev === target ? null : prev))
+    }),
+    [triggerBurst]
+  );
 
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLElement>) => {
     if (e.pointerType !== "mouse" || prefersReducedMotion()) return;
@@ -128,21 +152,29 @@ function Contact() {
   }, []);
 
   const onPointerLeave = useCallback(() => {
-    setEnergized(false);
+    setHoverTarget(null);
     const sec = secRef.current;
     if (!sec) return;
     sec.style.setProperty("--px", "0");
     sec.style.setProperty("--py", "0");
   }, []);
 
-  const onInteractiveEnter = useCallback(() => setEnergized(true), []);
-  const onInteractiveLeave = useCallback(() => setEnergized(false), []);
+  const tlEnergized = hoverTarget === "tl" || hoverTarget === "both";
+  const brEnergized = hoverTarget === "br" || hoverTarget === "both";
+  const tlBurst = bursting && (burstTarget === "tl" || burstTarget === "both");
+  const brBurst = bursting && (burstTarget === "br" || burstTarget === "both");
+  const showTlWaves = burstId > 0 && (burstTarget === "tl" || burstTarget === "both");
+  const showBrWaves = burstId > 0 && (burstTarget === "br" || burstTarget === "both");
+
+  const activeSparkles = useMemo(
+    () => (burstTarget === "both" ? SPARKLES : SPARKLES.filter(sp => sp.zone === burstTarget)),
+    [burstTarget]
+  );
 
   const sectionClass = [
     "contact",
     inView ? "is-inview" : "",
-    energized ? "is-energized" : "",
-    bursting ? "is-bursting" : ""
+    bursting && burstTarget === "both" ? "is-bursting-thanks" : ""
   ]
     .filter(Boolean)
     .join(" ");
@@ -155,20 +187,18 @@ function Contact() {
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
     >
-      {/* Layer Latar Interaktif: 2 Bola Orbital + Gelombang + Sparkle Kreatif (GPU-only) */}
+      {/* Layer Latar Interaktif: Bola Atas-Kiri (LinkedIn, Shutterstock) & Bawah-Kanan (Adobe Stock, PNGtree), Klik THANKS = Keduanya */}
       <div className="contact__stage" aria-hidden="true">
         <div
-          className="contact__orb-wrap contact__orb-wrap--tl"
-          onClick={triggerBurst}
-          onPointerEnter={onInteractiveEnter}
-          onPointerLeave={onInteractiveLeave}
+          className={`contact__orb-wrap contact__orb-wrap--tl${tlEnergized ? " is-energized" : ""}${tlBurst ? " is-bursting" : ""}`}
+          {...bindTarget("tl")}
         >
           <div className="contact__orb contact__orb--tl">
             <span className="contact__orb-ring">
               <span className="contact__orb-sat" />
             </span>
             <span className="contact__orb-ring contact__orb-ring--outer" />
-            {burstId > 0 && (
+            {showTlWaves && (
               <span key={`w-tl-${burstId}`} className="contact__orb-waves">
                 <span className="contact__orb-wave" />
                 <span className="contact__orb-wave contact__orb-wave--delay" />
@@ -178,17 +208,15 @@ function Contact() {
         </div>
 
         <div
-          className="contact__orb-wrap contact__orb-wrap--br"
-          onClick={triggerBurst}
-          onPointerEnter={onInteractiveEnter}
-          onPointerLeave={onInteractiveLeave}
+          className={`contact__orb-wrap contact__orb-wrap--br${brEnergized ? " is-energized" : ""}${brBurst ? " is-bursting" : ""}`}
+          {...bindTarget("br")}
         >
           <div className="contact__orb contact__orb--br">
             <span className="contact__orb-ring">
               <span className="contact__orb-sat" />
             </span>
             <span className="contact__orb-ring contact__orb-ring--outer" />
-            {burstId > 0 && (
+            {showBrWaves && (
               <span key={`w-br-${burstId}`} className="contact__orb-waves">
                 <span className="contact__orb-wave" />
                 <span className="contact__orb-wave contact__orb-wave--delay" />
@@ -199,7 +227,7 @@ function Contact() {
 
         {burstId > 0 && (
           <div key={`sp-${burstId}`} className="contact__sparkles">
-            {SPARKLES.map(sp => (
+            {activeSparkles.map(sp => (
               <span
                 key={sp.id}
                 className={`contact__sparkle contact__sparkle--${sp.kind}`}
@@ -226,13 +254,9 @@ function Contact() {
           <button
             type="button"
             className="contact__thanks-btn"
-            onClick={triggerBurst}
-            onPointerEnter={onInteractiveEnter}
-            onPointerLeave={onInteractiveLeave}
-            onFocus={onInteractiveEnter}
-            onBlur={onInteractiveLeave}
-            aria-label="THANKS — Klik untuk animasi interaktif"
-            title="Klik untuk animasi interaktif!"
+            {...bindTarget("both")}
+            aria-label="THANKS — Klik untuk menganimasikan kedua bola"
+            title="Klik untuk animasi kedua bola!"
           >
             THANKS
           </button>
@@ -240,17 +264,7 @@ function Contact() {
         <p data-reveal-item>Tertarik bekerja sama atau punya proyek desain? Mari ngobrol.</p>
         <div className="contact__links" data-reveal-item>
           {LINKS.map(l => (
-            <a
-              key={l.key}
-              href={l.href(CONTACT[l.key])}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={triggerBurst}
-              onPointerEnter={onInteractiveEnter}
-              onPointerLeave={onInteractiveLeave}
-              onFocus={onInteractiveEnter}
-              onBlur={onInteractiveLeave}
-            >
+            <a key={l.key} href={l.href(CONTACT[l.key])} target="_blank" rel="noopener noreferrer" {...bindTarget("tl")}>
               {l.label}
             </a>
           ))}
@@ -258,11 +272,7 @@ function Contact() {
             href="https://linkedin.com/in/agungsaeful"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={triggerBurst}
-            onPointerEnter={onInteractiveEnter}
-            onPointerLeave={onInteractiveLeave}
-            onFocus={onInteractiveEnter}
-            onBlur={onInteractiveLeave}
+            {...bindTarget("tl")}
           >
             LinkedIn — Agung Saeful ↗
           </a>
@@ -277,11 +287,7 @@ function Contact() {
               href={m.url}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={triggerBurst}
-              onPointerEnter={onInteractiveEnter}
-              onPointerLeave={onInteractiveLeave}
-              onFocus={onInteractiveEnter}
-              onBlur={onInteractiveLeave}
+              {...bindTarget(MICROSTOCK_TARGET[m.name] ?? "br")}
             >
               {m.name} ↗
             </a>
