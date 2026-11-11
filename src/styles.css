@@ -474,7 +474,7 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .certs__dot.is-active { width: 26px; background: var(--grad); }
 
 /* Portfolio (Kartu Ditingkatkan dari Referensi UI + Palet Warna Lama) */
-.work { padding: 90px 0; }
+.work { padding: 90px 0 64px; }
 .work__total {
   font-size: .82rem; font-weight: 600; color: var(--blue);
   background: #fff; border: 1.5px solid #e1e5f5; padding: .45rem 1rem; border-radius: 999px;
@@ -535,6 +535,33 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   transition: transform .25s var(--ease-smooth), background .25s ease;
 }
 .card:hover .card__arrow { background: var(--grad); transform: scale(1.08) rotate(10deg); }
+
+/* Specialty Marquee Ribbon (Di Bawah Portfolio, Loop GPU Seamless) */
+@keyframes marqueeScroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.ribbon-band { background: var(--bg); padding: 0 0 56px; }
+.ribbon {
+  background: linear-gradient(90deg, var(--purple) 0%, var(--blue) 52%, var(--cyan) 100%);
+  color: #fff; overflow: hidden; padding: .88rem 0;
+  box-shadow: 0 8px 24px rgba(100, 105, 195, .18);
+}
+.ribbon__track {
+  display: flex; align-items: center; width: max-content;
+  animation: marqueeScroll 36s linear infinite; will-change: transform;
+}
+@media (hover: hover) and (pointer: fine) {
+  .ribbon:hover .ribbon__track { animation-play-state: paused; }
+}
+.ribbon__group {
+  display: flex; align-items: center; flex-shrink: 0; gap: 2.2rem; padding-right: 2.2rem;
+}
+.ribbon__item {
+  display: inline-flex; align-items: center; gap: .65rem;
+  font-weight: 600; font-size: .92rem; letter-spacing: .01em; white-space: nowrap;
+}
+.ribbon__star { opacity: .9; flex: 0 0 auto; filter: drop-shadow(0 0 4px rgba(255,255,255,.35)); }
 
 /* Modal Keyframes & GPU-Only Compositor Animation */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

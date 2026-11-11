@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar.tsx";
 import Hero from "./components/Hero.tsx";
 import About from "./components/About.tsx";
 import Portfolio from "./components/Portfolio.tsx";
+import SpecialtyRibbon from "./components/SpecialtyRibbon.tsx";
 import Contact from "./components/Contact.tsx";
 import ScrollUI from "./components/ScrollUI.tsx";
 import { PROJECTS } from "./data.ts";
@@ -93,6 +94,7 @@ export default function App() {
           onOpenProject={setProject}
           onPrefetchModal={loadModal}
         />
+        <SpecialtyRibbon />
         <Contact />
       </main>
 
