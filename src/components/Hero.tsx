@@ -9,7 +9,7 @@ function Hero() {
   const artRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  useLoopingVideo(videoRef, isSaveData() || prefersReducedMotion());
+  useLoopingVideo(videoRef, isSaveData());
 
   useEffect(() => {
     if (prefersReducedMotion()) return;

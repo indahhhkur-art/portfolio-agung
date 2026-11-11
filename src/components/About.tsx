@@ -1,6 +1,6 @@
 import { memo, useRef } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
-import { prefersReducedMotion, useCountUp, useJourneyReveal, useLoopingVideo, useReveal, useRevealGroup } from "../hooks.ts";
+import { useCountUp, useJourneyReveal, useLoopingVideo, useReveal, useRevealGroup } from "../hooks.ts";
 import { isSaveData } from "../prefetch.ts";
 import type { LightboxItem } from "../types.ts";
 import CertSwitcher from "./CertSwitcher.tsx";
@@ -37,7 +37,7 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
   const expCardRef = useJourneyReveal<HTMLDivElement>(1020);
 
   // Putar video About terus-menerus & looping mulus tanpa jeda saat scroll
-  useLoopingVideo(videoRef, isSaveData() || prefersReducedMotion());
+  useLoopingVideo(videoRef, isSaveData());
 
   return (
     <section className="about" id="about">
