@@ -16,9 +16,23 @@ export const CONTACT: ContactConfig = {
   email: "",
   whatsapp: "",
   instagram: "",
-  behance: "",
-  dribbble: ""
+  behance: ""
 };
+
+export const MICROSTOCK_LINKS = [
+  {
+    name: "Adobe Stock",
+    url: "https://stock.adobe.com/id/contributor/207650548/hani-suwaryo?load_type=author&prev_url=detail"
+  },
+  {
+    name: "Shutterstock",
+    url: "https://www.shutterstock.com/g/HaniSuwaryo"
+  },
+  {
+    name: "PNGtree",
+    url: "https://pngtree.com/hanisuwaryo_13570250?type=1"
+  }
+] as const;
 
 export const IMG = `${import.meta.env.BASE_URL}img/`;
 

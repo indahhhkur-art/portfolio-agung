@@ -6,7 +6,6 @@ export interface ContactConfig {
   whatsapp: string;
   instagram: string;
   behance: string;
-  dribbble: string;
 }
 
 export interface Project {

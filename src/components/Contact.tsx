@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { CONTACT } from "../data.ts";
+import { CONTACT, MICROSTOCK_LINKS } from "../data.ts";
 import { useRevealGroup } from "../hooks.ts";
 import type { ContactConfig } from "../types.ts";
 
@@ -14,8 +14,7 @@ const LINKS: ContactLinkItem[] = (
     { key: "email", label: "✉ Email", href: (v: string) => `mailto:${v}` },
     { key: "whatsapp", label: "WhatsApp", href: (v: string) => `https://wa.me/${v}` },
     { key: "instagram", label: "Instagram", href: (v: string) => `https://instagram.com/${v}` },
-    { key: "behance", label: "Behance", href: (v: string) => v },
-    { key: "dribbble", label: "Dribbble", href: (v: string) => v }
+    { key: "behance", label: "Behance", href: (v: string) => v }
   ] satisfies ContactLinkItem[]
 ).filter(l => Boolean(CONTACT[l.key]));
 
@@ -39,9 +38,15 @@ function Contact() {
           </a>
         </div>
         <p className="contact__note" data-reveal-item>
-          Karya microstock tersedia di Adobe Stock, Shutterstock, PNGtree, dan Dribbble dengan nama pena{" "}
-          <strong>Hani Suwaryo</strong>.
+          Karya microstock dengan nama pena <strong>Hani Suwaryo</strong> juga tersedia di:
         </p>
+        <div className="contact__microstock" data-reveal-item>
+          {MICROSTOCK_LINKS.map(m => (
+            <a key={m.name} href={m.url} target="_blank" rel="noopener noreferrer">
+              {m.name} ↗
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   );

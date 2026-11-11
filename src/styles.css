@@ -780,7 +780,20 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
 }
 .contact__links a:hover { transform: translate3d(0, -3px, 0); box-shadow: 0 10px 22px rgba(0,0,0,.15); }
 .contact__links a:active { transform: scale(0.96); transition-duration: 0.08s; }
-.contact__note { font-size: .85rem; opacity: .9; max-width: 36rem; margin-inline: auto; margin-top: .8rem; }
+.contact__note { font-size: .88rem; opacity: .95; max-width: 38rem; margin-inline: auto; margin-top: .8rem; }
+.contact__microstock {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: .65rem; margin-top: .95rem;
+}
+.contact__microstock a {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .48rem 1.05rem; border-radius: 999px; font-size: .82rem; font-weight: 600;
+  color: #fff; background: rgba(18, 24, 58, 0.28); border: 1.5px solid rgba(255, 255, 255, 0.45);
+  transition: transform .22s var(--ease-smooth), background-color .2s ease, border-color .2s ease;
+}
+.contact__microstock a:hover {
+  transform: translate3d(0, -2px, 0); background: rgba(18, 24, 58, 0.44); border-color: #fff;
+}
+.contact__microstock a:active { transform: scale(0.96); transition-duration: 0.08s; }
 
 .footer { padding: 1.4rem 0; font-size: .85rem; color: var(--muted); background: #fff; border-top: 1px solid #edf0f8; }
 .footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .6rem; }
