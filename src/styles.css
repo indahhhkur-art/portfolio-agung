@@ -183,9 +183,7 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   max-height: clamp(420px, 42vw, 600px);
   display: block; object-fit: cover; object-position: center bottom;
   pointer-events: none; mix-blend-mode: multiply;
-  filter: contrast(1.08) brightness(1.08);
-  -webkit-mask-image: radial-gradient(ellipse 54% 58% at 50% 56%, #000 58%, rgba(0, 0, 0, .55) 79%, transparent 97%);
-  mask-image: radial-gradient(ellipse 54% 58% at 50% 56%, #000 58%, rgba(0, 0, 0, .55) 79%, transparent 97%);
+  filter: contrast(1.03) brightness(1.02);
 }
 .about h2 { font-weight: 800; font-size: clamp(2rem, 4vw, 2.8rem); color: #46464b; margin-bottom: 1rem; }
 .about__name-link {
