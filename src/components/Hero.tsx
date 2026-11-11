@@ -41,17 +41,28 @@ function Hero() {
       }
 
       if (vid) {
-        if (progress >= 0.98 && !vid.paused) vid.pause();
-        else if (progress < 0.98 && vid.paused) void vid.play().catch(() => {});
+        if ((progress >= 0.98 || document.hidden) && !vid.paused) vid.pause();
+        else if (progress < 0.98 && !document.hidden && !reduced && !isSaveData() && vid.paused) {
+          void vid.play().catch(() => {});
+        }
       }
     };
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update);
     };
+    const onVisibility = () => {
+      if (!vid) return;
+      if (document.hidden && !vid.paused) vid.pause();
+      else if (!document.hidden && lastProgress < 0.98 && !reduced && !isSaveData() && vid.paused) {
+        void vid.play().catch(() => {});
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
 

@@ -43,7 +43,12 @@ if (fs.existsSync(assetsDir)) {
   precacheJs = assetFiles
     .filter(f => (f.startsWith("index-") || f.startsWith("vendor-")) && f.endsWith(".js"))
     .map(f => `/assets/${f}`);
-  const criticalFontPrefixes = ["poppins-latin-800-normal", "montserrat-latin-400-normal"];
+  const criticalFontPrefixes = [
+    "poppins-latin-600-normal",
+    "poppins-latin-800-normal",
+    "montserrat-latin-400-normal",
+    "montserrat-latin-500-normal"
+  ];
   const preloads = criticalFontPrefixes
     .map(prefix => assetFiles.find(f => f.startsWith(prefix) && f.endsWith(".woff2")))
     .filter(Boolean)
