@@ -171,7 +171,7 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   background: radial-gradient(circle, rgba(79, 195, 232, .12), rgba(155, 114, 201, .06) 55%, transparent 75%);
 }
 .hero__art img {
-  width: 100%; max-width: 740px; height: auto; display: block;
+  width: 100%; max-width: 740px; aspect-ratio: 1136 / 1193; height: auto; display: block;
   position: relative; z-index: 1;
   animation: heroArtFloat 7s ease-in-out infinite;
 }
@@ -781,7 +781,7 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
   .tools__grid { grid-template-columns: repeat(2, 1fr); }
   .hero { padding: 96px 0 36px; }
   .hero__text { padding: 0; }
-  .hero__art { order: -1; margin-right: 0; max-width: 420px; margin-inline: auto; justify-content: center; }
+  .hero__art { order: -1; margin-right: 0; width: 100%; max-width: 420px; margin-inline: auto; justify-content: center; }
   .about__photo { max-width: 340px; margin-inline: auto; }
 }
 
