@@ -200,6 +200,13 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 }
 .hero { padding: 66px 0 0; overflow: hidden; background: var(--surface); transition: background-color .3s ease; }
 .hero__inner { display: grid; grid-template-columns: minmax(0, .94fr) minmax(0, 1.14fr); align-items: stretch; gap: clamp(2rem, 4vw, 4rem); }
+@media (min-width: 901px) {
+  .hero {
+    min-height: clamp(540px, calc(100svh - 52px), 900px);
+    display: flex; flex-direction: column;
+  }
+  .hero__inner { flex: 1; }
+}
 .hero__text { align-self: center; padding: 72px 0 96px; }
 .hero__text .eyebrow, .hero__lead, .hero__cta { animation: heroLiftIn .6s var(--ease-smooth) backwards; }
 .hero__lead { animation-delay: .06s; }
@@ -1130,7 +1137,7 @@ html[data-theme="dark"] {
 
 html[data-theme="dark"] .hero__video-box {
   background: #ffffff;
-  border-radius: 26px 0 0 26px;
+  border-radius: 26px 0 0 0;
   box-shadow: inset 0 0 0 1.5px rgba(160, 185, 255, .28), -16px 20px 54px rgba(0, 0, 0, .44);
   -webkit-mask-image: none;
   mask-image: none;
