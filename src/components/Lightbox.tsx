@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { IMG } from "../data.ts";
 import { useFocusTrap } from "../hooks.ts";
+import { prefetchImage } from "../prefetch.ts";
 import type { LightboxItem } from "../types.ts";
 
 interface LightboxProps {
@@ -50,17 +51,18 @@ function Lightbox({ items, index, closing, onClose, onStep }: LightboxProps) {
       (index + 2) % items.length
     ];
     for (const idx of new Set(neighbors)) {
-      const preload = new Image();
-      preload.decoding = "async";
-      preload.src = `${IMG}${items[idx].src}`;
+      prefetchImage(`${IMG}${items[idx].src}`);
     }
   }, [index, items, single]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
       if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft" && !single) onStep(-1);
-      if (e.key === "ArrowRight" && !single) onStep(1);
+      else if (e.key === "ArrowLeft" && !single) onStep(-1);
+      else if (e.key === "ArrowRight" && !single) onStep(1);
+      else if (e.key === "+" || e.key === "=") setZoomed(true);
+      else if (e.key === "-" || e.key === "0") setZoomed(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

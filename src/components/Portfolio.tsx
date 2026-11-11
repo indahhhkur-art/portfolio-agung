@@ -1,6 +1,7 @@
 import { memo, useMemo, useRef } from "react";
 import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.ts";
 import { useRevealCard, useRevealGroup } from "../hooks.ts";
+import { prefetchImages } from "../prefetch.ts";
 import type { FilterKey, Project } from "../types.ts";
 import Picture, { toWebpSrc } from "./Picture.tsx";
 
@@ -20,6 +21,10 @@ const ProjectCard = memo(function ProjectCard({
   onPrefetch
 }: ProjectCardProps) {
   const cardRef = useRevealCard<HTMLButtonElement>((index % 4) * 40, filter);
+  const warmProject = () => {
+    onPrefetch();
+    prefetchImages(project.images.slice(0, 2).map(file => `${IMG}${file}`));
+  };
 
   return (
     <button
@@ -27,9 +32,9 @@ const ProjectCard = memo(function ProjectCard({
       type="button"
       className="card"
       data-reveal-item
-      onPointerEnter={onPrefetch}
-      onTouchStart={onPrefetch}
-      onFocus={onPrefetch}
+      onPointerEnter={warmProject}
+      onTouchStart={warmProject}
+      onFocus={warmProject}
       onClick={() => onOpen(project)}
     >
       <div className="card__media">

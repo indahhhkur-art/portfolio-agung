@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IMG } from "../data.ts";
 import { useRevealGroup } from "../hooks.ts";
+import { prefetchImage } from "../prefetch.ts";
 import type { Certification, LightboxItem } from "../types.ts";
 
 const COPIES = 4;
@@ -30,6 +31,11 @@ const CertCard = memo(function CertCard({
   onPrefetch,
   onCardClick
 }: CertCardProps) {
+  const warmCert = () => {
+    onPrefetch();
+    prefetchImage(`${IMG}${cert.src}`);
+  };
+
   return (
     <button
       ref={el => setCardRef(slot, el)}
@@ -37,8 +43,9 @@ const CertCard = memo(function CertCard({
       tabIndex={total > 1 ? (copy === 1 ? 0 : -1) : 0}
       className={`cert-app${focused ? " is-focused" : ""}`}
       aria-label={`Lihat ${cert.label}`}
-      onPointerEnter={onPrefetch}
-      onFocus={onPrefetch}
+      onPointerEnter={warmCert}
+      onTouchStart={warmCert}
+      onFocus={warmCert}
       onClick={e => onCardClick(logicalIndex, e)}
     >
       <div className="cert-app__bar">

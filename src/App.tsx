@@ -8,6 +8,7 @@ import Contact from "./components/Contact.tsx";
 import ScrollUI from "./components/ScrollUI.tsx";
 import { PROJECTS } from "./data.ts";
 import { useAnimatedPresence, useBodyLock, useSmoothScroll } from "./hooks.ts";
+import { isSaveData } from "./prefetch.ts";
 import type { FilterKey, LightboxItem, Project } from "./types.ts";
 
 const loadModal = () => import("./components/ProjectModal.tsx");
@@ -56,8 +57,7 @@ export default function App() {
 
   // Pre-warm chunk modal & lightbox setelah load + idle panjang agar beban initial render 0 byte ekstra
   useEffect(() => {
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    if (conn?.saveData) return;
+    if (isSaveData()) return;
     let timer = 0;
     const warm = () => {
       loadModal();
@@ -83,15 +83,18 @@ export default function App() {
     };
   }, []);
 
-  // Esc menutup modal proyek (lightbox menangani Esc-nya sendiri)
+  // Esc menutup modal proyek dan ArrowLeft/Right berpindah proyek (lightbox menangani tombolnya sendiri)
   useEffect(() => {
     if (!project || lightbox) return;
     const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
       if (e.key === "Escape") setProject(null);
+      else if (e.key === "ArrowLeft" && visibleProjects.length > 1) stepProject(-1);
+      else if (e.key === "ArrowRight" && visibleProjects.length > 1) stepProject(1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [project, lightbox]);
+  }, [project, lightbox, stepProject, visibleProjects.length]);
 
   return (
     <>

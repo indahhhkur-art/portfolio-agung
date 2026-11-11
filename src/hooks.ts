@@ -8,32 +8,35 @@ let sweepRaf = 0;
 
 function runRevealSweep(): void {
   sweepRaf = 0;
+  if (pendingRevealNodes.size === 0) return;
   const triggerLine = window.innerHeight * 0.99;
-  for (const node of [...pendingRevealNodes]) {
+  // Fase baca layout terlebih dahulu untuk mencegah interleaved read/write layout thrashing
+  const matched: Array<{ node: Element; cb: () => void }> = [];
+  for (const node of pendingRevealNodes) {
     if (node.getBoundingClientRect().top <= triggerLine) {
       const cb = revealCallbacks.get(node);
-      if (cb) {
-        cb();
-        revealCallbacks.delete(node);
-      }
-      pendingRevealNodes.delete(node);
-      sharedRevealIO?.unobserve(node);
+      if (cb) matched.push({ node, cb });
+      else pendingRevealNodes.delete(node);
     }
+  }
+  for (const { node, cb } of matched) {
+    revealCallbacks.delete(node);
+    pendingRevealNodes.delete(node);
+    sharedRevealIO?.unobserve(node);
+    cb();
+  }
+}
+
+function scheduleRevealSweep(): void {
+  if (!sweepRaf && pendingRevealNodes.size > 0) {
+    sweepRaf = window.requestAnimationFrame(runRevealSweep);
   }
 }
 
 function attachSweep(): void {
   if (sweepListenerAttached) return;
   sweepListenerAttached = true;
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (!sweepRaf && pendingRevealNodes.size > 0) {
-        sweepRaf = window.requestAnimationFrame(runRevealSweep);
-      }
-    },
-    { passive: true }
-  );
+  window.addEventListener("scroll", scheduleRevealSweep, { passive: true });
 }
 
 function getRevealObserver(): IntersectionObserver {
@@ -41,20 +44,35 @@ function getRevealObserver(): IntersectionObserver {
   attachSweep();
   sharedRevealIO = new IntersectionObserver(
     entries => {
+      const toRun: Array<() => void> = [];
       for (const en of entries) {
         if (!en.isIntersecting) continue;
         const cb = revealCallbacks.get(en.target);
-        if (cb) {
-          cb();
-          revealCallbacks.delete(en.target);
-        }
+        if (cb) toRun.push(cb);
+        revealCallbacks.delete(en.target);
         pendingRevealNodes.delete(en.target);
         sharedRevealIO?.unobserve(en.target);
       }
+      for (const cb of toRun) cb();
     },
     { rootMargin: "0px 0px -1% 0px", threshold: 0.01 }
   );
   return sharedRevealIO;
+}
+
+/** Mengamati kemunculan elemen lewat satu shared IntersectionObserver & satu batched rAF sweep. */
+function observeReveal(node: Element, onEnter: () => void): () => void {
+  const io = getRevealObserver();
+  revealCallbacks.set(node, onEnter);
+  pendingRevealNodes.add(node);
+  io.observe(node);
+  scheduleRevealSweep();
+
+  return () => {
+    revealCallbacks.delete(node);
+    pendingRevealNodes.delete(node);
+    io.unobserve(node);
+  };
 }
 
 /** Mengamati elemen tunggal saat masuk viewport. */
@@ -63,26 +81,7 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(): RefObject<T
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    const io = getRevealObserver();
-    revealCallbacks.set(node, () => node.classList.add("is-visible"));
-    pendingRevealNodes.add(node);
-    io.observe(node);
-
-    const raf = window.requestAnimationFrame(() => {
-      if (node.getBoundingClientRect().top <= window.innerHeight * 0.99 && revealCallbacks.has(node)) {
-        node.classList.add("is-visible");
-        revealCallbacks.delete(node);
-        pendingRevealNodes.delete(node);
-        io.unobserve(node);
-      }
-    });
-
-    return () => {
-      window.cancelAnimationFrame(raf);
-      revealCallbacks.delete(node);
-      pendingRevealNodes.delete(node);
-      io.unobserve(node);
-    };
+    return observeReveal(node, () => node.classList.add("is-visible"));
   }, []);
   return ref;
 }
@@ -100,46 +99,15 @@ export function useJourneyReveal<T extends HTMLElement = HTMLDivElement>(
     if (!card) return;
     let settled = 0;
 
-    const activate = () => {
+    const unobserve = observeReveal(card, () => {
       if (card.classList.contains("is-animated")) return;
       card.classList.add("is-animated");
       settled = window.setTimeout(() => card.classList.add("is-settled"), settleMs);
-    };
-
-    const io = new IntersectionObserver(
-      entries => {
-        for (const en of entries) {
-          if (en.isIntersecting) {
-            activate();
-            io.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: "0px 0px -4% 0px", threshold: 0.05 }
-    );
-    io.observe(card);
-
-    let raf = 0;
-    const onScrollPast = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        if (card.getBoundingClientRect().top <= window.innerHeight * 0.95) {
-          activate();
-          io.disconnect();
-          window.removeEventListener("scroll", onScrollPast);
-        }
-      });
-    };
-    window.addEventListener("scroll", onScrollPast, { passive: true });
-    onScrollPast();
+    });
 
     return () => {
-      if (raf) window.cancelAnimationFrame(raf);
+      unobserve();
       if (settled) window.clearTimeout(settled);
-      window.removeEventListener("scroll", onScrollPast);
-      io.disconnect();
     };
   }, [settleMs]);
   return ref;
@@ -157,35 +125,18 @@ export function useRevealCard<T extends HTMLElement = HTMLButtonElement>(
     el.classList.remove("is-shown", "is-settled");
     let settleTimer = 0;
 
-    const show = () => {
+    const unobserve = observeReveal(el, () => {
       el.style.setProperty("--reveal-delay", `${delayMs}ms`);
       el.classList.add("is-shown");
       settleTimer = window.setTimeout(() => {
         el.classList.add("is-settled");
         el.style.removeProperty("--reveal-delay");
       }, 460 + delayMs);
-    };
-
-    const io = getRevealObserver();
-    revealCallbacks.set(el, show);
-    pendingRevealNodes.add(el);
-    io.observe(el);
-
-    const raf = window.requestAnimationFrame(() => {
-      if (el.getBoundingClientRect().top <= window.innerHeight * 0.99 && revealCallbacks.has(el)) {
-        show();
-        revealCallbacks.delete(el);
-        pendingRevealNodes.delete(el);
-        io.unobserve(el);
-      }
     });
 
     return () => {
-      window.cancelAnimationFrame(raf);
+      unobserve();
       if (settleTimer) window.clearTimeout(settleTimer);
-      revealCallbacks.delete(el);
-      pendingRevealNodes.delete(el);
-      io.unobserve(el);
     };
   }, [delayMs, resetKey]);
   return ref;
@@ -206,7 +157,7 @@ export function useRevealGroup<T extends HTMLElement = HTMLDivElement>(
     for (const el of targets) el.classList.remove("is-shown", "is-settled");
 
     let settleTimer = 0;
-    const triggerShow = () => {
+    const unobserve = observeReveal(root, () => {
       const maxDelay = Math.min(targets.length - 1, 8) * staggerMs;
       targets.forEach((el, idx) => {
         el.style.setProperty("--reveal-delay", `${Math.min(idx, 8) * staggerMs}ms`);
@@ -218,28 +169,11 @@ export function useRevealGroup<T extends HTMLElement = HTMLDivElement>(
           el.style.removeProperty("--reveal-delay");
         }
       }, 460 + maxDelay);
-    };
-
-    const io = getRevealObserver();
-    revealCallbacks.set(root, triggerShow);
-    pendingRevealNodes.add(root);
-    io.observe(root);
-
-    const immediateCheck = window.requestAnimationFrame(() => {
-      if (root.getBoundingClientRect().top <= window.innerHeight * 0.99 && revealCallbacks.has(root)) {
-        triggerShow();
-        revealCallbacks.delete(root);
-        pendingRevealNodes.delete(root);
-        io.unobserve(root);
-      }
     });
 
     return () => {
-      window.cancelAnimationFrame(immediateCheck);
+      unobserve();
       if (settleTimer) window.clearTimeout(settleTimer);
-      revealCallbacks.delete(root);
-      pendingRevealNodes.delete(root);
-      io.unobserve(root);
     };
   }, [staggerMs, triggerKey]);
   return ref;
@@ -262,8 +196,7 @@ export function useCountUp<T extends HTMLElement = HTMLElement>(
     setDisplay(`0${suffix}`);
     let raf = 0;
     let started = false;
-    const io = getRevealObserver();
-    const startCount = () => {
+    const unobserve = observeReveal(node, () => {
       if (started) return;
       started = true;
       const start = performance.now();
@@ -274,26 +207,11 @@ export function useCountUp<T extends HTMLElement = HTMLElement>(
         if (t < 1) raf = window.requestAnimationFrame(tick);
       };
       raf = window.requestAnimationFrame(tick);
-    };
-    revealCallbacks.set(node, startCount);
-    pendingRevealNodes.add(node);
-    io.observe(node);
-
-    const immediateRaf = window.requestAnimationFrame(() => {
-      if (!started && node.getBoundingClientRect().top <= window.innerHeight * 0.99) {
-        startCount();
-        revealCallbacks.delete(node);
-        pendingRevealNodes.delete(node);
-        io.unobserve(node);
-      }
     });
 
     return () => {
-      window.cancelAnimationFrame(immediateRaf);
+      unobserve();
       if (raf) window.cancelAnimationFrame(raf);
-      revealCallbacks.delete(node);
-      pendingRevealNodes.delete(node);
-      io.unobserve(node);
     };
   }, [num, suffix, duration]);
 

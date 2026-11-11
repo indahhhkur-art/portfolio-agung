@@ -21,6 +21,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: 76px; }
+section[id] { scroll-margin-top: 84px; }
 @media (pointer: coarse) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
