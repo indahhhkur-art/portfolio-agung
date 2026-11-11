@@ -20,6 +20,8 @@ function Lightbox({ items, index, closing, onClose, onStep }: LightboxProps) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const touchRef = useRef({ active: false, startX: 0, startY: 0, dx: 0, dy: 0 });
   const [zoomed, setZoomed] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   const item = items[index];
   const single = items.length < 2;
@@ -34,7 +36,9 @@ function Lightbox({ items, index, closing, onClose, onStep }: LightboxProps) {
 
   useEffect(() => {
     setZoomed(false);
-  }, [index]);
+    setImgError(false);
+    setRetryCount(0);
+  }, [index, item.src]);
 
   useEffect(() => {
     if (!zoomed && imgRef.current) {
@@ -177,14 +181,31 @@ function Lightbox({ items, index, closing, onClose, onStep }: LightboxProps) {
           onMouseMove={onStageMouseMove}
           onClick={e => e.target === stageRef.current && onClose()}
         >
-          <img
-            ref={imgRef}
-            key={item.src}
-            src={`${IMG}${item.src}`}
-            alt={item.label}
-            decoding="sync"
-            onClick={toggleZoom}
-          />
+          {imgError ? (
+            <div className="lightbox__error">
+              <p>Gambar gagal dimuat.</p>
+              <button
+                type="button"
+                className="gallery__retry"
+                onClick={() => {
+                  setImgError(false);
+                  setRetryCount(c => c + 1);
+                }}
+              >
+                ↻ Coba Muat Ulang
+              </button>
+            </div>
+          ) : (
+            <img
+              ref={imgRef}
+              key={`${item.src}-${retryCount}`}
+              src={retryCount ? `${IMG}${item.src}?retry=${retryCount}` : `${IMG}${item.src}`}
+              alt={item.label}
+              decoding="sync"
+              onClick={toggleZoom}
+              onError={() => setImgError(true)}
+            />
+          )}
         </div>
         <figcaption>
           <span>{item.label}</span>

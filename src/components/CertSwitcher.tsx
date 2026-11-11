@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IMG } from "../data.ts";
-import { useRevealGroup } from "../hooks.ts";
+import { prefersReducedMotion, useRevealGroup } from "../hooks.ts";
 import { prefetchImage } from "../prefetch.ts";
 import type { Certification, LightboxItem } from "../types.ts";
 
@@ -330,7 +330,8 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
       const startX = track.scrollLeft;
       const destX = getSlotTargetScroll(track, safeSlot, metrics);
       const dist = destX - startX;
-      if (Math.abs(dist) < 1) {
+      if (Math.abs(dist) < 1 || prefersReducedMotion()) {
+        if (Math.abs(dist) >= 1) track.scrollLeft = destX;
         targetSlotRef.current = null;
         return;
       }

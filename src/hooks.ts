@@ -179,26 +179,37 @@ export function useRevealGroup<T extends HTMLElement = HTMLDivElement>(
   return ref;
 }
 
+/** Mengecek preferensi pengguna untuk mengurangi animasi gerakan (a11y). */
+export function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 /** Menghitung angka naik (0 -> target) dengan kurva easeOut saat masuk viewport. */
 export function useCountUp<T extends HTMLElement = HTMLElement>(
   target: string | number,
   duration = 950
 ): { ref: RefObject<T | null>; display: string } {
   const ref = useRef<T | null>(null);
-  const num = Number.parseInt(String(target), 10) || 0;
-  const suffix = String(target).replaceAll(/[0-9]/g, "");
-  const [display, setDisplay] = useState(`0${suffix}`);
+  const fullLabel = String(target);
+  const num = Number.parseInt(fullLabel, 10) || 0;
+  const suffix = fullLabel.replaceAll(/[0-9]/g, "");
+  // Inisialisasi nilai asli agar SSR/non-JS menampilkan angka sebenarnya & bebas hydration mismatch
+  const [display, setDisplay] = useState(fullLabel);
 
   useEffect(() => {
     const node = ref.current;
-    if (!node || !num) return;
+    if (!node || !num || prefersReducedMotion()) return;
 
-    setDisplay(`0${suffix}`);
     let raf = 0;
     let started = false;
     const unobserve = observeReveal(node, () => {
       if (started) return;
       started = true;
+      setDisplay(`0${suffix}`);
       const start = performance.now();
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / duration);
@@ -239,7 +250,7 @@ export function useSmoothScroll(disabled: boolean): void {
       cancelAnim();
       const startY = window.scrollY;
       const dist = targetY - startY;
-      if (Math.abs(dist) < 2) {
+      if (Math.abs(dist) < 2 || prefersReducedMotion()) {
         window.scrollTo({ top: targetY, behavior: "instant" });
         return;
       }

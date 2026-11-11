@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { CATEGORY_LABEL, IMG } from "../data.ts";
 import { useFocusTrap } from "../hooks.ts";
 import type { LightboxItem, Project } from "../types.ts";
@@ -25,6 +25,8 @@ function ProjectModal({
   const modalRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
+  const [failedSrcs, setFailedSrcs] = useState<Record<string, boolean>>({});
+  const [retryMap, setRetryMap] = useState<Record<string, number>>({});
 
   useFocusTrap(modalRef, !closing);
 
@@ -35,6 +37,8 @@ function ProjectModal({
   }, []);
 
   useEffect(() => {
+    setFailedSrcs({});
+    setRetryMap({});
     if (panelRef.current) panelRef.current.scrollTop = 0;
   }, [project.id]);
 
@@ -80,31 +84,57 @@ function ProjectModal({
           )}
         </div>
         <div className="gallery">
-          {items.map((it, i) => (
-            <button
-              key={it.src}
-              type="button"
-              aria-label={`Perbesar ${it.label}`}
-              onClick={() => onOpenImage(items, i)}
-            >
-              <img
-                ref={el => {
-                  if (el?.complete) {
-                    el.classList.add("is-loaded");
-                    el.parentElement?.classList.add("is-img-ready");
-                  }
-                }}
-                src={`${IMG}${it.src}`}
-                alt={it.label}
-                loading="lazy"
-                decoding="async"
-                onLoad={e => {
-                  e.currentTarget.classList.add("is-loaded");
-                  e.currentTarget.parentElement?.classList.add("is-img-ready");
-                }}
-              />
-            </button>
-          ))}
+          {items.map((it, i) => {
+            const hasError = Boolean(failedSrcs[it.src]);
+            const attempt = retryMap[it.src] || 0;
+            const srcUrl = attempt ? `${IMG}${it.src}?retry=${attempt}` : `${IMG}${it.src}`;
+            if (hasError) {
+              return (
+                <div key={it.src} className="gallery__fallback" role="group" aria-label={`Gagal memuat ${it.label}`}>
+                  <span>Gagal memuat gambar</span>
+                  <button
+                    type="button"
+                    className="gallery__retry"
+                    onClick={() => {
+                      setFailedSrcs(prev => ({ ...prev, [it.src]: false }));
+                      setRetryMap(prev => ({ ...prev, [it.src]: attempt + 1 }));
+                    }}
+                  >
+                    ↻ Muat Ulang
+                  </button>
+                </div>
+              );
+            }
+            return (
+              <button
+                key={it.src}
+                type="button"
+                aria-label={`Perbesar ${it.label}`}
+                onClick={() => onOpenImage(items, i)}
+              >
+                <img
+                  ref={el => {
+                    if (el?.complete && el.naturalWidth > 0) {
+                      el.classList.add("is-loaded");
+                      el.parentElement?.classList.add("is-img-ready");
+                    }
+                  }}
+                  src={srcUrl}
+                  alt={it.label}
+                  loading="lazy"
+                  decoding="async"
+                  onLoad={e => {
+                    e.currentTarget.classList.add("is-loaded");
+                    e.currentTarget.parentElement?.classList.add("is-img-ready");
+                  }}
+                  onError={e => {
+                    e.currentTarget.parentElement?.classList.add("is-img-ready");
+                    setFailedSrcs(prev => ({ ...prev, [it.src]: true }));
+                  }}
+                />
+              </button>
+            );
+          })}
         </div>
         {projectTotal > 1 && onStepProject && (
           <div className="modal__pager">

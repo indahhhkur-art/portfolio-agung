@@ -35,13 +35,11 @@ function Navbar() {
     <header ref={headerRef} className={`nav${scrolled ? " is-scrolled" : ""}`}>
       <div className="container nav__inner">
         <a
-          href="https://linkedin.com/in/agungsaeful"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#home"
           className="nav__brand"
-          title="Kunjungi profil LinkedIn Agung Saeful"
+          aria-label="Agung Saeful — Kembali ke beranda"
         >
-          Agung saeful
+          Agung Saeful
         </a>
         <button
           ref={toggleRef}

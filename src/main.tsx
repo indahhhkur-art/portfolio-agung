@@ -6,10 +6,16 @@ import "@fontsource/poppins/latin-700.css";
 import "@fontsource/poppins/latin-800.css";
 import "@fontsource/montserrat/latin-400.css";
 import "@fontsource/montserrat/latin-500.css";
-import "@fontsource/montserrat/latin-600.css";
 import "@fontsource/montserrat/latin-700.css";
 import App from "./App.tsx";
 import "./styles.css";
+
+if (
+  typeof document !== "undefined" &&
+  !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+) {
+  document.documentElement.classList.add("js-reveal");
+}
 
 const rootEl = document.getElementById("root");
 if (rootEl) {

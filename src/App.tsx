@@ -117,7 +117,7 @@ export default function App() {
       <footer className="footer">
         <div className="container">
           <span>
-            © {new Date().getFullYear()}{" "}
+            © <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
             <a
               href="https://linkedin.com/in/agungsaeful"
               target="_blank"

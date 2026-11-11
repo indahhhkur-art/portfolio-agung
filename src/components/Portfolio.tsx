@@ -3,7 +3,6 @@ import { CATEGORY_LABEL, FILTERS, IMG, PROJECTS } from "../data.ts";
 import { useRevealCard, useRevealGroup } from "../hooks.ts";
 import { prefetchImages } from "../prefetch.ts";
 import type { FilterKey, Project } from "../types.ts";
-import Picture, { toWebpSrc } from "./Picture.tsx";
 
 interface ProjectCardProps {
   project: Project;
@@ -38,14 +37,19 @@ const ProjectCard = memo(function ProjectCard({
       onClick={() => onOpen(project)}
     >
       <div className="card__media">
-        <Picture
-          src={`${IMG}${project.cover}`}
-          webpSrc={toWebpSrc(project.cover, "thumbs/")}
+        <img
+          src={`${IMG}thumbs/${project.cover}`}
           alt={`Cover proyek ${project.title}`}
           width={400}
           height={300}
           loading="lazy"
           decoding="async"
+          onError={e => {
+            const img = e.currentTarget;
+            if (img.dataset.fallbackTried) return;
+            img.dataset.fallbackTried = "1";
+            img.src = `${IMG}${project.cover}`;
+          }}
         />
         <span className="card__cat">{CATEGORY_LABEL[project.category]}</span>
         <span className="card__count">{project.images.length} karya</span>

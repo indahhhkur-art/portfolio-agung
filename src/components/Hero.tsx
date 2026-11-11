@@ -1,5 +1,7 @@
 import { memo, useEffect, useRef } from "react";
 import { IMG } from "../data.ts";
+import { prefersReducedMotion } from "../hooks.ts";
+import { isSaveData } from "../prefetch.ts";
 
 function Hero() {
   const secRef = useRef<HTMLElement | null>(null);
@@ -9,13 +11,14 @@ function Hero() {
 
   useEffect(() => {
     const vid = videoRef.current;
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    if (vid && !conn?.saveData) {
+    const reduced = prefersReducedMotion();
+    if (vid && !isSaveData() && !reduced) {
       vid.defaultMuted = true;
       vid.muted = true;
-      vid.preload = "auto";
       void vid.play().catch(() => {});
     }
+
+    if (reduced) return;
 
     let raf = 0;
     let lastProgress = -1;
@@ -70,17 +73,19 @@ function Hero() {
           <div className="hero__video-box">
             <video
               ref={videoRef}
-              src={`${import.meta.env.BASE_URL}video/intro.mp4`}
               poster={`${IMG}hero-intro-poster.webp`}
-              width={1280}
-              height={720}
+              width={902}
+              height={684}
               autoPlay
               muted
               loop
               playsInline
               preload="metadata"
               aria-label="Animasi ilustrasi desainer grafis memegang karya dan palet desain"
-            />
+            >
+              <source src={`${import.meta.env.BASE_URL}video/intro.webm`} type="video/webm" />
+              <source src={`${import.meta.env.BASE_URL}video/intro.mp4`} type="video/mp4" />
+            </video>
           </div>
         </div>
       </div>
