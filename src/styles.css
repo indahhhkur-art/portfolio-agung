@@ -28,9 +28,9 @@
   --dot-hover: #9daadd;
   --divider-soft: #ebeff9;
   --divider-nav: #eeeeee;
-  --nav-bg: rgba(255,255,255,.78);
-  --nav-bg-scrolled: rgba(255,255,255,.94);
-  --nav-border-scrolled: rgba(91, 127, 199, .10);
+  --nav-bg: rgba(255,255,255,.88);
+  --nav-bg-scrolled: #ffffff;
+  --nav-border-scrolled: rgba(91, 127, 199, .12);
   --nav-shadow-scrolled: 0 4px 24px rgba(35, 45, 95, .07);
   --arrow-bg: #25294a;
   --arrow-ink: #ffffff;
@@ -873,6 +873,15 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
   --px: 0; --py: 0;
   padding: 100px 0 90px; text-align: center; color: #fff; background: var(--grad-contrast);
   position: relative; overflow: hidden;
+  scroll-margin-top: 66px;
+}
+@media (min-width: 901px) {
+  .contact {
+    min-height: clamp(460px, calc(100svh - 134px), 780px);
+    display: grid;
+    align-content: center;
+    padding: 84px 0 80px;
+  }
 }
 .contact :focus-visible { outline-color: #fff; }
 .contact__stage { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
@@ -1118,8 +1127,8 @@ html[data-theme="dark"] {
   --dot-hover: rgba(148, 168, 232, .56);
   --divider-soft: rgba(148, 168, 232, .16);
   --divider-nav: rgba(148, 168, 232, .14);
-  --nav-bg: rgba(12, 16, 32, .80);
-  --nav-bg-scrolled: rgba(12, 16, 32, .94);
+  --nav-bg: rgba(12, 16, 32, .88);
+  --nav-bg-scrolled: #0c1020;
   --nav-border-scrolled: rgba(148, 168, 232, .16);
   --nav-shadow-scrolled: 0 6px 28px rgba(0, 0, 0, .48);
   --arrow-bg: #263259;
