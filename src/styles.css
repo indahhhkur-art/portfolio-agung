@@ -79,8 +79,8 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 }
 .text-grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-.section-heading { font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.18; color: #46464b; }
-.section-sub { color: var(--muted); font-size: .95rem; margin-top: .35rem; font-family: "Montserrat", sans-serif; }
+.section-heading { font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.18; color: #46464b; text-wrap: balance; }
+.section-sub { color: var(--muted); font-size: .95rem; margin-top: .35rem; font-family: "Montserrat", sans-serif; text-wrap: pretty; }
 .section-split {
   display: flex; align-items: flex-end; justify-content: space-between; gap: 1.2rem; flex-wrap: wrap;
   margin-bottom: 1.8rem;
@@ -156,9 +156,9 @@ button, .btn, .chip, .icon-btn, .gallery button, .cert-app, .certs__dot, .card, 
 .hero__text .eyebrow, .hero__lead, .hero__cta { animation: heroLiftIn .6s var(--ease-smooth) backwards; }
 .hero__lead { animation-delay: .06s; }
 .hero__cta { animation-delay: .12s; }
-.hero h1 { font-weight: 800; font-size: clamp(2.6rem, 5.5vw, 4.8rem); line-height: 1.05; color: #46464b; margin: .2rem 0 1rem; }
+.hero h1 { font-weight: 800; font-size: clamp(2.6rem, 5.5vw, 4.8rem); line-height: 1.05; color: #46464b; margin: .2rem 0 1rem; text-wrap: balance; }
 .hero h1 span { display: block; font-size: .55em; font-weight: 700; margin-top: .3rem; }
-.hero__lead { max-width: 35rem; color: var(--muted); margin-bottom: 2rem; font-family: "Montserrat", sans-serif; font-size: clamp(.94rem, 1.08vw, 1.06rem); }
+.hero__lead { max-width: 35rem; color: var(--muted); margin-bottom: 2rem; font-family: "Montserrat", sans-serif; font-size: clamp(.94rem, 1.08vw, 1.06rem); text-wrap: pretty; }
 .hero__cta { display: flex; gap: 1rem; flex-wrap: wrap; }
 .hero__art {
   display: flex; align-items: flex-end; justify-content: flex-end;

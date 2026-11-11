@@ -8,15 +8,16 @@ export const toWebpSrc = (filename: string, subdir = ""): string =>
 interface PictureProps extends ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   webpSrc: string;
+  webpSrcSet?: string;
   alt: string;
 }
 
-/** Gambar responsif WebP + fallback JPEG agar lebih cepat tanpa mengorbankan kompatibilitas. */
-export default function Picture({ src, webpSrc, alt, ...imgProps }: PictureProps) {
+/** Gambar responsif WebP + srcSet adaptif dengan fallback JPEG kompatibel penuh. */
+export default function Picture({ src, webpSrc, webpSrcSet, sizes, alt, ...imgProps }: PictureProps) {
   return (
     <picture style={{ display: "contents" }}>
-      <source srcSet={webpSrc} type="image/webp" />
-      <img src={src} alt={alt} {...imgProps} />
+      <source srcSet={webpSrcSet ?? webpSrc} sizes={sizes} type="image/webp" />
+      <img src={src} alt={alt} sizes={sizes} {...imgProps} />
     </picture>
   );
 }

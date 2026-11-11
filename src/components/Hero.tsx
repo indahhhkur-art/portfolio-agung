@@ -55,6 +55,8 @@ function Hero() {
           <Picture
             src={`${IMG}hero-art.jpg`}
             webpSrc={toWebpSrc("hero-art.jpg")}
+            webpSrcSet={`${IMG}hero-art-sm.webp 720w, ${IMG}hero-art.webp 1136w`}
+            sizes="(max-width: 900px) 92vw, 740px"
             alt="Ilustrasi desainer grafis memegang gambar, palet warna, dan ikon tipografi"
             width={1136}
             height={1193}

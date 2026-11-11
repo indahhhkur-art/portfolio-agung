@@ -72,14 +72,21 @@ interface CertSwitcherProps {
 
 function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
   const count = items.length;
+  const [infiniteReady, setInfiniteReady] = useState(false);
+
+  useEffect(() => {
+    setInfiniteReady(true);
+  }, []);
+
+  const copies = infiniteReady && count > 1 ? COPIES : 1;
   const repeated = useMemo(
     () =>
-      count > 1
-        ? Array.from({ length: COPIES }, (_, copy) =>
+      copies > 1
+        ? Array.from({ length: copies }, (_, copy) =>
             items.map((item, idx) => ({ item, idx, copy, slot: copy * count + idx }))
           ).flat()
         : items.map((item, idx) => ({ item, idx, copy: 0, slot: idx })),
-    [items, count]
+    [items, count, copies]
   );
 
   const sectionRef = useRevealGroup<HTMLDivElement>(50);
@@ -100,7 +107,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
   const targetSlotRef = useRef<number | null>(null);
   const initializedRef = useRef(false);
   const [eagerImgs, setEagerImgs] = useState(false);
-  const [activeSlot, setActiveSlot] = useState(count > 1 ? count : 0);
+  const [activeSlot, setActiveSlot] = useState(0);
   const active = count > 0 ? ((activeSlot % count) + count) % count : 0;
 
   // Muat seluruh salinan sertifikat begitu section mendekati viewport agar swipe unlimited tanpa gambar kosong
@@ -158,9 +165,9 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
 
   const normalizeBoundary = useCallback(
     (track: HTMLDivElement, metrics: { setWidth: number }): number => {
-      if (count <= 1 || metrics.setWidth <= 0) return 0;
+      if (copies <= 1 || count <= 1 || metrics.setWidth <= 0) return 0;
       const low = metrics.setWidth * 0.55;
-      const high = metrics.setWidth * (COPIES - 1.45);
+      const high = metrics.setWidth * (copies - 1.45);
       let delta = 0;
       if (track.scrollLeft < low) delta = metrics.setWidth;
       else if (track.scrollLeft >= high) delta = -metrics.setWidth;
@@ -178,7 +185,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
       }
       return delta;
     },
-    [count]
+    [copies, count]
   );
 
   const findNearestSlot = useCallback((track: HTMLDivElement, metrics: { padLeft: number; isNarrow: boolean }) => {
@@ -260,10 +267,13 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
     const track = trackRef.current;
     if (!track || count === 0) return;
 
-    if (!initializedRef.current && count > 1) {
+    cardRefs.current.length = repeated.length;
+
+    if (!initializedRef.current && copies > 1 && count > 1) {
       initializedRef.current = true;
       const metrics = getMetrics(track);
       track.scrollTo({ left: getSlotTargetScroll(track, count, metrics), behavior: "instant" });
+      setActiveSlot(count);
     }
 
     let raf = 0;
@@ -285,7 +295,7 @@ function CertSwitcher({ items, onOpenImage, onPrefetch }: CertSwitcherProps) {
       track.removeEventListener("scroll", scheduleSync);
       ro.disconnect();
     };
-  }, [count, getMetrics, getSlotTargetScroll, stopAnim, syncCards]);
+  }, [copies, count, getMetrics, getSlotTargetScroll, repeated.length, stopAnim, syncCards]);
 
   /** Tween horizontal GPU cepat (240ms) tanpa lock penahan klik berturut-turut. */
   const animateToSlot = useCallback(

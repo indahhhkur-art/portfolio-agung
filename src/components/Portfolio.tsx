@@ -28,6 +28,7 @@ const ProjectCard = memo(function ProjectCard({
       className="card"
       data-reveal-item
       onPointerEnter={onPrefetch}
+      onTouchStart={onPrefetch}
       onFocus={onPrefetch}
       onClick={() => onOpen(project)}
     >

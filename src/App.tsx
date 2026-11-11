@@ -54,20 +54,33 @@ export default function App() {
     []
   );
 
-  // Idle pre-warm chunk modal & lightbox pada koneksi normal agar klik pertama instan
+  // Pre-warm chunk modal & lightbox setelah load + idle panjang agar beban initial render 0 byte ekstra
   useEffect(() => {
     const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     if (conn?.saveData) return;
+    let timer = 0;
     const warm = () => {
       loadModal();
       loadLightbox();
     };
-    if (typeof window.requestIdleCallback === "function") {
-      const id = window.requestIdleCallback(warm, { timeout: 1800 });
-      return () => window.cancelIdleCallback(id);
+    const schedule = () => {
+      timer = globalThis.setTimeout(() => {
+        if (typeof window.requestIdleCallback === "function") {
+          window.requestIdleCallback(warm, { timeout: 2500 });
+        } else {
+          warm();
+        }
+      }, 2800);
+    };
+    if (document.readyState === "complete") {
+      schedule();
+    } else {
+      window.addEventListener("load", schedule, { once: true });
     }
-    const timer = globalThis.setTimeout(warm, 1400);
-    return () => globalThis.clearTimeout(timer);
+    return () => {
+      if (timer) globalThis.clearTimeout(timer);
+      window.removeEventListener("load", schedule);
+    };
   }, []);
 
   // Esc menutup modal proyek (lightbox menangani Esc-nya sendiri)
