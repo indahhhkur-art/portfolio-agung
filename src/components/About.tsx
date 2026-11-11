@@ -1,6 +1,6 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useRef } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
-import { prefersReducedMotion, useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.ts";
+import { prefersReducedMotion, useCountUp, useJourneyReveal, useLoopingVideo, useReveal, useRevealGroup } from "../hooks.ts";
 import { isSaveData } from "../prefetch.ts";
 import type { LightboxItem } from "../types.ts";
 import CertSwitcher from "./CertSwitcher.tsx";
@@ -37,27 +37,7 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
   const expCardRef = useJourneyReveal<HTMLDivElement>(1020);
 
   // Putar video About terus-menerus & looping mulus tanpa jeda saat scroll
-  useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
-    if (isSaveData() || prefersReducedMotion()) {
-      vid.pause();
-      return;
-    }
-
-    const ensurePlay = () => {
-      if (document.hidden) return;
-      vid.defaultMuted = true;
-      vid.muted = true;
-      if (vid.paused) void vid.play().catch(() => {});
-    };
-
-    ensurePlay();
-    document.addEventListener("visibilitychange", ensurePlay);
-    return () => {
-      document.removeEventListener("visibilitychange", ensurePlay);
-    };
-  }, []);
+  useLoopingVideo(videoRef, isSaveData() || prefersReducedMotion());
 
   return (
     <section className="about" id="about">

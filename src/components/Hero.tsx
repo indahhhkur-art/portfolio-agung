@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef } from "react";
 import { IMG } from "../data.ts";
-import { prefersReducedMotion } from "../hooks.ts";
+import { prefersReducedMotion, useLoopingVideo } from "../hooks.ts";
 import { isSaveData } from "../prefetch.ts";
 
 function Hero() {
@@ -9,16 +9,10 @@ function Hero() {
   const artRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  useEffect(() => {
-    const vid = videoRef.current;
-    const reduced = prefersReducedMotion();
-    if (vid && !isSaveData() && !reduced) {
-      vid.defaultMuted = true;
-      vid.muted = true;
-      void vid.play().catch(() => {});
-    }
+  useLoopingVideo(videoRef, isSaveData() || prefersReducedMotion());
 
-    if (reduced) return;
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
 
     let raf = 0;
     let lastProgress = -1;
@@ -43,16 +37,10 @@ function Hero() {
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update);
     };
-    const onVisibility = () => {
-      if (!vid || document.hidden || reduced || isSaveData()) return;
-      if (vid.paused) void vid.play().catch(() => {});
-    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
 

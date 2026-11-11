@@ -404,3 +404,46 @@ export function useAnimatedPresence<T>(value: T | null, exitMs = 160): {
 
   return { rendered: value ?? cached, closing: Boolean(!value && cached && closing) };
 }
+
+/** Memastikan video terus berputar dan looping mulus tanpa jeda saat scroll maupun berpindah posisi halaman. */
+export function useLoopingVideo(
+  videoRef: RefObject<HTMLVideoElement | null>,
+  disabled: boolean
+): void {
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    if (disabled) {
+      vid.pause();
+      return;
+    }
+
+    const ensurePlay = () => {
+      if (document.hidden) return;
+      vid.defaultMuted = true;
+      vid.muted = true;
+      if (vid.paused) void vid.play().catch(() => {});
+    };
+
+    ensurePlay();
+
+    let io: IntersectionObserver | undefined;
+    if (typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        entries => {
+          if (entries.some(e => e.isIntersecting)) ensurePlay();
+        },
+        { rootMargin: "320px 0px" }
+      );
+      io.observe(vid);
+    }
+
+    vid.addEventListener("canplay", ensurePlay);
+    document.addEventListener("visibilitychange", ensurePlay);
+    return () => {
+      io?.disconnect();
+      vid.removeEventListener("canplay", ensurePlay);
+      document.removeEventListener("visibilitychange", ensurePlay);
+    };
+  }, [videoRef, disabled]);
+}
