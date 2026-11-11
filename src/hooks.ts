@@ -309,6 +309,9 @@ export function useScrollSpy(ids: readonly string[]): { active: string; scrolled
   useEffect(() => {
     const io = new IntersectionObserver(
       entries => {
+        if (window.scrollY <= 36) return;
+        const doc = document.documentElement;
+        if (window.innerHeight + window.scrollY >= doc.scrollHeight - 24) return;
         for (const en of entries) {
           if (en.isIntersecting) {
             setState(prev => (prev.active === en.target.id ? prev : { ...prev, active: en.target.id }));

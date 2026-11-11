@@ -200,7 +200,7 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 }
 .hero { padding: 66px 0 0; overflow: hidden; background: var(--surface); transition: background-color .3s ease; }
 .hero__inner { display: grid; grid-template-columns: minmax(0, .94fr) minmax(0, 1.14fr); align-items: stretch; gap: clamp(2rem, 4vw, 4rem); }
-@media (min-width: 901px) {
+@media (min-width: 901px) and (orientation: landscape) {
   .hero {
     min-height: clamp(540px, calc(100vh - 52px), 900px);
     min-height: clamp(540px, calc(100svh - 52px), 900px);
@@ -235,7 +235,7 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 /* About (Versi Sebelumnya + LinkedIn & Deskripsi BSI) */
 .about { padding: 80px 0 40px; background: var(--surface); transition: background-color .3s ease; }
 .about__inner { display: grid; grid-template-columns: minmax(280px, .86fr) minmax(0, 1.14fr); gap: clamp(2rem, 4vw, 4.5rem); align-items: center; }
-@media (min-width: 901px) {
+@media (min-width: 901px) and (orientation: landscape) {
   .about__inner {
     min-height: clamp(500px, calc(100vh - 146px), 720px);
     min-height: clamp(500px, calc(100svh - 146px), 720px);
@@ -263,9 +263,10 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 
 /* Tools Strip (Sesuai Referensi Screenshot: Kapsul Oval 3 Kolom x 2 Baris) */
 .section-center-head { text-align: center; margin-bottom: 2rem; }
-.tools-block { padding: clamp(96px, 12vh, 148px) 0 40px; }
-@media (min-width: 901px) {
+.tools-block { padding: 64px 0 36px; }
+@media (min-width: 901px) and (orientation: landscape) {
   .tools-block {
+    padding: clamp(96px, 12vh, 148px) 0 40px;
     min-height: clamp(500px, calc(100vh - 106px), 700px);
     min-height: clamp(500px, calc(100svh - 106px), 700px);
     display: flex; flex-direction: column; justify-content: center;
@@ -300,7 +301,10 @@ html[data-theme="dark"] .theme-toggle__sun { display: block; }
 .tool-pill span { font-size: .76rem; color: var(--muted); font-family: "Montserrat", sans-serif; line-height: 1.35; }
 
 /* Education & Work Experience Cards (Animasi Timeline & Kaskade Terasa Hidup) */
-.journey { padding: clamp(96px, 12vh, 148px) 0 28px; }
+.journey { padding: 56px 0 28px; }
+@media (min-width: 901px) and (orientation: landscape) {
+  .journey { padding: clamp(96px, 12vh, 148px) 0 28px; }
+}
 .journey__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem; align-items: stretch; }
 .journey-card {
   position: relative; overflow: hidden;
@@ -890,7 +894,7 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
   position: relative; overflow: hidden;
   scroll-margin-top: 66px;
 }
-@media (min-width: 901px) {
+@media (min-width: 901px) and (orientation: landscape) {
   .contact {
     min-height: clamp(460px, calc(100vh - 134px), 780px);
     min-height: clamp(460px, calc(100svh - 134px), 780px);
