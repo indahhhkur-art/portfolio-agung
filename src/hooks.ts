@@ -505,9 +505,14 @@ function readStoredTheme(): ThemeMode | null {
 
 function syncThemeDom(mode: ThemeMode): void {
   if (typeof document === "undefined") return;
-  document.documentElement.dataset.theme = mode;
+  if (document.documentElement.dataset.theme !== mode) {
+    document.documentElement.dataset.theme = mode;
+  }
+  const color = mode === "dark" ? "#0c1020" : "#4361ab";
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", mode === "dark" ? "#0c1020" : "#4361ab");
+  if (meta && meta.getAttribute("content") !== color) {
+    meta.setAttribute("content", color);
+  }
 }
 
 /** Mengelola tema terang/malam dengan sinkronisasi preferensi OS, localStorage, & bebas FOUC/CSP. */
@@ -517,7 +522,7 @@ export function useTheme(): { theme: ThemeMode; toggleTheme: () => void } {
   useEffect(() => {
     const initial = readStoredTheme() ?? readSystemTheme();
     syncThemeDom(initial);
-    setTheme(initial);
+    setTheme(prev => (prev === initial ? prev : initial));
 
     if (typeof window.matchMedia !== "function") return;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");

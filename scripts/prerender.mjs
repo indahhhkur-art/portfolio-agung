@@ -47,9 +47,11 @@ if (fs.existsSync(assetsDir)) {
 
   const criticalFontPrefixes = [
     "poppins-latin-600-normal",
+    "poppins-latin-700-normal",
     "poppins-latin-800-normal",
     "montserrat-latin-400-normal",
-    "montserrat-latin-500-normal"
+    "montserrat-latin-500-normal",
+    "montserrat-latin-700-normal"
   ];
   const fontPreloads = criticalFontPrefixes
     .map(prefix => assetFiles.find(f => f.startsWith(prefix) && f.endsWith(".woff2")))

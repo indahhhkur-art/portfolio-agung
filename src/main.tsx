@@ -1,6 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
-import "@fontsource/poppins/latin-500.css";
 import "@fontsource/poppins/latin-600.css";
 import "@fontsource/poppins/latin-700.css";
 import "@fontsource/poppins/latin-800.css";
@@ -17,21 +16,19 @@ if (rootEl) {
       <App />
     </StrictMode>
   );
-  const enableReveal = () => {
+  const startApp = () => {
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("js-reveal");
     }
-  };
-  if (rootEl.hasChildNodes()) {
-    // Paint SSR Hero & poster terlebih dahulu, hidrasi di frame berikutnya, lalu aktifkan js-reveal tanpa long task
-    window.requestAnimationFrame(() => {
+    if (rootEl.hasChildNodes()) {
       hydrateRoot(rootEl, app);
-      globalThis.setTimeout(enableReveal, 0);
-    });
-  } else {
-    enableReveal();
-    createRoot(rootEl).render(app);
-  }
+    } else {
+      createRoot(rootEl).render(app);
+    }
+    (window as Window & { __appHydrated?: boolean }).__appHydrated = true;
+  };
+  // Tunggu frame paint awal agar FCP/LCP selesai terlebih dahulu sebelum hidrasi React
+  window.requestAnimationFrame(() => startApp());
 }
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
