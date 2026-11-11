@@ -38,7 +38,7 @@ function Navbar() {
         <a
           href="#home"
           className="nav__brand"
-          aria-label="Agung Saeful — Kembali ke beranda"
+          aria-label="Agung Saeful, kembali ke beranda"
         >
           Agung Saeful
         </a>

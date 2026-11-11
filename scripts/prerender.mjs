@@ -46,12 +46,11 @@ if (fs.existsSync(assetsDir)) {
     .map(f => `/assets/${f}`);
 
   const criticalFontPrefixes = [
-    "poppins-latin-600-normal",
-    "poppins-latin-700-normal",
-    "poppins-latin-800-normal",
-    "montserrat-latin-400-normal",
-    "montserrat-latin-500-normal",
-    "montserrat-latin-700-normal"
+    "archivo-latin-700-normal",
+    "archivo-latin-800-normal",
+    "poppins-latin-400-normal",
+    "poppins-latin-500-normal",
+    "poppins-latin-600-normal"
   ];
   const fontPreloads = criticalFontPrefixes
     .map(prefix => assetFiles.find(f => f.startsWith(prefix) && f.endsWith(".woff2")))
@@ -125,7 +124,7 @@ const notFoundHtml = `<!DOCTYPE html>
   <meta name="color-scheme" content="light dark">
   <script src="/theme-init.js"></script>
   <meta name="robots" content="noindex">
-  <title>404 — Halaman Tidak Ditemukan | Agung Saeful</title>
+  <title>404: Halaman Tidak Ditemukan | Agung Saeful</title>
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
   ${cssLinkTag}
 </head>

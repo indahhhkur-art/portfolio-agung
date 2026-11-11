@@ -191,7 +191,7 @@ export const PROJECTS: Project[] = [
   {
     id: "ecozest-social",
     category: "social",
-    title: "Ecozest — Social Media",
+    title: "Ecozest: Social Media",
     summary: "Desain konten promosi produk organik & natural untuk Instagram.",
     bullets: [
       "Membuat desain digital, brosur, banner, dan signage untuk media sosial.",
@@ -205,7 +205,7 @@ export const PROJECTS: Project[] = [
   {
     id: "ecozest-packaging",
     category: "print",
-    title: "Ecozest — Packaging & Label",
+    title: "Ecozest: Packaging & Label",
     summary: "Desain kemasan keripik & kerupuk sehat beserta label produknya.",
     bullets: [
       "Mendesain grafis kemasan dengan sistem warna dan tipografi yang konsisten.",
@@ -232,7 +232,7 @@ export const PROJECTS: Project[] = [
   {
     id: "microstock",
     category: "illustration",
-    title: "Microstock — Icon, Flat Design & Illustration",
+    title: "Microstock: Icon, Flat Design & Illustration",
     summary: "Karya freelance untuk marketplace microstock: ikon, ilustrasi, dan aset vektor.",
     bullets: [
       "Membuat desain template.",
@@ -253,7 +253,7 @@ export const CERTS: Certification[] = [
     src: "cert-01.webp",
     w: 702,
     h: 1006,
-    label: "Sertifikat Kompetensi — Desainer Grafis Muda (BNSP)",
+    label: "Sertifikat Kompetensi: Desainer Grafis Muda (BNSP)",
     shortTitle: "Junior Graphic Designer",
     issuer: "BNSP · LSP Informatika",
     year: "2023",
@@ -263,7 +263,7 @@ export const CERTS: Certification[] = [
     src: "cert-02.webp",
     w: 711,
     h: 1005,
-    label: "Sertifikat Kompetensi — Data Management Staff (BNSP)",
+    label: "Sertifikat Kompetensi: Data Management Staff (BNSP)",
     shortTitle: "Data Management Staff",
     issuer: "BNSP · LSP Teknologi Digital",
     year: "2022",
@@ -283,7 +283,7 @@ export const CERTS: Certification[] = [
     src: "cert-04.webp",
     w: 636,
     h: 491,
-    label: "Graphic Design Specialization — CalArts (Coursera)",
+    label: "Graphic Design Specialization: CalArts (Coursera)",
     shortTitle: "Graphic Design Specialization",
     issuer: "CalArts · Coursera",
     year: "2023",
@@ -303,7 +303,7 @@ export const TOOLS: ToolItem[] = [
 export const EDUCATION_LIST: TimelineItem[] = [
   {
     period: "Lulus 2025 · IPK 3.82 / 4.00",
-    title: "S1 Teknik Informatika — STMIK IKMI Cirebon",
+    title: "S1 Teknik Informatika, STMIK IKMI Cirebon",
     detail: "Analisis Data, Ilmu Data, Data Management, dan Sistem Basis Data."
   },
   {
@@ -331,17 +331,17 @@ export const EXPERIENCE_LIST: TimelineItem[] = [
   },
   {
     period: "August 2023 – December 2023",
-    title: "Schoters by Ruangguru — Graphic Design Intern",
+    title: "Schoters by Ruangguru: Graphic Design Intern",
     detail: "Menyelesaikan desain selaras brand guidelines dalam tenggat 3 hari (3–8 variasi/proyek) untuk mendukung pemasaran digital."
   },
   {
     period: "May 2023 – June 2023",
-    title: "DPRD Kabupaten Cirebon — Administrasi Staff",
+    title: "DPRD Kabupaten Cirebon: Administrasi Staff",
     detail: "Mengelola dokumen & data, administrasi kegiatan/event, serta dokumentasi foto dan video publikasi lembaga."
   },
   {
     period: "December 2020 – December 2022",
-    title: "Ecozest — Graphic Design & Marketing Staff",
+    title: "Ecozest: Graphic Design & Marketing Staff",
     detail: "Merancang puluhan aset konten digital bulanan dengan CorelDRAW, Illustrator, dan Canva (3–12 aset/proyek dalam 2 hari kerja)."
   }
 ];

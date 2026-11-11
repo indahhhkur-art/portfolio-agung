@@ -1,5 +1,5 @@
-const SHELL_CACHE = "agung-shell-v7";
-const IMG_CACHE = "agung-img-v7";
+const SHELL_CACHE = "agung-shell-v8";
+const IMG_CACHE = "agung-img-v8";
 const MAX_IMG_ENTRIES = 60;
 const PRECACHE_ASSETS = ["/", "/theme-init.js", "/icon.svg", "/icon-192.png", "/apple-touch-icon.png", "/site.webmanifest", "/img/hero-intro-poster.webp?v=2"];
 

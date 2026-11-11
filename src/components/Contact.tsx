@@ -14,18 +14,18 @@ interface ContactLinkItem {
 interface SparkleSpec {
   id: number;
   zone: "tl" | "br";
-  kind: "star" | "ring" | "dot" | "diamond";
+  kind: "ring" | "dot" | "diamond";
   size: number;
 }
 
 const SPARKLES: SparkleSpec[] = [
-  { id: 1, zone: "tl", kind: "star", size: 16 },
+  { id: 1, zone: "tl", kind: "diamond", size: 13 },
   { id: 2, zone: "tl", kind: "ring", size: 13 },
-  { id: 3, zone: "tl", kind: "star", size: 14 },
-  { id: 4, zone: "tl", kind: "dot", size: 9 },
-  { id: 5, zone: "tl", kind: "star", size: 13 },
+  { id: 3, zone: "tl", kind: "dot", size: 10 },
+  { id: 4, zone: "tl", kind: "ring", size: 11 },
+  { id: 5, zone: "tl", kind: "diamond", size: 12 },
   { id: 6, zone: "br", kind: "diamond", size: 12 },
-  { id: 7, zone: "br", kind: "star", size: 16 },
+  { id: 7, zone: "br", kind: "ring", size: 14 },
   { id: 8, zone: "br", kind: "diamond", size: 12 },
   { id: 9, zone: "br", kind: "ring", size: 13 },
   { id: 10, zone: "br", kind: "dot", size: 10 }
@@ -39,7 +39,7 @@ const MICROSTOCK_TARGET: Record<string, OrbTarget> = {
 
 const LINKS: ContactLinkItem[] = (
   [
-    { key: "email", label: "✉ Email", href: (v: string) => `mailto:${v}` },
+    { key: "email", label: "Email", href: (v: string) => `mailto:${v}` },
     { key: "whatsapp", label: "WhatsApp", href: (v: string) => `https://wa.me/${v}` },
     { key: "instagram", label: "Instagram", href: (v: string) => `https://instagram.com/${v}` },
     { key: "behance", label: "Behance", href: (v: string) => v }
@@ -47,13 +47,6 @@ const LINKS: ContactLinkItem[] = (
 ).filter(l => Boolean(CONTACT[l.key]));
 
 function SparkleShape({ spec }: { spec: SparkleSpec }) {
-  if (spec.kind === "star") {
-    return (
-      <svg viewBox="0 0 24 24" width={spec.size} height={spec.size}>
-        <path fill="currentColor" d="M12 1L14.9 9.1L23 12L14.9 14.9L12 23L9.1 14.9L1 12L9.1 9.1Z" />
-      </svg>
-    );
-  }
   if (spec.kind === "ring") {
     return (
       <svg viewBox="0 0 24 24" width={spec.size} height={spec.size}>
@@ -237,8 +230,8 @@ function Contact() {
             type="button"
             className="contact__thanks-btn"
             {...bindTarget("both")}
-            aria-label="THANKS — Klik untuk menganimasikan kedua bola"
-            title="Klik untuk animasi kedua bola!"
+            aria-label="THANKS: Klik untuk menganimasikan bingkai"
+            title="Klik untuk menganimasikan bingkai!"
           >
             THANKS
           </button>
@@ -256,7 +249,7 @@ function Contact() {
             rel="noopener noreferrer"
             {...bindTarget("tl")}
           >
-            LinkedIn — Agung Saeful ↗
+            LinkedIn: Agung Saeful ↗
           </a>
         </div>
         <p className="contact__note" data-reveal-item>

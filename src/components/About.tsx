@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
+import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, PROJECTS, TOOLS } from "../data.ts";
 import { useCountUp, useJourneyReveal, useLoopingVideo, useReveal, useRevealGroup } from "../hooks.ts";
 import { isSaveData } from "../prefetch.ts";
 import type { LightboxItem } from "../types.ts";
@@ -7,9 +7,9 @@ import CertSwitcher from "./CertSwitcher.tsx";
 import ToolIcon from "./ToolIcons.tsx";
 
 const STATS = [
-  { value: "5+", label: "Tahun pengalaman" },
-  { value: "12+", label: "Klien & proyek" },
-  { value: String(CERTS.length), label: "Sertifikasi" }
+  { value: "5 tahun", label: "Desain & marketing sejak Des 2020" },
+  { value: `${PROJECTS.length} proyek`, label: "Terdokumentasi di portofolio ini" },
+  { value: `${CERTS.length} sertifikat`, label: "BNSP, Google & CalArts (2022–2023)" }
 ];
 
 function StatCounter({ value, label }: { value: string; label: string }) {
@@ -143,7 +143,12 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
         <div className="journey__grid">
           <div className="journey-card journey-card--left" ref={eduCardRef}>
             <div className="journey-card__head">
-              <span className="journey-card__icon" aria-hidden="true">🎓</span>
+              <span className="journey-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+              </span>
               <h4>Education</h4>
             </div>
             <ul className="journey-card__list">
@@ -167,7 +172,12 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
 
           <div className="journey-card journey-card--right" ref={expCardRef}>
             <div className="journey-card__head">
-              <span className="journey-card__icon" aria-hidden="true">💼</span>
+              <span className="journey-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+              </span>
               <h4>Work Experience</h4>
             </div>
             <ul className="journey-card__list">

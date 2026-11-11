@@ -1,11 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
+import "@fontsource/archivo/latin-700.css";
+import "@fontsource/archivo/latin-800.css";
+import "@fontsource/poppins/latin-400.css";
+import "@fontsource/poppins/latin-500.css";
 import "@fontsource/poppins/latin-600.css";
-import "@fontsource/poppins/latin-700.css";
-import "@fontsource/poppins/latin-800.css";
-import "@fontsource/montserrat/latin-400.css";
-import "@fontsource/montserrat/latin-500.css";
-import "@fontsource/montserrat/latin-700.css";
 import App from "./App.tsx";
 import "./styles.css";
 
