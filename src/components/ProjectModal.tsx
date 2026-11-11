@@ -121,7 +121,7 @@ function ProjectModal({
                   }}
                   src={srcUrl}
                   alt={it.label}
-                  loading={i < 3 ? "eager" : "lazy"}
+                  loading="eager"
                   decoding="async"
                   onLoad={e => {
                     e.currentTarget.classList.add("is-loaded");
