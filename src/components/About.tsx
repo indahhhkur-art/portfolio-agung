@@ -74,7 +74,7 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
         <div className="about__photo reveal" ref={photoRef}>
           <video
             ref={videoRef}
-            poster={`${IMG}agung-about-poster.webp`}
+            poster={`${IMG}agung-about-poster.webp?v=2`}
             width={760}
             height={600}
             muted
@@ -83,8 +83,8 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
             preload="none"
             aria-label="Video perkenalan Agung Saeful dengan latar grafis desain"
           >
-            <source src={`${import.meta.env.BASE_URL}video/about.webm`} type="video/webm" />
-            <source src={`${import.meta.env.BASE_URL}video/about.mp4`} type="video/mp4" />
+            <source src={`${import.meta.env.BASE_URL}video/about.webm?v=2`} type="video/webm" />
+            <source src={`${import.meta.env.BASE_URL}video/about.mp4?v=2`} type="video/mp4" />
           </video>
         </div>
         <div className="about__text" ref={textRef}>
