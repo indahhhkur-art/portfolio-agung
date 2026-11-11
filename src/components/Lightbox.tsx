@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { IMG } from "../data.ts";
 import { useFocusTrap } from "../hooks.ts";
+import { IMAGE_DIMS } from "../imageDims.ts";
 import { prefetchImage } from "../prefetch.ts";
 import type { LightboxItem } from "../types.ts";
 
@@ -25,6 +26,7 @@ function Lightbox({ items, index, closing, onClose, onStep }: LightboxProps) {
 
   const item = items[index];
   const single = items.length < 2;
+  const dims = IMAGE_DIMS[item.src];
 
   useFocusTrap(rootRef, !closing);
 
@@ -197,12 +199,20 @@ function Lightbox({ items, index, closing, onClose, onStep }: LightboxProps) {
             </div>
           ) : (
             <img
-              ref={imgRef}
+              ref={el => {
+                imgRef.current = el;
+                if (el?.complete && el.naturalWidth > 0) {
+                  el.classList.add("is-ready");
+                }
+              }}
               key={`${item.src}-${retryCount}`}
               src={retryCount ? `${IMG}${item.src}?retry=${retryCount}` : `${IMG}${item.src}`}
+              width={dims?.[0]}
+              height={dims?.[1]}
               alt={item.label}
               decoding="sync"
               onClick={toggleZoom}
+              onLoad={e => e.currentTarget.classList.add("is-ready")}
               onError={() => setImgError(true)}
             />
           )}

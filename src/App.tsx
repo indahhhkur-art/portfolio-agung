@@ -85,6 +85,10 @@ export default function App() {
 
   // Esc menutup modal proyek dan ArrowLeft/Right berpindah proyek (lightbox menangani tombolnya sendiri)
   useEffect(() => {
+    if (project && !isSaveData()) void loadLightbox();
+  }, [project]);
+
+  useEffect(() => {
     if (!project || lightbox) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey) return;

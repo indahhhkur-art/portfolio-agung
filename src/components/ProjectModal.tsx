@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { CATEGORY_LABEL, IMG } from "../data.ts";
 import { useFocusTrap } from "../hooks.ts";
+import { IMAGE_DIMS } from "../imageDims.ts";
 import type { LightboxItem, Project } from "../types.ts";
 
 interface ProjectModalProps {
@@ -88,6 +89,7 @@ function ProjectModal({
             const hasError = Boolean(failedSrcs[it.src]);
             const attempt = retryMap[it.src] || 0;
             const srcUrl = attempt ? `${IMG}${it.src}?retry=${attempt}` : `${IMG}${it.src}`;
+            const dims = IMAGE_DIMS[it.src];
             if (hasError) {
               return (
                 <div key={it.src} className="gallery__fallback" role="group" aria-label={`Gagal memuat ${it.label}`}>
@@ -120,8 +122,10 @@ function ProjectModal({
                     }
                   }}
                   src={srcUrl}
+                  width={dims?.[0]}
+                  height={dims?.[1]}
                   alt={it.label}
-                  loading="eager"
+                  loading={i < 4 ? "eager" : "lazy"}
                   decoding="async"
                   onLoad={e => {
                     e.currentTarget.classList.add("is-loaded");
