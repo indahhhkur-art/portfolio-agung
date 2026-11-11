@@ -408,7 +408,8 @@ export function useAnimatedPresence<T>(value: T | null, exitMs = 160): {
 /** Memastikan video terus berputar dan looping mulus tanpa jeda saat scroll maupun berpindah posisi halaman. */
 export function useLoopingVideo(
   videoRef: RefObject<HTMLVideoElement | null>,
-  disabled: boolean
+  disabled: boolean,
+  deferUntilView = false
 ): void {
   useEffect(() => {
     const vid = videoRef.current;
@@ -418,24 +419,35 @@ export function useLoopingVideo(
       return;
     }
 
+    let active = !deferUntilView;
     const ensurePlay = () => {
-      if (document.hidden) return;
+      if (!active || document.hidden) return;
+      if (deferUntilView && vid.preload === "none") vid.preload = "auto";
       vid.defaultMuted = true;
       vid.muted = true;
       if (vid.paused) void vid.play().catch(() => {});
     };
 
-    ensurePlay();
+    if (active) ensurePlay();
 
     let io: IntersectionObserver | undefined;
     if (typeof IntersectionObserver !== "undefined") {
       io = new IntersectionObserver(
         entries => {
-          if (entries.some(e => e.isIntersecting)) ensurePlay();
+          if (!entries.some(e => e.isIntersecting)) return;
+          active = true;
+          ensurePlay();
+          if (deferUntilView) {
+            io?.disconnect();
+            io = undefined;
+          }
         },
-        { rootMargin: "320px 0px" }
+        deferUntilView ? { threshold: 0.08 } : { rootMargin: "320px 0px" }
       );
       io.observe(vid);
+    } else {
+      active = true;
+      ensurePlay();
     }
 
     vid.addEventListener("canplay", ensurePlay);
@@ -445,7 +457,7 @@ export function useLoopingVideo(
       vid.removeEventListener("canplay", ensurePlay);
       document.removeEventListener("visibilitychange", ensurePlay);
     };
-  }, [videoRef, disabled]);
+  }, [videoRef, disabled, deferUntilView]);
 }
 
 export type ThemeMode = "light" | "dark";

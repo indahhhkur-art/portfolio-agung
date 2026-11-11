@@ -36,8 +36,8 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
   const eduCardRef = useJourneyReveal<HTMLDivElement>(940);
   const expCardRef = useJourneyReveal<HTMLDivElement>(1020);
 
-  // Putar video About terus-menerus & looping mulus tanpa jeda saat scroll
-  useLoopingVideo(videoRef, isSaveData());
+  // Putar video About saat mendekati viewport & biarkan looping mulus tanpa jeda
+  useLoopingVideo(videoRef, isSaveData(), true);
 
   return (
     <section className="about" id="about">
@@ -48,11 +48,10 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
             poster={`${IMG}agung-about-poster.webp?v=4`}
             width={760}
             height={600}
-            autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
             aria-label="Video perkenalan Agung Saeful dengan latar grafis desain"
           >
             <source src={`${import.meta.env.BASE_URL}video/about.webm?v=4`} type="video/webm" />
