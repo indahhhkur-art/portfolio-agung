@@ -77,6 +77,7 @@ if (fs.existsSync(distSwPath) && precacheCoreAssets.length) {
   const swText = fs.readFileSync(distSwPath, "utf8");
   const precacheList = JSON.stringify([
     "/",
+    "/theme-init.js",
     "/icon.svg",
     "/icon-192.png",
     "/site.webmanifest",

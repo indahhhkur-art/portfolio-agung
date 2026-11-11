@@ -447,3 +447,65 @@ export function useLoopingVideo(
     };
   }, [videoRef, disabled]);
 }
+
+export type ThemeMode = "light" | "dark";
+
+const THEME_STORAGE_KEY = "agung-theme";
+
+function readSystemTheme(): ThemeMode {
+  if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  return "light";
+}
+
+function readStoredTheme(): ThemeMode | null {
+  try {
+    const v = localStorage.getItem(THEME_STORAGE_KEY);
+    return v === "light" || v === "dark" ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function syncThemeDom(mode: ThemeMode): void {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.theme = mode;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", mode === "dark" ? "#0c1020" : "#4361ab");
+}
+
+/** Mengelola tema terang/malam dengan sinkronisasi preferensi OS, localStorage, & bebas FOUC/CSP. */
+export function useTheme(): { theme: ThemeMode; toggleTheme: () => void } {
+  const [theme, setTheme] = useState<ThemeMode>("light");
+
+  useEffect(() => {
+    const initial = readStoredTheme() ?? readSystemTheme();
+    syncThemeDom(initial);
+    setTheme(initial);
+
+    if (typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onSystemChange = (e: MediaQueryListEvent) => {
+      if (readStoredTheme()) return;
+      const next: ThemeMode = e.matches ? "dark" : "light";
+      syncThemeDom(next);
+      setTheme(next);
+    };
+    mq.addEventListener("change", onSystemChange);
+    return () => mq.removeEventListener("change", onSystemChange);
+  }, []);
+
+  const toggleTheme = () => {
+    const next: ThemeMode = theme === "dark" ? "light" : "dark";
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, next);
+    } catch {
+      // Abaikan saat private mode membatasi storage
+    }
+    syncThemeDom(next);
+    setTheme(next);
+  };
+
+  return { theme, toggleTheme };
+}
