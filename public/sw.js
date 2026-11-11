@@ -1,7 +1,7 @@
-const SHELL_CACHE = "agung-shell-v3";
-const IMG_CACHE = "agung-img-v3";
+const SHELL_CACHE = "agung-shell-v4";
+const IMG_CACHE = "agung-img-v4";
 const MAX_IMG_ENTRIES = 60;
-const PRECACHE_ASSETS = ["/", "/icon.svg", "/icon-192.png", "/site.webmanifest", "/img/hero-intro-poster.webp"];
+const PRECACHE_ASSETS = ["/", "/icon.svg", "/icon-192.png", "/site.webmanifest", "/img/hero-intro-poster.webp?v=2"];
 
 async function trimCache(cacheName, maxItems) {
   const cache = await caches.open(cacheName);

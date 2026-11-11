@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef } from "react";
 import { CERTS, EDUCATION_LIST, EXPERIENCE_LIST, IMG, KEY_SKILLS, TOOLS } from "../data.ts";
-import { useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.ts";
+import { prefersReducedMotion, useCountUp, useJourneyReveal, useReveal, useRevealGroup } from "../hooks.ts";
 import { isSaveData } from "../prefetch.ts";
 import type { LightboxItem } from "../types.ts";
 import CertSwitcher from "./CertSwitcher.tsx";
@@ -36,37 +36,28 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
   const eduCardRef = useJourneyReveal<HTMLDivElement>(940);
   const expCardRef = useJourneyReveal<HTMLDivElement>(1020);
 
-  // Lazy load & playback video About hanya saat mendekati viewport & tab aktif (hemat bandwidth & baterai)
+  // Putar video About terus-menerus & looping mulus tanpa jeda saat scroll
   useEffect(() => {
-    const wrap = photoRef.current;
     const vid = videoRef.current;
-    if (!wrap || !vid || isSaveData() || typeof IntersectionObserver === "undefined") return;
+    if (!vid) return;
+    if (isSaveData() || prefersReducedMotion()) {
+      vid.pause();
+      return;
+    }
 
-    let visible = false;
-    const syncPlayback = () => {
-      if (visible && !document.hidden) {
-        vid.defaultMuted = true;
-        vid.muted = true;
-        if (vid.paused) void vid.play().catch(() => {});
-      } else if (!vid.paused) {
-        vid.pause();
-      }
+    const ensurePlay = () => {
+      if (document.hidden) return;
+      vid.defaultMuted = true;
+      vid.muted = true;
+      if (vid.paused) void vid.play().catch(() => {});
     };
 
-    const io = new IntersectionObserver(
-      entries => {
-        for (const en of entries) visible = en.isIntersecting;
-        syncPlayback();
-      },
-      { threshold: 0.18 }
-    );
-    io.observe(wrap);
-    document.addEventListener("visibilitychange", syncPlayback);
+    ensurePlay();
+    document.addEventListener("visibilitychange", ensurePlay);
     return () => {
-      io.disconnect();
-      document.removeEventListener("visibilitychange", syncPlayback);
+      document.removeEventListener("visibilitychange", ensurePlay);
     };
-  }, [photoRef]);
+  }, []);
 
   return (
     <section className="about" id="about">
@@ -74,17 +65,18 @@ function About({ onOpenImage, onPrefetchLightbox }: AboutProps) {
         <div className="about__photo reveal" ref={photoRef}>
           <video
             ref={videoRef}
-            poster={`${IMG}agung-about-poster.webp?v=2`}
+            poster={`${IMG}agung-about-poster.webp?v=3`}
             width={760}
             height={600}
+            autoPlay
             muted
             loop
             playsInline
-            preload="none"
+            preload="metadata"
             aria-label="Video perkenalan Agung Saeful dengan latar grafis desain"
           >
-            <source src={`${import.meta.env.BASE_URL}video/about.webm?v=2`} type="video/webm" />
-            <source src={`${import.meta.env.BASE_URL}video/about.mp4?v=2`} type="video/mp4" />
+            <source src={`${import.meta.env.BASE_URL}video/about.webm?v=3`} type="video/webm" />
+            <source src={`${import.meta.env.BASE_URL}video/about.mp4?v=3`} type="video/mp4" />
           </video>
         </div>
         <div className="about__text" ref={textRef}>

@@ -80,7 +80,7 @@ if (fs.existsSync(distSwPath) && precacheCoreAssets.length) {
     "/icon.svg",
     "/icon-192.png",
     "/site.webmanifest",
-    "/img/hero-intro-poster.webp",
+    "/img/hero-intro-poster.webp?v=2",
     ...precacheCoreAssets
   ]);
   fs.writeFileSync(

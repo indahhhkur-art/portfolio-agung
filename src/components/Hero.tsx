@@ -39,23 +39,13 @@ function Hero() {
         artRef.current.style.transform = progress ? `translate3d(0, ${(-progress * 54).toFixed(1)}px, 0)` : "";
         artRef.current.style.opacity = progress ? String(Math.max(0.2, 1 - progress * 0.85).toFixed(3)) : "";
       }
-
-      if (vid) {
-        if ((progress >= 0.98 || document.hidden) && !vid.paused) vid.pause();
-        else if (progress < 0.98 && !document.hidden && !reduced && !isSaveData() && vid.paused) {
-          void vid.play().catch(() => {});
-        }
-      }
     };
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update);
     };
     const onVisibility = () => {
-      if (!vid) return;
-      if (document.hidden && !vid.paused) vid.pause();
-      else if (!document.hidden && lastProgress < 0.98 && !reduced && !isSaveData() && vid.paused) {
-        void vid.play().catch(() => {});
-      }
+      if (!vid || document.hidden || reduced || isSaveData()) return;
+      if (vid.paused) void vid.play().catch(() => {});
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
@@ -84,7 +74,7 @@ function Hero() {
           <div className="hero__video-box">
             <video
               ref={videoRef}
-              poster={`${IMG}hero-intro-poster.webp`}
+              poster={`${IMG}hero-intro-poster.webp?v=2`}
               width={902}
               height={684}
               autoPlay
@@ -94,8 +84,8 @@ function Hero() {
               preload="metadata"
               aria-label="Animasi ilustrasi desainer grafis memegang karya dan palet desain"
             >
-              <source src={`${import.meta.env.BASE_URL}video/intro.webm`} type="video/webm" />
-              <source src={`${import.meta.env.BASE_URL}video/intro.mp4`} type="video/mp4" />
+              <source src={`${import.meta.env.BASE_URL}video/intro.webm?v=2`} type="video/webm" />
+              <source src={`${import.meta.env.BASE_URL}video/intro.mp4?v=2`} type="video/mp4" />
             </video>
           </div>
         </div>
