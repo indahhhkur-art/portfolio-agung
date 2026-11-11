@@ -759,20 +759,135 @@ html.js-reveal .journey-card:not(.is-animated) .skill-chip { opacity: 0; transfo
 .lightbox__prev { left: 20px; }
 .lightbox__next { right: 20px; }
 
-/* Contact (Versi Sebelumnya — Gradient High-Contrast THANKS) */
-@keyframes orbFloat {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(14px, -12px, 0); }
+/* Contact (Interactive Glowing Orbs, Orbital Halo & Click Celebration) */
+@keyframes orbDriftA {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(26px, 18px, 0) scale(1.06); }
+  66% { transform: translate3d(10px, -22px, 0) scale(0.96); }
 }
-.contact { padding: 100px 0 90px; text-align: center; color: #fff; background: var(--grad-contrast); position: relative; overflow: hidden; }
-.contact::before, .contact::after {
-  content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,.12);
-  animation: orbFloat 11s ease-in-out infinite;
+@keyframes orbDriftB {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(-28px, -18px, 0) scale(1.07); }
+  66% { transform: translate3d(-8px, 22px, 0) scale(0.95); }
 }
-.contact::before { width: 420px; height: 420px; left: -120px; top: -160px; }
-.contact::after { width: 320px; height: 320px; right: -80px; bottom: -140px; animation-delay: -5.5s; }
-.contact__inner { position: relative; z-index: 1; text-shadow: 0 1px 12px rgba(25, 35, 75, .14); }
-.contact h2 { font-size: clamp(2.6rem, 8vw, 5rem); font-weight: 800; letter-spacing: .04em; margin-bottom: .6rem; }
+@keyframes orbSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes orbWaveOut {
+  0% { opacity: .68; transform: scale(0.86); }
+  100% { opacity: 0; transform: scale(1.88); }
+}
+@keyframes orbBurstPop {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.16); }
+  55% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+@keyframes thanksPop {
+  0% { transform: scale(1) translate3d(0, 0, 0); }
+  30% { transform: scale(1.08) translate3d(0, -4px, 0); }
+  65% { transform: scale(0.98) translate3d(0, 1px, 0); }
+  100% { transform: scale(1) translate3d(0, 0, 0); }
+}
+@keyframes sparkleFly {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.35) rotate(0deg); }
+  18% { opacity: 1; }
+  75% { opacity: .95; }
+  100% { opacity: 0; transform: translate3d(var(--dx, 0px), var(--dy, -40px), 0) scale(1.05) rotate(var(--rot, 25deg)); }
+}
+
+.contact {
+  --px: 0; --py: 0;
+  padding: 100px 0 90px; text-align: center; color: #fff; background: var(--grad-contrast);
+  position: relative; overflow: hidden;
+}
+.contact :focus-visible { outline-color: #fff; }
+.contact__stage { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.contact__orb-wrap {
+  position: absolute; aspect-ratio: 1; pointer-events: auto; cursor: pointer;
+  transition: transform .55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.contact__orb-wrap--tl {
+  width: clamp(230px, 34vw, 430px); left: clamp(-140px, -9vw, -75px); top: clamp(-175px, -11vw, -100px);
+  transform: translate3d(calc(var(--px) * -28px), calc(var(--py) * -22px), 0);
+}
+.contact__orb-wrap--br {
+  width: clamp(190px, 28vw, 340px); right: clamp(-110px, -7vw, -55px); bottom: clamp(-150px, -10vw, -85px);
+  transform: translate3d(calc(var(--px) * 32px), calc(var(--py) * 24px), 0);
+}
+.contact.is-energized .contact__orb-wrap--tl {
+  transform: translate3d(calc(var(--px) * -28px + 20px), calc(var(--py) * -22px + 14px), 0) scale(1.07);
+}
+.contact.is-energized .contact__orb-wrap--br {
+  transform: translate3d(calc(var(--px) * 32px - 20px), calc(var(--py) * 24px - 14px), 0) scale(1.09);
+}
+.contact.is-bursting .contact__orb-wrap { animation: orbBurstPop .75s var(--ease-smooth); }
+
+.contact__orb {
+  position: relative; width: 100%; height: 100%; border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, rgba(255,255,255,.32) 0%, rgba(255,255,255,.15) 56%, rgba(255,255,255,.06) 100%);
+  box-shadow: inset 0 0 38px rgba(255,255,255,.18), 0 0 42px rgba(255,255,255,.08);
+  transition: box-shadow .35s ease, filter .35s ease;
+  will-change: transform;
+}
+.contact__orb--tl { animation: orbDriftA 8.5s ease-in-out infinite; }
+.contact__orb--br { animation: orbDriftB 9.8s ease-in-out infinite; }
+.contact.is-energized .contact__orb {
+  box-shadow: inset 0 0 48px rgba(255,255,255,.34), 0 0 64px rgba(155, 220, 255, .28);
+}
+
+.contact__orb-ring {
+  position: absolute; inset: -14px; border-radius: 50%;
+  border: 1.5px dashed rgba(255,255,255,.34); pointer-events: none;
+  animation: orbSpin 20s linear infinite;
+  transition: border-color .3s ease, opacity .3s ease;
+}
+.contact__orb--br .contact__orb-ring { animation-direction: reverse; animation-duration: 24s; }
+.contact__orb-ring--outer {
+  inset: -32px; border: 1px solid rgba(255,255,255,.16);
+  animation-duration: 32s; animation-direction: reverse;
+}
+.contact__orb--br .contact__orb-ring--outer { animation-direction: normal; animation-duration: 28s; }
+.contact.is-energized .contact__orb-ring { border-color: rgba(255,255,255,.58); }
+
+.contact__orb-sat {
+  position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px;
+  border-radius: 50%; background: #fff;
+  box-shadow: 0 0 12px 3px rgba(255,255,255,.78);
+}
+
+.contact:not(.is-inview) .contact__orb,
+.contact:not(.is-inview) .contact__orb-ring { animation-play-state: paused; }
+
+.contact__orb-waves { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
+.contact__orb-wave {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,.72);
+  animation: orbWaveOut .82s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.contact__orb-wave--delay { animation-delay: 140ms; border-width: 1.8px; border-color: rgba(165, 232, 255, .75); }
+
+.contact__sparkles { position: absolute; inset: 0; pointer-events: none; }
+.contact__sparkle {
+  position: absolute; color: #fff; opacity: 0;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,.55));
+  animation: sparkleFly .88s var(--ease-smooth) var(--sp-delay, 0ms) forwards;
+}
+.contact__sparkle--ring, .contact__sparkle--diamond { color: #bfefff; }
+
+.contact__inner { position: relative; z-index: 2; text-shadow: 0 1px 12px rgba(25, 35, 75, .14); }
+.contact h2 { font-size: clamp(2.6rem, 8vw, 5rem); font-weight: 800; letter-spacing: .04em; margin-bottom: .6rem; line-height: 1.1; }
+.contact__thanks-btn {
+  font: inherit; letter-spacing: inherit; color: inherit;
+  background: none; border: 0; padding: .05em .22em; border-radius: 18px; cursor: pointer;
+  display: inline-block;
+  transition: transform .25s var(--ease-smooth), text-shadow .25s ease;
+}
+.contact__thanks-btn:hover { transform: translate3d(0, -3px, 0) scale(1.03); text-shadow: 0 8px 28px rgba(255,255,255,.35); }
+.contact__thanks-btn:active { transform: scale(0.95); transition-duration: 0.08s; }
+.contact.is-bursting .contact__thanks-btn { animation: thanksPop .55s var(--ease-smooth); }
 .contact__links { display: flex; flex-wrap: wrap; justify-content: center; gap: .9rem; margin: 1.8rem 0; }
 .contact__links a {
   background: #fff; color: var(--blue-ink); padding: .8rem 1.6rem; border-radius: 999px; font-weight: 600;
@@ -890,15 +1005,18 @@ html.js-reveal [data-reveal-item]:not(.is-shown) {
   .certs__dot.is-active { width: 48px; }
 }
 
+@keyframes orbCalmPulse {
+  0%, 100% { opacity: .88; transform: scale(0.985); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
-  }
   .ribbon__track { animation: none; }
-  .contact::before, .contact::after { animation: none; }
-  .reveal, [data-reveal-item], .journey-card { opacity: 1 !important; transform: none !important; }
+  .hero__text .eyebrow, .hero__lead, .hero__cta { animation: none; }
+  .reveal, [data-reveal-item], .journey-card {
+    opacity: 1 !important; transform: none !important; transition: none !important;
+  }
+  .contact__orb { animation: orbCalmPulse 6.5s ease-in-out infinite; }
+  .contact__orb-ring { animation-duration: 40s; }
 }
